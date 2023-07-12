@@ -1,0 +1,16 @@
+{
+    "sites": [
+        {
+            "id": 12345,
+            "name": "testsite.com"
+        },
+        {
+            "id": 67890,
+            "name": "wow.ca"
+        },
+        {
+            "id": 65656,
+            "name": "somethingelse.io"
+        }
+    ]
+}

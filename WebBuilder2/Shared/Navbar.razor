@@ -1,0 +1,25 @@
+﻿<div class="nb-container">
+    <MudPaper Width="300px">
+        <MudList Clickable="true">
+            <MudListSubheader>
+                Menu
+            </MudListSubheader>
+            <MudListItem Icon="@Icons.Material.Filled.Home" Href="/">
+                Home
+            </MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Web" Href="/sites">
+                Sites
+            </MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Cancel" Text="Test" InitiallyExpanded="false">
+                <NestedList>
+                    <MudListItem Icon="@Icons.Material.Filled.StarRate" Href="starred">
+                        Starred
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.WatchLater" Href="snoozed">
+                        Snoozed
+                    </MudListItem>
+                </NestedList>
+            </MudListItem>
+        </MudList>
+    </MudPaper>
+</div>
