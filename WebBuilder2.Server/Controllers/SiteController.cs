@@ -22,4 +22,10 @@ public class SiteController : ControllerBase
     {
         return await _awsS3Service.GetSitesAsync();
     }
+
+    [HttpGet("/site/{id}")]
+    public async Task<Site> Get([FromBody] int id)
+    {
+        return await _awsS3Service.GetSingleSiteAsync(id);
+    }
 }

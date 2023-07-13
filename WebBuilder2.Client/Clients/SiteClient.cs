@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json;
+using System.Net.Http;
 using System.Net.Http.Json;
 using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Shared.Models;
@@ -14,17 +15,30 @@ namespace WebBuilder2.Client.Clients
             _httpClient = httpClient;
         }
 
+        public async Task<Site?> GetSingleSiteAsync(int id)
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<Site>(message);
+            return result;
+        }
+
         public async Task<IEnumerable<Site>?> GetSitesAsync()
         {
-            var path = "https://localhost:7137/site";
-            HttpResponseMessage response = await _httpClient.GetAsync(path);
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site");
             if(!response.IsSuccessStatusCode)
             {
                 // Handle error
             }
 
-            var result = await response.Content.ReadAsStringAsync();
-            return null;
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<IEnumerable<Site>>(message);
+            return result;
         }
     }
 }

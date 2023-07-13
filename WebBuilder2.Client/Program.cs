@@ -1,5 +1,3 @@
-using Amazon.Runtime;
-using Amazon.S3;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;

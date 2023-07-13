@@ -14,6 +14,19 @@ public class AwsS3Service : IAwsS3Service
         _client = client;
     }
 
+    public async Task<Site> GetSingleSiteAsync(int id)
+    {
+        ListBucketsResponse bucketResponse = await _client.ListBucketsAsync(); 
+
+        var bucket = bucketResponse.Buckets.Single(bucket => bucket.BucketName.GetHashCode() == id);
+
+        return new Site
+        {
+            Name = bucket.BucketName,
+            CreationDate = bucket.CreationDate
+        };
+    }
+
     public async Task<IEnumerable<Site>> GetSitesAsync()
     {
         var sites = new List<Site>();

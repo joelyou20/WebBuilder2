@@ -43,11 +43,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-//app.UseCors(options => options
-//    .WithOrigins(allowedOrigins.ToArray())
-//    .AllowAnyHeader()
-//    .AllowAnyMethod()
-//);
+app.UseCors(options => options
+    .WithOrigins(allowedOrigins.ToArray())
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+);
 
 app.UseHttpsRedirection();
 

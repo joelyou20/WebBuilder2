@@ -32,7 +32,7 @@ public partial class Sites
 
     public void OnCreateSiteBtnClicked()
     {
-        siteList.Add(new Site(idCounter, $"Test Site {idCounter}"));
+        siteList.Add(new Site($"Test Site {idCounter}"));
         idCounter++;
     }
 
