@@ -16,14 +16,17 @@ namespace WebBuilder2.Client.Clients
             _httpClient = httpClient;
         }
 
-        public async Task<bool> PostConnectionRequestAsync()
+        public async Task<GithubRespositoryResponse> GetRepositoriesAsync()
         {
-            var request = new GithubConnectionRequest();
-            var content = JsonContent.Create(request);
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/repos");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
 
-            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github", content);
-
-            return response.IsSuccessStatusCode;
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<GithubRespositoryResponse>(message);
+            return result;
         }
     }
 }

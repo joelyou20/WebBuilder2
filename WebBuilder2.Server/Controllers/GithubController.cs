@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Shared.Models.Projections;
 
 namespace WebBuilder2.Server.Controllers
 {
@@ -9,17 +10,17 @@ namespace WebBuilder2.Server.Controllers
     [ApiController]
     public class GithubController : ControllerBase
     {
-        private IGithubConnectionService _githubConnectionService;
+        private IGithubService _githubConnectionService;
 
-        public GithubController(IGithubConnectionService githubConnectionService)
+        public GithubController(IGithubService githubConnectionService)
         {
             _githubConnectionService = githubConnectionService;
         }
 
-        [HttpPost("/github")]
-        public async Task Post()
+        [HttpGet("/github/repos")]
+        public async Task<GithubRespositoryResponse> Get()
         {
-            await _githubConnectionService.ConnectAsync();
+            return await _githubConnectionService.GetRespositoriesAsync();
         }
     }
 }

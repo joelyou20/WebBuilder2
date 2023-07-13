@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebBuilder2.Shared.Models.Projections;
+namespace WebBuilder2.Shared.Models;
 
-public class GithubConnectionRequest
+public class GithubRepository
 {
+    public string Name { get; set; } = "";
 }

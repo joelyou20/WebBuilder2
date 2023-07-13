@@ -1,8 +1,8 @@
 ﻿using WebBuilder2.Shared.Models.Projections;
 
-namespace WebBuilder2.Client.Clients.Contracts;
+namespace WebBuilder2.Client.Services.Contracts;
 
-public interface IGithubClient
+public interface IGithubService
 {
     Task<GithubRespositoryResponse> GetRepositoriesAsync();
 }

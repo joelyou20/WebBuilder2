@@ -18,8 +18,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IGithubConnectionService, GithubConnectionService>();
-builder.Services.AddScoped(sp => new GitHubClient(new ProductHeaderValue("TestGithubAPI")));
+var githubSettings = configuration.GetSection("GithubSettings").Get<GithubSettings>()!;
+builder.Services.AddScoped<IGithubService, GithubService>();
+builder.Services.AddScoped(sp => new GitHubClient(new ProductHeaderValue(githubSettings.OrganizationName))
+    {
+        Credentials = new Credentials(githubSettings.Token)
+    });
 
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 

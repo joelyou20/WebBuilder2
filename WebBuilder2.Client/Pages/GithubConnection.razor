@@ -1,5 +1,8 @@
 ﻿@page "/connections/github"
 
 <div class="gc-button-row">
-    <MudButton Variant="@Variant.Filled" OnClick="@OnConnectBtnClick">Connect</MudButton>
+    @foreach(GithubRepository repo in _githubRepositories)
+    {
+        <MudCard>@repo.Name</MudCard>
+    }
 </div>

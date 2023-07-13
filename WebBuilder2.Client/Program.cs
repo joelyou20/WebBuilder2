@@ -53,7 +53,7 @@ builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
 
 // SERVICES ==========================>
 
-builder.Services.AddScoped<IGithubConnectionService, GithubConnectionService>();
+builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<ISiteService, SiteService>();
 
 // <================== END OF SERVICES

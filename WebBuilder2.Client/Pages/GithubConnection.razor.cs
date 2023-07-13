@@ -2,15 +2,19 @@
 using WebBuilder2.Client.Managers;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
+using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Client.Pages;
 
 public partial class GithubConnection
 {
-    [Inject] public IGithubConnectionService GithubConnectionService { get; set; } = default!;
+    [Inject] public IGithubService GithubConnectionService { get; set; } = default!;
 
-    public void OnConnectBtnClick() => InvokeAsync(async () =>
+    List<GithubRepository> _githubRepositories { get; set; } = new List<GithubRepository>();
+
+    protected override async Task OnInitializedAsync()
     {
-        await GithubConnectionService.ConnectAsync();
-    });
+        var response = await GithubConnectionService.GetRepositoriesAsync();
+        _githubRepositories = response.Repositories.ToList();
+    }
 }
