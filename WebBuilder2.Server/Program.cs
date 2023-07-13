@@ -1,6 +1,7 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using Microsoft.Extensions.Configuration;
+using Octokit;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Settings;
@@ -16,6 +17,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IGithubConnectionService, GithubConnectionService>();
+builder.Services.AddScoped(sp => new GitHubClient(new ProductHeaderValue("TestGithubAPI")));
 
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 

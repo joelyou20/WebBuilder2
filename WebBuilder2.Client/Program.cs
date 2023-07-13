@@ -7,6 +7,8 @@ using System.Net.Http.Headers;
 using WebBuilder2.Client;
 using WebBuilder2.Client.Clients;
 using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Managers;
+using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Client.Settings;
@@ -18,6 +20,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 WebAssemblyHostConfiguration configuration = builder.Configuration;
 
 Settings settings = configuration.GetSection("Settings").Get<Settings>()!;
+
+// CLIENTS ==========================>
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
@@ -34,7 +38,25 @@ builder.Services.AddHttpClient<ISiteClient, SiteClient>(client =>
     client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!);
 });
 
+builder.Services.AddHttpClient<IGithubClient, GithubClient>(client =>
+{
+    client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!);
+});
+
+// <================== END OF CLIENTS
+
+// MANAGERS ==========================>
+
+builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
+
+// <================== END OF MANAGERS
+
+// SERVICES ==========================>
+
+builder.Services.AddScoped<IGithubConnectionService, GithubConnectionService>();
 builder.Services.AddScoped<ISiteService, SiteService>();
+
+// <================== END OF SERVICES
 
 builder.Services.AddMudServices();
 

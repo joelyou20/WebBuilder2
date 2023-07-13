@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBuilder2.Client", "WebBu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBuilder2.Server", "..\WebBuilder2.Server\WebBuilder2.Server.csproj", "{08557601-DF3C-4D97-8236-66DEA0D0152C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBuilder2.Shared", "..\WebBuilder2.Shared\WebBuilder2.Shared.csproj", "{6383A4EF-7926-4A14-A51B-330495F9F8BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBuilder2.Shared", "..\WebBuilder2.Shared\WebBuilder2.Shared.csproj", "{6383A4EF-7926-4A14-A51B-330495F9F8BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
