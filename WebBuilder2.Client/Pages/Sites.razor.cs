@@ -50,6 +50,6 @@ public partial class Sites
 
     public void OnSiteCardClicked(Site site)
     {
-        NavigationManager.NavigateTo($"site/{site.Id}");
+        NavigationManager.NavigateTo($"site/{site.Name}");
     }
 }

@@ -20,6 +20,6 @@ namespace WebBuilder2.Client.Services
         //public async Task<List<Site>?> GetSitesAsync() => (await _databaseClient.GetSitesAsync())?.ToList();
         public async Task<List<Site>?> GetSitesAsync() => (await _siteClient.GetSitesAsync())?.ToList();
 
-        public async Task<Site?> GetSingleSiteAsync(int id) => (await _siteClient.GetSingleSiteAsync(id));
+        public async Task<Site?> GetSingleSiteAsync(string name) => (await _siteClient.GetSingleSiteAsync(name));
     }
 }

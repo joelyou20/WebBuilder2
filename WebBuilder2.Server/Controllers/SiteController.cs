@@ -23,9 +23,9 @@ public class SiteController : ControllerBase
         return await _awsS3Service.GetSitesAsync();
     }
 
-    [HttpGet("/site/{id}")]
-    public async Task<Site> Get([FromBody] int id)
+    [HttpGet("/site/{string}")]
+    public async Task<Site> Get([FromRoute] string name)
     {
-        return await _awsS3Service.GetSingleSiteAsync(id);
+        return await _awsS3Service.GetSingleSiteAsync(name);
     }
 }

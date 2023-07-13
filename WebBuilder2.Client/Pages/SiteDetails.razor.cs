@@ -8,12 +8,12 @@ public partial class SiteDetails
 {
     [Inject] public ISiteService SiteService { get; set; } = default!;
 
-    [Parameter] public int SiteId { get; set; }
+    [Parameter] public string SiteName { get; set; } = "";
 
     private Site? _site;
 
     protected override async Task OnInitializedAsync()
     {
-        _site = await SiteService.GetSingleSiteAsync(SiteId);
+        _site = await SiteService.GetSingleSiteAsync(SiteName);
     }
 }

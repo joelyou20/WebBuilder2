@@ -15,9 +15,9 @@ namespace WebBuilder2.Client.Clients
             _httpClient = httpClient;
         }
 
-        public async Task<Site?> GetSingleSiteAsync(int id)
+        public async Task<Site?> GetSingleSiteAsync(string name)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site/{name}");
             if (!response.IsSuccessStatusCode)
             {
                 // Handle error

@@ -14,11 +14,11 @@ public class AwsS3Service : IAwsS3Service
         _client = client;
     }
 
-    public async Task<Site> GetSingleSiteAsync(int id)
+    public async Task<Site> GetSingleSiteAsync(string name)
     {
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync(); 
 
-        var bucket = bucketResponse.Buckets.Single(bucket => bucket.BucketName.GetHashCode() == id);
+        var bucket = bucketResponse.Buckets.Single(bucket => bucket.BucketName.Equals(name));
 
         return new Site
         {

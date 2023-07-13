@@ -11,7 +11,7 @@ public class Site
     public string Name { get; set; } = "";
     [JsonPropertyName("creationDate")]
     public DateTime CreationDate { get; set; }
-    public int Id => Name.GetHashCode();
+    public int Id => Math.Abs(Name.GetHashCode());
 
     public Site() { }
 
