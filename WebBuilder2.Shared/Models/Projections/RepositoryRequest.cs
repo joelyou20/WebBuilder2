@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace WebBuilder2.Shared.Models.Projections;
 
-public class GithubRepositoryRequest
+public class RepositoryRequest
 {
 }

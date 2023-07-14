@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace WebBuilder2.Shared.Models;
 
-public class GithubRepository
+public class SiteRepository
 {
-    public string Name { get; set; } = "";
+    public Site Site { get; set; } = default!;
+    public Repository Repository { get; set; } = default!;
 }

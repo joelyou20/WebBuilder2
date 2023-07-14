@@ -14,21 +14,22 @@ public class GithubService : IGithubService
         _client = client;
     }
 
-    public async Task<GithubRespositoryResponse> GetRespositoriesAsync()
+    public async Task<RespositoryResponse> GetRespositoriesAsync()
     {
-        List<GithubRepository> repos = new();
+        List<Shared.Models.Repository> repos = new();
 
         var repositories = await _client.Repository.GetAllForCurrent();
 
         foreach(var repo in repositories)
         {
-            repos.Add(new GithubRepository
+            repos.Add(new Shared.Models.Repository
             {
-                Name = repo.Name
+                Id = repo.Id,
+                Name = repo.Name,
             });
         }
 
-        var response = new GithubRespositoryResponse
+        var response = new RespositoryResponse
         {
             Repositories = repos
         };

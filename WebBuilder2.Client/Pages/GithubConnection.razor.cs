@@ -10,11 +10,19 @@ public partial class GithubConnection
 {
     [Inject] public IGithubService GithubConnectionService { get; set; } = default!;
 
-    List<GithubRepository> _githubRepositories { get; set; } = new List<GithubRepository>();
+    List<Repository> _githubRepositories { get; set; } = new List<Repository>();
+
+    private bool _isTableLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         var response = await GithubConnectionService.GetRepositoriesAsync();
         _githubRepositories = response.Repositories.ToList();
+        _isTableLoading = false;
+    }
+
+    public void OnConnectRepoButtonClicked(Repository repository)
+    {
+
     }
 }

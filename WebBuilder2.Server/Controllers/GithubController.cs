@@ -18,7 +18,7 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpGet("/github/repos")]
-        public async Task<GithubRespositoryResponse> Get()
+        public async Task<RespositoryResponse> Get()
         {
             return await _githubConnectionService.GetRespositoriesAsync();
         }

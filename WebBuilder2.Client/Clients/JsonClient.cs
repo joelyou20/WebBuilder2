@@ -3,6 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Pages;
+using WebBuilder2.Client.Services;
+using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Client.Clients;
@@ -20,16 +23,39 @@ public class JsonClient : IDatabaseClient
         _httpClient = httpClient;
     }
 
-    public async Task<Site?> GetSingleSiteAsync(int id)
+    public async Task<SiteRepository?> GetSingleSiteRepositoryBySiteNameAsync(string siteName)
     {
-        return (await GetSitesAsync())?.SingleOrDefault(site => site.Id == id);
+        return (await GetSiteRepositoriesAsync())?.SingleOrDefault(site => site.Site.Name.Equals(siteName));
     }
 
-    public async Task<IEnumerable<Site>?> GetSitesAsync()
+    public async Task<SiteRepository?> GetSingleSiteRepositoryByRepositoryIdAsync(long repoId)
     {
-        var response = await _httpClient.GetAsync("./test.json");
-        var message = (await response.Content.ReadAsStringAsync()).Replace("\r\n", "");
-        IEnumerable<Site> sites = JsonConvert.DeserializeObject<IEnumerable<Site>>(message);
-        return sites;
+        return (await GetSiteRepositoriesAsync())?.SingleOrDefault(site => site.Repository.Id == repoId);
     }
+
+    public async Task<IEnumerable<SiteRepository>?> GetSiteRepositoriesAsync()
+    {
+        //var response = await _httpClient.GetAsync("./site-repositories.json");
+        //var message = (await response.Content.ReadAsStringAsync()).Replace("\r\n", "");
+        //IEnumerable<SiteConnection> siteConnections = JsonConvert.DeserializeObject<IEnumerable<SiteConnection>>(message);
+
+        //var repos = await GetRepositoriesAsync();
+
+        //if (repos == null) return null;
+
+        //var sites = await GetSitesAsync();
+        //var siteRepos = new List<SiteRepository>();
+
+        //repos.Where(repo => siteConnections.Any(sc => repo.Id == sc.RepositoryId)).ToList();
+
+        //repos.Foreach
+
+        return null;
+    }
+}
+
+public class SiteConnection
+{
+    public string SiteName { get; set; } = "";
+    public long RepositoryId { get; set; } 
 }

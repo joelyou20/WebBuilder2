@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebBuilder2.Shared.Models.Projections;
 
-public class GithubRespositoryResponse
+public class RespositoryResponse
 {
-    public List<GithubRepository> Repositories { get; set; } = new List<GithubRepository>();
+    public List<Repository> Repositories { get; set; } = new List<Repository>();
 }

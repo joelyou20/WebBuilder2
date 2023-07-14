@@ -13,7 +13,7 @@ namespace WebBuilder2.Client.Services
             _client = client;
         }
 
-        public async Task<GithubRespositoryResponse> GetRepositoriesAsync()
+        public async Task<RespositoryResponse> GetRepositoriesAsync()
         {
             return await _client.GetRepositoriesAsync();
         }

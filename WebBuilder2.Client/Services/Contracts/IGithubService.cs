@@ -4,5 +4,5 @@ namespace WebBuilder2.Client.Services.Contracts;
 
 public interface IGithubService
 {
-    Task<GithubRespositoryResponse> GetRepositoriesAsync();
+    Task<RespositoryResponse> GetRepositoriesAsync();
 }

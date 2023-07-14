@@ -16,7 +16,7 @@ namespace WebBuilder2.Client.Clients
             _httpClient = httpClient;
         }
 
-        public async Task<GithubRespositoryResponse> GetRepositoriesAsync()
+        public async Task<RespositoryResponse> GetRepositoriesAsync()
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/repos");
             if (!response.IsSuccessStatusCode)
@@ -25,7 +25,7 @@ namespace WebBuilder2.Client.Clients
             }
 
             var message = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<GithubRespositoryResponse>(message);
+            var result = JsonConvert.DeserializeObject<RespositoryResponse>(message);
             return result;
         }
     }
