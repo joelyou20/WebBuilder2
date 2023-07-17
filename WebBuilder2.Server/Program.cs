@@ -1,7 +1,9 @@
 using Amazon.Runtime;
 using Amazon.S3;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Octokit;
+using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Settings;
@@ -25,7 +27,11 @@ builder.Services.AddScoped(sp => new GitHubClient(new ProductHeaderValue(githubS
         Credentials = new Credentials(githubSettings.Token)
     });
 
+builder.Services.AddScoped<DbContextOptions<AppDbContext>>();
+builder.Services.AddScoped<AppDbContextFactory>();
+builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContextFactory>().CreateDbContext(Array.Empty<string>()));
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
+builder.Services.AddScoped<ISiteDbService, SiteDbService>();
 
 AwsSettings awsSettings = configuration.GetSection("AwsSettings").Get<AwsSettings>()!;
 BasicAWSCredentials awsCredentials = new(awsSettings.AccessKey, awsSettings.SecretKey);

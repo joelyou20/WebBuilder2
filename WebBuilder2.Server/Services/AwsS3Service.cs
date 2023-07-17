@@ -22,8 +22,7 @@ public class AwsS3Service : IAwsS3Service
 
         return new Site
         {
-            Name = bucket.BucketName,
-            CreationDate = bucket.CreationDate
+            Name = bucket.BucketName
         };
     }
 
@@ -36,8 +35,7 @@ public class AwsS3Service : IAwsS3Service
         {
             sites.Add(new Site
             {
-                Name = bucket.BucketName,
-                CreationDate = bucket.CreationDate
+                Name = bucket.BucketName
             });
         }
 

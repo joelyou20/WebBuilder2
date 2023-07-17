@@ -30,11 +30,13 @@ public partial class Sites
         }
     }
 
-    public void OnCreateSiteBtnClicked()
+    public void OnCreateSiteBtnClicked() => InvokeAsync(async () =>
     {
-        siteList.Add(new Site($"Test Site {idCounter}"));
+        var site = new Site($"Test Site {idCounter}");
+        siteList.Add(site);
+        await SiteService.AddSiteAsync(site);
         idCounter++;
-    }
+    });
 
     public void OnAddExistingSiteBtnClicked() => InvokeAsync(async () =>
     {

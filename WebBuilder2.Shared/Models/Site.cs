@@ -4,14 +4,13 @@ using System.Text.Json.Serialization;
 namespace WebBuilder2.Shared.Models;
 
 [Serializable]
-public class Site
+public class Site : AuditableEntity
 {
     [Key]
+    [JsonPropertyName("id")]
+    public long Id { get; set; }
     [JsonPropertyName("name")]
     public string Name { get; set; } = "";
-    [JsonPropertyName("creationDate")]
-    public DateTime CreationDate { get; set; }
-    public int Id => Math.Abs(Name.GetHashCode());
 
     public Site() { }
 
