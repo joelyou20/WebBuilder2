@@ -14,32 +14,32 @@ public class AwsS3Service : IAwsS3Service
         _client = client;
     }
 
-    public async Task<Site> GetSingleSiteAsync(string name)
+    public async Task<Bucket> GetSingleBucketAsync(string name)
     {
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync(); 
 
         var bucket = bucketResponse.Buckets.Single(bucket => bucket.BucketName.Equals(name));
 
-        return new Site
+        return new Bucket
         {
             Name = bucket.BucketName
         };
     }
 
-    public async Task<IEnumerable<Site>> GetSitesAsync()
+    public async Task<IEnumerable<Bucket>> GetBucketsAsync()
     {
-        var sites = new List<Site>();
+        var buckets = new List<Bucket>();
 
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync();
         foreach(S3Bucket bucket in bucketResponse.Buckets)
         {
-            sites.Add(new Site
+            buckets.Add(new Bucket
             {
                 Name = bucket.BucketName
             });
         }
 
-        return sites;
+        return buckets;
     }
 
 }

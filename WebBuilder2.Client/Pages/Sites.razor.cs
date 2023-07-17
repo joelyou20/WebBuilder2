@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
+using WebBuilder2.Client.Components.Dialogs;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 
@@ -8,6 +10,7 @@ public partial class Sites
 {
     [Inject] public ISiteService SiteService { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
     public List<Site> siteList = new();
 
@@ -40,9 +43,17 @@ public partial class Sites
 
     public void OnAddExistingSiteBtnClicked() => InvokeAsync(async () =>
     {
-        await SiteService.GetSitesAsync();
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center
+        };
 
-        var x = 1;
+        await DialogService.ShowAsync<AddExistingSiteDialog>(
+            title: "Add Existing Site",
+            options: options
+        );
     });
 
     public void OnDeleteSiteBtnClicked(Site site)

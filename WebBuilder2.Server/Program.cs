@@ -8,6 +8,7 @@ using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Settings;
 using WebBuilder2.Server.Utils;
+using WebBuilder2.Server.Utils.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,17 +32,11 @@ builder.Services.AddScoped<DbContextOptions<AppDbContext>>();
 builder.Services.AddScoped<AppDbContextFactory>();
 builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContextFactory>().CreateDbContext(Array.Empty<string>()));
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
+builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
 builder.Services.AddScoped<ISiteDbService, SiteDbService>();
 
-AwsSettings awsSettings = configuration.GetSection("AwsSettings").Get<AwsSettings>()!;
-BasicAWSCredentials awsCredentials = new(awsSettings.AccessKey, awsSettings.SecretKey);
-AmazonS3Config awsConfig = new()
-{
-    UseAlternateUserAgentHeader = AwsConfig.UseAlternateUserAgentHeader,
-    RegionEndpoint = AwsConfig.RegionEndpoint
-};
-
-builder.Services.AddScoped(sp => new AmazonS3Client(awsCredentials, awsConfig));
+builder.Services.AddAwsS3Client(configuration);
+builder.Services.AddAwsRoute53Client(configuration);
 
 var app = builder.Build();
 

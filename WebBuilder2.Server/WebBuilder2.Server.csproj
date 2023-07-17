@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.7.108.1" />
+    <PackageReference Include="AWSSDK.Core" Version="3.7.108.2" />
+    <PackageReference Include="AWSSDK.Route53" Version="3.7.104.93" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.107.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />

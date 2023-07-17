@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
+using MudBlazor;
 using MudBlazor.Services;
 using System.Net;
 using System.Net.Http.Headers;
@@ -43,6 +44,11 @@ builder.Services.AddHttpClient<IGithubClient, GithubClient>(client =>
     client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!);
 });
 
+builder.Services.AddHttpClient<IAwsClient, AwsClient>(client =>
+{
+    client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!);
+});
+
 // <================== END OF CLIENTS
 
 // MANAGERS ==========================>
@@ -55,6 +61,8 @@ builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
 
 builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<ISiteService, SiteService>();
+builder.Services.AddScoped<IDialogService, DialogService>();
+builder.Services.AddScoped<IAwsService, AwsService>();
 
 // <================== END OF SERVICES
 

@@ -5,7 +5,7 @@ namespace WebBuilder2.Server.Services.Contracts
 {
     public interface IAwsS3Service
     {
-        Task<Site> GetSingleSiteAsync(string name);
-        Task<IEnumerable<Site>> GetSitesAsync();
+        Task<Bucket> GetSingleBucketAsync(string name);
+        Task<IEnumerable<Bucket>> GetBucketsAsync();
     }
 }

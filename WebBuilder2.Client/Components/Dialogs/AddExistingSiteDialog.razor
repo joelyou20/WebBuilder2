@@ -1,0 +1,22 @@
+﻿@using WebBuilder2.Client.Components.Forms
+
+<MudDialog>
+    <DialogContent>
+        @if(!_buckets.Any())
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        @foreach(Bucket bucket in _buckets)
+        {
+            <MudCard>Bucket: @bucket.Name</MudCard>
+        }
+        @if (!_hostedZones.Any())
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        @foreach (HostedZone HostedZone in _hostedZones)
+        {
+            <MudCard>HostedZone: @HostedZone.Name</MudCard>
+        }
+    </DialogContent>
+</MudDialog>
