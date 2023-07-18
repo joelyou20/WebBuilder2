@@ -1,0 +1,18 @@
+﻿div > ::deep .mud-paper {
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: unset;
+}
+
+::deep .mud-typography-body1 {
+    font-weight: 500;
+}
+
+.nb-container {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100%;
+}
+
+

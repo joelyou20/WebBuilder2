@@ -1,0 +1,18 @@
+﻿@page "/connections/github"
+
+<div>
+    <MudTable Items="@_githubRepositories" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_isTableLoading" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>Repository Name</MudTh>
+            <MudTh>Repository Id</MudTh>
+            <MudTh>Is Connected to Site?</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="IsConnected">@context.IsConnected</MudTd>
+            <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => OnConnectRepoButtonClicked(context))">Connect</MudButton></MudTd>
+        </RowTemplate>
+    </MudTable>
+</div>

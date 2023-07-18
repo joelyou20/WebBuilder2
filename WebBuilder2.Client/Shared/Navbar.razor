@@ -1,0 +1,22 @@
+﻿<div class="nb-container">
+    <MudPaper Width="300px">
+        <MudList Clickable="true">
+            <MudListSubheader>
+                Menu
+            </MudListSubheader>
+            <MudListItem Icon="@Icons.Material.Filled.Home" Href="/">
+                Home
+            </MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Web" Href="/sites">
+                Sites
+            </MudListItem>
+            <MudListItem Icon="@Icons.Material.Filled.Cable" Text="Connections" InitiallyExpanded="false">
+                <NestedList>
+                    <MudListItem Icon="@Icons.Custom.Brands.GitHub" Href="connections/github">
+                        Github
+                    </MudListItem>
+                </NestedList>
+            </MudListItem>
+        </MudList>
+    </MudPaper>
+</div>

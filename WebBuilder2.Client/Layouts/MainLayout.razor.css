@@ -1,0 +1,13 @@
+﻿div {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+main {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-left: 19rem;
+}
