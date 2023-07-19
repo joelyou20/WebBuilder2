@@ -5,4 +5,5 @@ namespace WebBuilder2.Client.Services.Contracts;
 public interface IGithubService
 {
     Task<RespositoryResponse> GetRepositoriesAsync();
+    Task<GithubAuthenticationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
 }

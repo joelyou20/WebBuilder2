@@ -1,12 +1,8 @@
-using Amazon.Runtime;
-using Amazon.S3;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Octokit;
 using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Settings;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Server.Utils.Extensions;
 
@@ -21,26 +17,29 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var githubSettings = configuration.GetSection("GithubSettings").Get<GithubSettings>()!;
-builder.Services.AddScoped<IGithubService, GithubService>();
-builder.Services.AddScoped(sp => new GitHubClient(new ProductHeaderValue(githubSettings.OrganizationName))
-    {
-        Credentials = new Credentials(githubSettings.Token)
-    });
-
 builder.Services.AddScoped<DbContextOptions<AppDbContext>>();
 builder.Services.AddScoped<AppDbContextFactory>();
 builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContextFactory>().CreateDbContext(Array.Empty<string>()));
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
+builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<ISiteDbService, SiteDbService>();
+builder.Services.AddScoped<IGithubService, GithubService>();
 
+builder.Services.AddGitHubClient(configuration);
 builder.Services.AddAwsS3Client(configuration);
 builder.Services.AddAwsRoute53Client(configuration);
+builder.Services.AddAwsCostExplorerClient(configuration);
 
 var app = builder.Build();
 
 IEnumerable<string> allowedOrigins = configuration.GetSection("AllowedOrigins").Get<IEnumerable<string>>()!;
+
+app.UseCors(options => options
+    .WithOrigins(allowedOrigins.ToArray())
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -51,12 +50,6 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     });
 }
-
-app.UseCors(options => options
-    .WithOrigins(allowedOrigins.ToArray())
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-);
 
 app.UseHttpsRedirection();
 

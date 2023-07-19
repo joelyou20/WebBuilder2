@@ -22,5 +22,11 @@ namespace WebBuilder2.Server.Controllers
         {
             return await _githubConnectionService.GetRespositoriesAsync();
         }
+
+        [HttpPost("/github/auth")]
+        public async Task<GithubAuthenticationResponse> Authenticate([FromBody] GithubAuthenticationRequest request)
+        {
+            return await _githubConnectionService.AuthenticateUserAsync(request);
+        }
     }
 }

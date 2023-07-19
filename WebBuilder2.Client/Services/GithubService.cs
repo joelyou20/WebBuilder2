@@ -17,5 +17,9 @@ namespace WebBuilder2.Client.Services
         {
             return await _client.GetRepositoriesAsync();
         }
+        public async Task<GithubAuthenticationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
+        {
+            return await _client.PostAuthenticateAsync(request);
+        }
     }
 }

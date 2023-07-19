@@ -1,0 +1,14 @@
+﻿@page "/github/auth"
+
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@_githubAuthenticationRequest" OnValidSubmit="OnValidSubmit">
+    <MudCard>
+        <MudCardContent>
+            <MudTextField @bind-Value="@_githubAuthenticationRequest.PersonalAccessToken" Label="Personal Access Token (PAT)"></MudTextField>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Sign In</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>

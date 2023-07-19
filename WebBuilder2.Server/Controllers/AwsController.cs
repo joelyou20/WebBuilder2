@@ -12,11 +12,13 @@ namespace WebBuilder2.Server.Controllers
     {
         private IAwsS3Service _awsS3Service;
         private IAwsRoute53Service _awsRoute53Service;
+        private IAwsCostExplorerService _awsCostExplorerService;
 
-        public AwsController(IAwsS3Service awsS3Service, IAwsRoute53Service awsRoute53Service)
+        public AwsController(IAwsS3Service awsS3Service, IAwsRoute53Service awsRoute53Service, IAwsCostExplorerService awsCostExplorerService)
         {
             _awsS3Service = awsS3Service;
             _awsRoute53Service = awsRoute53Service;
+            _awsCostExplorerService = awsCostExplorerService;
         }
 
         [HttpGet("/aws/buckets")]
@@ -29,6 +31,12 @@ namespace WebBuilder2.Server.Controllers
         public async Task<IEnumerable<HostedZone>> GetHostedZonesAsync()
         {
             return await _awsRoute53Service.GetHostedZonesAsync();
+        }
+
+        [HttpGet("/aws/cost")]
+        public async Task<string> GetForecastedCostAsync()
+        {
+            return await _awsCostExplorerService.GetForecastedCostAsync();
         }
     }
 }

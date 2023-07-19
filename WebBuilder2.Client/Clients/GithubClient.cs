@@ -28,5 +28,20 @@ namespace WebBuilder2.Client.Clients
             var result = JsonConvert.DeserializeObject<RespositoryResponse>(message);
             return result;
         }
+
+        public async Task<GithubAuthenticationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
+        {
+            var content = JsonContent.Create(request);
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/auth", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<GithubAuthenticationResponse>(message);
+            return result;
+
+        }
     }
 }
