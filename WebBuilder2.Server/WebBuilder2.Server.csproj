@@ -13,6 +13,8 @@
     <PackageReference Include="AWSSDK.CostExplorer" Version="3.7.200.1" />
     <PackageReference Include="AWSSDK.Route53" Version="3.7.200.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.200.1" />
+    <PackageReference Include="AWSSDK.SSO" Version="3.7.200.1" />
+    <PackageReference Include="AWSSDK.SSOOIDC" Version="3.7.200.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />

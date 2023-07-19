@@ -27,9 +27,9 @@ builder.Services.AddScoped<ISiteDbService, SiteDbService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 
 builder.Services.AddGitHubClient(configuration);
-builder.Services.AddAwsS3Client(configuration);
-builder.Services.AddAwsRoute53Client(configuration);
-builder.Services.AddAwsCostExplorerClient(configuration);
+builder.Services.AddAwsS3Client();
+builder.Services.AddAwsRoute53Client();
+builder.Services.AddAwsCostExplorerClient();
 
 var app = builder.Build();
 

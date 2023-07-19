@@ -3,6 +3,7 @@ using Amazon.Route53;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.Util;
+using Microsoft.Extensions.DependencyInjection;
 using Octokit;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
@@ -25,7 +26,7 @@ namespace WebBuilder2.Server.Utils.Extensions
             return services;
         }
 
-        public static IServiceCollection AddAwsS3Client(this IServiceCollection services, ConfigurationManager configuration)
+        public static IServiceCollection AddAwsS3Client(this IServiceCollection services)
         {
             AmazonS3Config awsConfig = new()
             {
@@ -33,10 +34,12 @@ namespace WebBuilder2.Server.Utils.Extensions
                 RegionEndpoint = AwsConfig.RegionEndpoint
             };
 
-            return services.AddScoped(sp => new AmazonS3Client(awsConfig));
+            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
+
+            return services.AddSingleton(sp => new AmazonS3Client(credentials, awsConfig));
         }
 
-        public static IServiceCollection AddAwsRoute53Client(this IServiceCollection services, ConfigurationManager configuration)
+        public static IServiceCollection AddAwsRoute53Client(this IServiceCollection services)
         {
             AmazonRoute53Config awsConfig = new()
             {
@@ -44,10 +47,12 @@ namespace WebBuilder2.Server.Utils.Extensions
                 RegionEndpoint = AwsConfig.RegionEndpoint
             };
 
-            return services.AddScoped(sp => new AmazonRoute53Client(awsConfig));
+            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
+
+            return services.AddSingleton(sp => new AmazonRoute53Client(credentials, awsConfig));
         }
 
-        public static IServiceCollection AddAwsCostExplorerClient(this IServiceCollection services, ConfigurationManager configuration)
+        public static IServiceCollection AddAwsCostExplorerClient(this IServiceCollection services)
         {
             AmazonCostExplorerConfig awsConfig = new()
             {
@@ -55,16 +60,9 @@ namespace WebBuilder2.Server.Utils.Extensions
                 RegionEndpoint = AwsConfig.RegionEndpoint
             };
 
-            //var credentials = GetAwsCredentials(configuration);
+            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
 
-            //return services.AddScoped(sp => new AmazonCostExplorerClient(credentials, awsConfig));
-            return services.AddScoped(sp => new AmazonCostExplorerClient(awsConfig));
-        }
-
-        private static BasicAWSCredentials GetAwsCredentials(ConfigurationManager configuration)
-        {
-            AwsSettings awsSettings = configuration.GetSection("AwsSettings").Get<AwsSettings>()!;
-            return new(awsSettings.AccessKey, awsSettings.SecretKey);
+            return services.AddScoped(sp => new AmazonCostExplorerClient(credentials, awsConfig));
         }
     }
 }

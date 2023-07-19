@@ -3,5 +3,4 @@
 public class GithubSettings
 {
     public string OrganizationName { get; set; } = "";
-    public string Token { get; set; } = "";
 }
