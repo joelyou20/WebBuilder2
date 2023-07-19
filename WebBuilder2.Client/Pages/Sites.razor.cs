@@ -56,9 +56,10 @@ public partial class Sites
         );
     });
 
-    public void OnDeleteSiteBtnClicked(Site site)
+    public async void OnDeleteSiteBtnClicked(Site site)
     {
         siteList.Remove(site);
+        await SiteService.SoftDeleteSiteAsync(site);
     }
 
     public void OnSiteCardClicked(Site site)

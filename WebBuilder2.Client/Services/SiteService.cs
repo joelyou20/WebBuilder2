@@ -44,5 +44,19 @@ namespace WebBuilder2.Client.Services
         }
 
         public async Task AddSiteAsync(Site site) => await _siteClient.AddSiteAsync(site);
+
+        public async Task<Site?> SoftDeleteSiteAsync(Site site)
+        {
+            ValidationResponse<Site>? response = await _siteClient.SoftDeleteSiteAsync(site);
+
+            if (response == null) return null;
+
+            if (!response.IsSuccessful)
+            {
+                // Handle error -> response.Message
+            }
+
+            return response.Values!.SingleOrDefault();
+        }
     }
 }

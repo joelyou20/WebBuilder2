@@ -6,9 +6,10 @@ namespace WebBuilder2.Server.Services.Contracts;
 public interface IDbService<T> where T : class
 {
     Task<ValidationResponse<T>> GetAllAsync();
-    Task<ValidationResponse<T>> InsertAsync(T site);
+    Task<ValidationResponse<T>> InsertAsync(T value);
     Task<ValidationResponse<T>> GetSingleAsync(long id);
-    Task<ValidationResponse<T>> UpdateAsync(T site);
-    Task<ValidationResponse<T>> UpsertAsync(T site);
-    Task<ValidationResponse<T>> DeleteAsync(T site);
+    Task<ValidationResponse<T>> UpdateAsync(T value);
+    Task<ValidationResponse<T>> UpsertAsync(T value);
+    Task<ValidationResponse<T>> DeleteAsync(T value);
+    Task<ValidationResponse<T>> SoftDeleteAsync(T value);
 }

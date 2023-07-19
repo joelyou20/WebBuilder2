@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Validation;
@@ -36,5 +37,11 @@ public class SiteController : ControllerBase
     public async Task<ValidationResponse<Site>> Put([FromBody] Site site)
     {
         return await _siteService.UpsertAsync(site);
-    } 
+    }
+
+    [HttpPost("/site/delete")]
+    public async Task<ValidationResponse<Site>> SoftDelete([FromBody] Site site)
+    {
+        return await _siteService.SoftDeleteAsync(site);
+    }
 }

@@ -8,5 +8,6 @@ namespace WebBuilder2.Client.Clients.Contracts
         Task AddSiteAsync(Site site);
         Task<ValidationResponse<Site>?> GetSingleSiteAsync(long id);
         Task<ValidationResponse<Site>?> GetSitesAsync();
+        Task<ValidationResponse<Site>?> SoftDeleteSiteAsync(Site site);
     }
 }

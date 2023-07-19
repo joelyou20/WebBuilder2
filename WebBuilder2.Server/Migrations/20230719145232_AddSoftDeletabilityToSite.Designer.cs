@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebBuilder2.Server.Data;
 
@@ -11,9 +12,11 @@ using WebBuilder2.Server.Data;
 namespace WebBuilder2.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230719145232_AddSoftDeletabilityToSite")]
+    partial class AddSoftDeletabilityToSite
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,7 @@ namespace WebBuilder2.Server.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedDateTime")
+                    b.Property<DateTime>("DeletedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ModifiedDateTime")

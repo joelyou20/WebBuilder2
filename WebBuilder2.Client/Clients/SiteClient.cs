@@ -52,5 +52,19 @@ namespace WebBuilder2.Client.Clients
             var result = JsonConvert.DeserializeObject<ValidationResponse<Site>>(message);
             return result;
         }
+
+        public async Task<ValidationResponse<Site>?> SoftDeleteSiteAsync(Site site)
+        {
+            var content = JsonContent.Create(site);
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}site/delete", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse<Site>>(message);
+            return result;
+        }
     }
 }

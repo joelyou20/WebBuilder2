@@ -23,7 +23,9 @@ namespace WebBuilder2.Server.Services
         #region Get List of Sites
         public async Task<ValidationResponse<Site>> GetAllAsync()
         {
-            var sites = (await _appDBContext.Sites.ToListAsync()).Select(site => site.FromDto());
+            var sites = (await _appDBContext.Sites.ToListAsync())
+                .Select(site => site.FromDto())
+                .Where(site => site.DeletedDateTime == null);
             return sites.Any() ? 
                 ValidationResponse<Site>.Success(sites) :
                 ValidationResponse<Site>.Failure(sites);
@@ -31,64 +33,80 @@ namespace WebBuilder2.Server.Services
         #endregion
 
         #region Insert Site
-        public async Task<ValidationResponse<Site>> InsertAsync(Site site)
+        public async Task<ValidationResponse<Site>> InsertAsync(Site value)
         {
-            ValidationResponse<Site> response = await GetSingleAsync(site.Id);
+            ValidationResponse<Site> response = await GetSingleAsync(value.Id);
 
-            if (response.IsSuccessful) return ValidationResponse<Site>.EntityAlreadyExists(new List<Site> { site });
+            if (response.IsSuccessful) return ValidationResponse<Site>.EntityAlreadyExists(new List<Site> { value });
 
-            await _appDBContext.Sites.AddAsync(ToDto(site));
+            await _appDBContext.Sites.AddAsync(ToDto(value));
             var result = await _appDBContext.SaveChangesAsync();
 
-            return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { site }) : ValidationResponse<Site>.Success(new List<Site> { site });
+            return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { value }) : ValidationResponse<Site>.Success(new List<Site> { value });
         }
         #endregion
 
         #region Get Site by Id
         public async Task<ValidationResponse<Site>> GetSingleAsync(long id)
         {
-            SiteDTO? dto = await _appDBContext.Sites.FirstOrDefaultAsync(c => c.Id.Equals(id));
+            SiteDTO? dto = await _appDBContext.Sites
+                .FirstOrDefaultAsync(c => c.Id.Equals(id) && c.DeletedDateTime == null);
 
             return dto == null ? ValidationResponse<Site>.Failure(null) : ValidationResponse<Site>.Success(new List<Site> { dto!.FromDto() });
         }
         #endregion
 
         #region Update Site
-        public async Task<ValidationResponse<Site>> UpdateAsync(Site site)
+        public async Task<ValidationResponse<Site>> UpdateAsync(Site value)
         {
-            _appDBContext.Sites.Update(ToDto(site));
+            _appDBContext.Sites.Update(ToDto(value));
             var result = await _appDBContext.SaveChangesAsync();
-            return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { site }) : ValidationResponse<Site>.Success(new List<Site> { site });
+            return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { value }) : ValidationResponse<Site>.Success(new List<Site> { value });
         }
         #endregion
 
         #region Upsert Site
-        public async Task<ValidationResponse<Site>> UpsertAsync(Site site)
+        public async Task<ValidationResponse<Site>> UpsertAsync(Site value)
         {
-            ValidationResponse<Site> response = await GetSingleAsync(site.Id);
+            ValidationResponse<Site> response = await GetSingleAsync(value.Id);
 
-            if (response.IsSuccessful) _appDBContext.Sites.Update(ToDto(site));
-            else await _appDBContext.Sites.AddAsync(ToDto(site));
+            if (response.IsSuccessful) _appDBContext.Sites.Update(ToDto(value));
+            else await _appDBContext.Sites.AddAsync(ToDto(value));
 
             var result = await _appDBContext.SaveChangesAsync();
 
-            return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { site }) : ValidationResponse<Site>.Success(new List<Site> { site });
+            return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { value }) : ValidationResponse<Site>.Success(new List<Site> { value });
         }
         #endregion
 
         #region DeleteSite
-        public async Task<ValidationResponse<Site>> DeleteAsync(Site site)
+        public async Task<ValidationResponse<Site>> DeleteAsync(Site value)
         {
-            _appDBContext.Remove(ToDto(site));
+            _appDBContext.Remove(ToDto(value));
             var result = await _appDBContext.SaveChangesAsync();
-            return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { site }) : ValidationResponse<Site>.Success(new List<Site> { site });
+            return result == 0 ? 
+                ValidationResponse<Site>.Failure(new List<Site> { value }) : 
+                ValidationResponse<Site>.Success(new List<Site> { value });
         }
         #endregion
 
         public SiteDTO ToDto(Site site) => new()
         {
             Id = site.Id,
-            Name = site.Name
+            Name = site.Name,
+            CreatedDateTime = site.CreatedDateTime,
+            ModifiedDateTime = site.ModifiedDateTime,
+            DeletedDateTime = site.DeletedDateTime
         };
+
+        public async Task<ValidationResponse<Site>> SoftDeleteAsync(Site value)
+        {
+            value.DeletedDateTime = DateTime.UtcNow;
+            _appDBContext.Sites.Update(ToDto(value));
+            var result = await _appDBContext.SaveChangesAsync();
+            return result == 0 ? 
+                ValidationResponse<Site>.Failure(new List<Site> { value }) : 
+                ValidationResponse<Site>.Success(new List<Site> { value });
+        }
     }
 }
