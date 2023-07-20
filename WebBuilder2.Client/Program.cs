@@ -12,7 +12,7 @@ using WebBuilder2.Client.Managers;
 using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
-using WebBuilder2.Client.Settings;
+using WebBuilder2.Client.Utils.Settings;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -54,6 +54,7 @@ builder.Services.AddHttpClient<IAwsClient, AwsClient>(client =>
 // MANAGERS ==========================>
 
 builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
+builder.Services.AddScoped<ISiteManager, SiteManager>();
 
 // <================== END OF MANAGERS
 

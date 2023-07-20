@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services

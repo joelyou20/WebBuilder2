@@ -1,0 +1,12 @@
+﻿<div>
+    @foreach (Site site in Sites)
+    {
+        <MudCard Class="site-card" @onclick="@(() => OnSiteCardClicked(site))">
+            <MudImage Src="resources/duck.jpg" />
+            <div class="card-details">
+                <label class="card-site-name">Site Name: @site.Name</label>
+                <MudButton class="card-delete-site-btn" Variant="Variant.Filled" OnClick="@(() => OnDeleteSiteBtnClicked(site))">Delete Site</MudButton>
+            </div>
+        </MudCard>
+    }
+</div>

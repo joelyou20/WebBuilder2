@@ -73,4 +73,52 @@ public class GithubService : IGithubService
             }
         }
     }
+
+    public async Task<GithubCreateRepoResponse> CreateRepoAsync(GithubCreateRepoRequest request)
+    {
+        NewRepository newRepo = new(request.RepoName)
+        {
+            Description = request.Description,
+            Private = request.IsPrivate,
+            Visibility = request.Visibility switch
+            {
+                RepoVisibility.Public => RepositoryVisibility.Public,
+                RepoVisibility.Private => RepositoryVisibility.Private,
+                RepoVisibility.Internal => RepositoryVisibility.Internal,
+                _ => throw new ArgumentOutOfRangeException(nameof(request.Visibility),
+                                                           $"Not expected request visibility value {request.Visibility}"),
+            },
+            IsTemplate = request.IsTemplate,
+            AllowAutoMerge = request.AllowAutoMerge,
+            AllowMergeCommit = request.AllowMergeCommit,
+            AllowRebaseMerge = request.AllowRebaseMerge,
+            AllowSquashMerge = request.AllowSquashMerge,
+            AutoInit = request.AutoInit,
+            DeleteBranchOnMerge = request.DeleteBranchOnMerge,
+            GitignoreTemplate = request.GitignoreTemplate,
+            HasDownloads = request.HasDownloads,
+            HasIssues = request.HasIssues,
+            HasProjects = request.HasProjects,
+            HasWiki = request.HasWiki,
+            Homepage = request.Homepage,
+            LicenseTemplate = request.LicenseTemplate,
+            TeamId = request.TeamId,
+            UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault
+        };
+
+        var createResult = await _client.Repository.Create(newRepo);
+
+        GithubCreateRepoResponse result = new()
+        {
+            Id = createResult.Id,
+            Name = createResult.Name,
+        };
+
+        return result;
+    }
+
+    public async Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync()
+    {
+        return await _client.GitIgnore.GetAllGitIgnoreTemplates();
+    }
 }

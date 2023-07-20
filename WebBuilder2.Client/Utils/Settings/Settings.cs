@@ -1,4 +1,4 @@
-﻿namespace WebBuilder2.Client.Settings
+﻿namespace WebBuilder2.Client.Utils.Settings
 {
     public class Settings
     {

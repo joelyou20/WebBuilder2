@@ -10,6 +10,8 @@ public partial class GithubLogin
     [Inject] public IGithubService GithubService { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
+    [Parameter] public string ReturnUrl { get; set; } = string.Empty;
+
     private GithubAuthenticationRequest _githubAuthenticationRequest = new();
 
     private void OnValidSubmit(EditContext context) => InvokeAsync(async () =>
@@ -17,6 +19,6 @@ public partial class GithubLogin
         if (_githubAuthenticationRequest != null) await GithubService.PostAuthenticateAsync(_githubAuthenticationRequest);
         else throw new Exception("Form invalid");
 
-        NavigationManager.NavigateTo("connections/github");
+        NavigationManager.NavigateTo(ReturnUrl);
     });
 }

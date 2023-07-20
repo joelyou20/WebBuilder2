@@ -20,6 +20,16 @@ namespace WebBuilder2.Server.Services
         }
         #endregion
 
+        #region Get Site by Id
+        public async Task<ValidationResponse<Site>> GetSingleAsync(long id)
+        {
+            SiteDTO? dto = await _appDBContext.Sites
+                .FirstOrDefaultAsync(c => c.Id.Equals(id) && c.DeletedDateTime == null);
+
+            return dto == null ? ValidationResponse<Site>.Failure(null) : ValidationResponse<Site>.Success(new List<Site> { dto!.FromDto() });
+        }
+        #endregion
+
         #region Get List of Sites
         public async Task<ValidationResponse<Site>> GetAllAsync()
         {
@@ -43,16 +53,6 @@ namespace WebBuilder2.Server.Services
             var result = await _appDBContext.SaveChangesAsync();
 
             return result == 0 ? ValidationResponse<Site>.Failure(new List<Site> { value }) : ValidationResponse<Site>.Success(new List<Site> { value });
-        }
-        #endregion
-
-        #region Get Site by Id
-        public async Task<ValidationResponse<Site>> GetSingleAsync(long id)
-        {
-            SiteDTO? dto = await _appDBContext.Sites
-                .FirstOrDefaultAsync(c => c.Id.Equals(id) && c.DeletedDateTime == null);
-
-            return dto == null ? ValidationResponse<Site>.Failure(null) : ValidationResponse<Site>.Success(new List<Site> { dto!.FromDto() });
         }
         #endregion
 

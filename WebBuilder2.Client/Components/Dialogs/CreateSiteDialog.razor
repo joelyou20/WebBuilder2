@@ -1,0 +1,10 @@
+﻿@using WebBuilder2.Client.Components.Forms
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField Label="Site Name" T="string" @bind-Value="@_createSiteRequest.SiteName" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" OnClick="@(() => OnCreateBtnClick())">Create</MudButton>
+    </DialogActions>
+</MudDialog>

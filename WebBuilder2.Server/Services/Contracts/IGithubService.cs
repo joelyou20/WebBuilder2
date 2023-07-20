@@ -6,5 +6,7 @@ namespace WebBuilder2.Server.Services.Contracts
     {
         Task<RespositoryResponse> GetRespositoriesAsync();
         Task<GithubAuthenticationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request);
+        Task<GithubCreateRepoResponse> CreateRepoAsync(GithubCreateRepoRequest request);
+        Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync();
     }
 }

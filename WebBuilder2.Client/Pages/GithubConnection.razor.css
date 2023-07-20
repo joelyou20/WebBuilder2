@@ -1,3 +1,20 @@
 ﻿.gc-button-row {
     width: fit-content;
 }
+
+.gc-section {
+    height: auto;
+    margin-bottom: 2rem;
+}
+
+::deep .mud-table {
+    height: 50rem;
+}
+
+.gc-repo-table {
+    height: 40rem;
+}
+
+.gc-section-header {
+    font-size: var(--font-size-large);
+}

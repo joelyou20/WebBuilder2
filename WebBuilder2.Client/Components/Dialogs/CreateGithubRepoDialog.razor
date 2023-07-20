@@ -1,0 +1,25 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using WebBuilder2.Client.Components.Forms
+
+<MudDialog>
+    <DialogContent>
+        <EditForm OnValidSubmit="@OnValidSubmit" Model="@_model" >
+            <MudTextField Label="Repo Name" T="string" @bind-Value="@_model.RepoName" />
+            <MudCheckBox Label="IsPrivate" @bind-Checked="@_model.IsPrivate" />
+            <MudCheckBox Label="IsTemplate" @bind-Checked="@_model.IsPrivate" />
+            <MudCheckBox Label="AllowAutoMerge" @bind-Checked="@_model.IsPrivate" />
+            <MudCheckBox Label="AllowMergeCommit" @bind-Checked="@_model.IsPrivate" />
+            <MudCheckBox Label="AllowRebaseMerge" @bind-Checked="@_model.IsPrivate" />
+            <MudCheckBox Label="AllowSquashMerge" @bind-Checked="@_model.IsPrivate" />
+            <MudCheckBox Label="AutoInit" @bind-Checked="@_model.IsPrivate" />
+            <MudCheckBox Label="DeleteBranchOnMerge" @bind-Checked="@_model.IsPrivate" Required="false" />
+            <MudSelect T="string" Label="GitIgnoreTemplate" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.GitignoreTemplate" MultiSelection="false">
+                @foreach(string gitIgnoreTemplate in _gitIgnoretemplates)
+                {
+                    <MudSelectItem Value="@gitIgnoreTemplate" />
+                }
+            </MudSelect>
+        </EditForm>
+        <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" >Create</MudButton>
+    </DialogContent>
+</MudDialog>

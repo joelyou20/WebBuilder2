@@ -1,0 +1,12 @@
+﻿<div class="grtv-container">
+    @foreach(GithubTemplate template in Templates)
+    {
+        <MudCard>
+            <MudText>Template Name: @template.Name</MudText>
+            <label>
+                <MudIcon Icon="@Icons.Material.Filled.Dangerous" />
+                <MudText>Test</MudText>
+            </label>
+        </MudCard>
+    }
+</div>

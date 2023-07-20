@@ -10,23 +10,35 @@ namespace WebBuilder2.Server.Controllers
     [ApiController]
     public class GithubController : ControllerBase
     {
-        private IGithubService _githubConnectionService;
+        private IGithubService _githubService;
 
-        public GithubController(IGithubService githubConnectionService)
+        public GithubController(IGithubService githubService)
         {
-            _githubConnectionService = githubConnectionService;
+            _githubService = githubService;
         }
 
         [HttpGet("/github/repos")]
         public async Task<RespositoryResponse> Get()
         {
-            return await _githubConnectionService.GetRespositoriesAsync();
+            return await _githubService.GetRespositoriesAsync();
+        }
+
+        [HttpGet("/github/gitignore")]
+        public async Task<IEnumerable<string>> GetGitIgnoreTemplates()
+        {
+            return await _githubService.GetGitIgnoreTemplatesAsync();
+        }
+
+        [HttpPost("/github/repos/create")]
+        public async Task<GithubCreateRepoResponse> Create([FromBody] GithubCreateRepoRequest request)
+        {
+            return await _githubService.CreateRepoAsync(request);
         }
 
         [HttpPost("/github/auth")]
         public async Task<GithubAuthenticationResponse> Authenticate([FromBody] GithubAuthenticationRequest request)
         {
-            return await _githubConnectionService.AuthenticateUserAsync(request);
+            return await _githubService.AuthenticateUserAsync(request);
         }
     }
 }

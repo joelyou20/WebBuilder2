@@ -1,14 +1,23 @@
-﻿@page "/github/auth"
+﻿@page "/github/auth/{ReturnUrl}"
 
 @using Microsoft.AspNetCore.Components.Forms
 
-<EditForm Model="@_githubAuthenticationRequest" OnValidSubmit="OnValidSubmit">
-    <MudCard>
-        <MudCardContent>
-            <MudTextField @bind-Value="@_githubAuthenticationRequest.PersonalAccessToken" Label="Personal Access Token (PAT)"></MudTextField>
-        </MudCardContent>
-        <MudCardActions>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Sign In</MudButton>
-        </MudCardActions>
-    </MudCard>
-</EditForm>
+<div class="gh-login-container">
+    <MudText>Please Sign in to your Github Account</MudText>
+    <MudIcon Icon="@Icons.Custom.Brands.GitHub" Size="Size.Large" />
+    <EditForm Model="@_githubAuthenticationRequest" OnValidSubmit="OnValidSubmit">
+        <MudCard>
+            <MudCardContent>
+                <div class="gh-login-pat-instructions">
+                    <MudText Class="gh-login-h1" Align="Align.Center">Enter your Github account Personal Access Token (PAT) </MudText>
+                    <MudDivider />
+                    <MudText Class="gh-login-h2" Align="Align.Center">Follow this guide for help finding your token <MudLink Href="https://docs.github.com/en/enterprise-server@3.8/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens">Find your PAT</MudLink></MudText>
+                </div>
+                <MudTextField @bind-Value="@_githubAuthenticationRequest.PersonalAccessToken" Label="Personal Access Token (PAT)"></MudTextField>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Sign In</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</div>

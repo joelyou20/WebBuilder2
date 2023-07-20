@@ -1,2 +1,44 @@
 ﻿body {
+    margin: unset !important;
+}
+
+.gh-login-container {
+    background-color: var(--background-color);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.gh-login-pat-instructions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+::deep .gh-login-h1 {
+    font-size: var(--font-size-large);
+}
+
+::deep .gh-login-h2 {
+    font-size: var(--font-size-medium);
+}
+
+::deep .mud-card {
+    width: 20rem;
+}
+
+::deep .mud-card-actions {
+    display: flex;
+    justify-content: center;
+}
+
+::deep form {
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5rem;
 }

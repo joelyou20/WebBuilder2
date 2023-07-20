@@ -21,16 +21,10 @@ public class SiteController : ControllerBase
         _siteService = siteService;
     }
 
-    [HttpGet("/site")]
-    public async Task<ValidationResponse<Site>> Get()
+    [HttpGet("/site/{id?}")]
+    public async Task<ValidationResponse<Site>> Get([FromRoute] long? id)
     {
-        return await _siteService.GetAllAsync();
-    }
-
-    [HttpGet("/site/{long}")]
-    public async Task<ValidationResponse<Site>> Get([FromRoute] long id)
-    {
-        return await _siteService.GetSingleAsync(id);
+        return id == null ? await _siteService.GetAllAsync() : await _siteService.GetSingleAsync(id.Value);
     }
 
     [HttpPut("/site")]

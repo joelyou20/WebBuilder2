@@ -29,6 +29,19 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
+        public async Task<GithubTemplateResponse> GetTemplatesAsync()
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/templates");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<GithubTemplateResponse>(message);
+            return result;
+        }
+
         public async Task<GithubAuthenticationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
         {
             var content = JsonContent.Create(request);
@@ -41,7 +54,33 @@ namespace WebBuilder2.Client.Clients
             var message = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<GithubAuthenticationResponse>(message);
             return result;
+        }
 
+        public async Task<GithubCreateRepoResponse> PostCreateRepoAsync(GithubCreateRepoRequest request)
+        {
+            var content = JsonContent.Create(request);
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/repos/create", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<GithubCreateRepoResponse>(message);
+            return result;
+        }
+
+        public async Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync()
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/gitignore");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<IEnumerable<string>>(message);
+            return result;
         }
     }
 }

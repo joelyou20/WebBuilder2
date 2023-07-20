@@ -1,18 +1,19 @@
 ﻿@page "/connections/github"
 
 <div>
-    <MudTable Items="@_githubRepositories" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_isTableLoading" LoadingProgressColor="Color.Info">
-        <HeaderContent>
-            <MudTh>Repository Name</MudTh>
-            <MudTh>Repository Id</MudTh>
-            <MudTh>Is Connected to Site?</MudTh>
-            <MudTh></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="IsConnected">@context.IsConnected</MudTd>
-            <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => OnConnectRepoButtonClicked(context))">Connect</MudButton></MudTd>
-        </RowTemplate>
-    </MudTable>
+    <section class="gc-section">
+        <MudText Class="gc-section-header">Repositories</MudText>
+        <div class="gc-button-row">
+            <MudButton Variant="Variant.Filled" OnClick="@OnCreateRepoBtnClick">Create Repository</MudButton>
+        </div>
+        <GithubRepoTable ValueChanged="@UpdateReposAsync" Repositories="@_githubRepositories" IsLoading="@_isTableLoading" ShowConnectButton="true" ShowDeleteButton="true" />
+    </section>
+    <MudDivider />
+    <section>
+        <div class="gc-button-row">
+            <MudButton Variant="Variant.Filled" OnClick="@OnCreateTemplateBtnClick">Create Template</MudButton>
+        </div>
+        <MudText Class="gc-section-header">Templates</MudText>
+        <GithubRepoTemplateView Templates="@_templates" />
+    </section>
 </div>

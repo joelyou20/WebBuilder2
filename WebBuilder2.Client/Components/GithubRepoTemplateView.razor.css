@@ -1,0 +1,8 @@
+﻿.grtv-container {
+    display: flex;
+}
+
+.grtv-container > ::deep .mud-card {
+    margin: 0.5rem;
+    display: flex;
+}
