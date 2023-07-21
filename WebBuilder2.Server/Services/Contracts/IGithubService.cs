@@ -1,4 +1,5 @@
-﻿using WebBuilder2.Shared.Models.Projections;
+﻿using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Projections;
 
 namespace WebBuilder2.Server.Services.Contracts
 {
@@ -8,5 +9,6 @@ namespace WebBuilder2.Server.Services.Contracts
         Task<GithubAuthenticationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request);
         Task<GithubCreateRepoResponse> CreateRepoAsync(GithubCreateRepoRequest request);
         Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync();
+        Task<IEnumerable<GithubProjectLicense>> GetLicenseTemplatesAsync();
     }
 }

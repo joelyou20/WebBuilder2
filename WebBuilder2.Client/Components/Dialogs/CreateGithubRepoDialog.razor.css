@@ -1,2 +1,4 @@
-﻿body {
+﻿.gr-dialog-checkbox-section {
+    display: grid;
+    grid-template-columns: 50% 50%;
 }

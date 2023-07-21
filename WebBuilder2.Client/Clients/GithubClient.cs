@@ -82,5 +82,18 @@ namespace WebBuilder2.Client.Clients
             var result = JsonConvert.DeserializeObject<IEnumerable<string>>(message);
             return result;
         }
+
+        public async Task<IEnumerable<GithubProjectLicense>> GetGithubProjectLicensesAsync()
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/license");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<IEnumerable<GithubProjectLicense>>(message);
+            return result;
+        }
     }
 }

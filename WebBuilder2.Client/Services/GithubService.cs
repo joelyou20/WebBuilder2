@@ -1,5 +1,6 @@
 ﻿using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Client.Services.Contracts;
+using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
 
 namespace WebBuilder2.Client.Services
@@ -24,6 +25,10 @@ namespace WebBuilder2.Client.Services
         public async Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync()
         {
             return await _client.GetGitIgnoreTemplatesAsync();
+        }
+        public async Task<IEnumerable<GithubProjectLicense>> GetGithubProjectLicensesAsync()
+        {
+            return await _client.GetGithubProjectLicensesAsync();
         }
         public async Task<GithubAuthenticationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
         {

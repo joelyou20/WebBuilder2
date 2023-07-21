@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
 
 namespace WebBuilder2.Server.Controllers
@@ -29,10 +31,17 @@ namespace WebBuilder2.Server.Controllers
             return await _githubService.GetGitIgnoreTemplatesAsync();
         }
 
-        [HttpPost("/github/repos/create")]
-        public async Task<GithubCreateRepoResponse> Create([FromBody] GithubCreateRepoRequest request)
+        [HttpGet("/github/license")]
+        public async Task<IEnumerable<GithubProjectLicense>> GetLicenseTemplates()
         {
-            return await _githubService.CreateRepoAsync(request);
+            return await _githubService.GetLicenseTemplatesAsync();
+        }
+
+        [HttpPost("/github/repos/create")]
+        public async Task<ActionResult<GithubCreateRepoResponse>> Create([FromBody] GithubCreateRepoRequest request)
+        {
+            var result = await _githubService.CreateRepoAsync(request);
+            return result.Errors.Any() ? BadRequest(result) : Ok(result);
         }
 
         [HttpPost("/github/auth")]

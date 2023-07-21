@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Octokit;
+using System.Net;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
@@ -76,49 +77,78 @@ public class GithubService : IGithubService
 
     public async Task<GithubCreateRepoResponse> CreateRepoAsync(GithubCreateRepoRequest request)
     {
-        NewRepository newRepo = new(request.RepoName)
+        try
         {
-            Description = request.Description,
-            Private = request.IsPrivate,
-            Visibility = request.Visibility switch
+            NewRepository newRepo = new(request.RepoName)
             {
-                RepoVisibility.Public => RepositoryVisibility.Public,
-                RepoVisibility.Private => RepositoryVisibility.Private,
-                RepoVisibility.Internal => RepositoryVisibility.Internal,
-                _ => throw new ArgumentOutOfRangeException(nameof(request.Visibility),
-                                                           $"Not expected request visibility value {request.Visibility}"),
-            },
-            IsTemplate = request.IsTemplate,
-            AllowAutoMerge = request.AllowAutoMerge,
-            AllowMergeCommit = request.AllowMergeCommit,
-            AllowRebaseMerge = request.AllowRebaseMerge,
-            AllowSquashMerge = request.AllowSquashMerge,
-            AutoInit = request.AutoInit,
-            DeleteBranchOnMerge = request.DeleteBranchOnMerge,
-            GitignoreTemplate = request.GitignoreTemplate,
-            HasDownloads = request.HasDownloads,
-            HasIssues = request.HasIssues,
-            HasProjects = request.HasProjects,
-            HasWiki = request.HasWiki,
-            Homepage = request.Homepage,
-            LicenseTemplate = request.LicenseTemplate,
-            TeamId = request.TeamId,
-            UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault
-        };
+                Description = request.Description,
+                Private = request.IsPrivate,
+                Visibility = request.Visibility switch
+                {
+                    RepoVisibility.Public => RepositoryVisibility.Public,
+                    RepoVisibility.Private => RepositoryVisibility.Private,
+                    RepoVisibility.Internal => RepositoryVisibility.Internal,
+                    _ => throw new ArgumentOutOfRangeException(nameof(request.Visibility),
+                                                               $"Not expected request visibility value {request.Visibility}"),
+                },
+                IsTemplate = request.IsTemplate,
+                AllowAutoMerge = request.AllowAutoMerge,
+                AllowMergeCommit = request.AllowMergeCommit,
+                AllowRebaseMerge = request.AllowRebaseMerge,
+                AllowSquashMerge = request.AllowSquashMerge,
+                AutoInit = request.AutoInit,
+                DeleteBranchOnMerge = request.DeleteBranchOnMerge,
+                GitignoreTemplate = request.GitignoreTemplate,
+                HasDownloads = request.HasDownloads,
+                HasIssues = request.HasIssues,
+                HasProjects = request.HasProjects,
+                HasWiki = request.HasWiki,
+                Homepage = request.Homepage,
+                LicenseTemplate = request.LicenseTemplate,
+                TeamId = request.TeamId,
+                UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault
+            };
 
-        var createResult = await _client.Repository.Create(newRepo);
+            var createResult = await _client.Repository.Create(newRepo);
 
-        GithubCreateRepoResponse result = new()
+            GithubCreateRepoResponse result = new()
+            {
+                Id = createResult.Id,
+                Name = createResult.Name
+            };
+
+            return result;
+        }
+        catch(ApiException ex)
         {
-            Id = createResult.Id,
-            Name = createResult.Name,
-        };
+            var response = new GithubCreateRepoResponse();
+            response.Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError
+            {
+                Message = error.Message,
+                Code = error.Code,
+                Resource = error.Resource,
+                Field = error.Field
+            }).ToList();
 
-        return result;
+            return response;
+        }
     }
 
     public async Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync()
     {
         return await _client.GitIgnore.GetAllGitIgnoreTemplates();
+    }
+
+    public async Task<IEnumerable<GithubProjectLicense>> GetLicenseTemplatesAsync()
+    {
+        var licenses = await _client.Licenses.GetAllLicenses();
+
+        return licenses.Select(license => new GithubProjectLicense
+        {
+            Featured = license.Featured,
+            Key = license.Key,
+            Name = license.Name,
+            Url = license.Url
+        });
     }
 }

@@ -2,5 +2,5 @@
 
 public class AddExistingSiteFormObject
 {
-    public string BucketName { get; set; }
+    public string BucketName { get; set; } = string.Empty;
 }

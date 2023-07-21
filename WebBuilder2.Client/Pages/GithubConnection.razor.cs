@@ -53,7 +53,7 @@ public partial class GithubConnection
             CloseOnEscapeKey = true,
             CloseButton = true,
             Position = DialogPosition.Center,
-
+            FullWidth = true
         };
 
         var dialog = await DialogService.ShowAsync<CreateGithubRepoDialog>(

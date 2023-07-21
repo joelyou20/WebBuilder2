@@ -3,23 +3,53 @@
 
 <MudDialog>
     <DialogContent>
+        <MudCard>
+            @foreach(ApiError error in _response.Errors)
+            {
+                <MudAlert Severity="Severity.Error">@error.Message</MudAlert>
+            }
+        </MudCard>
         <EditForm OnValidSubmit="@OnValidSubmit" Model="@_model" >
-            <MudTextField Label="Repo Name" T="string" @bind-Value="@_model.RepoName" />
-            <MudCheckBox Label="IsPrivate" @bind-Checked="@_model.IsPrivate" />
-            <MudCheckBox Label="IsTemplate" @bind-Checked="@_model.IsPrivate" />
-            <MudCheckBox Label="AllowAutoMerge" @bind-Checked="@_model.IsPrivate" />
-            <MudCheckBox Label="AllowMergeCommit" @bind-Checked="@_model.IsPrivate" />
-            <MudCheckBox Label="AllowRebaseMerge" @bind-Checked="@_model.IsPrivate" />
-            <MudCheckBox Label="AllowSquashMerge" @bind-Checked="@_model.IsPrivate" />
-            <MudCheckBox Label="AutoInit" @bind-Checked="@_model.IsPrivate" />
-            <MudCheckBox Label="DeleteBranchOnMerge" @bind-Checked="@_model.IsPrivate" Required="false" />
-            <MudSelect T="string" Label="GitIgnoreTemplate" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.GitignoreTemplate" MultiSelection="false">
-                @foreach(string gitIgnoreTemplate in _gitIgnoretemplates)
-                {
-                    <MudSelectItem Value="@gitIgnoreTemplate" />
-                }
-            </MudSelect>
+            <DataAnnotationsValidator />
+            <MudTextField Label="Repo Name" T="string" @bind-Value="@_model.RepoName" Required="true" For="@(() => _model.RepoName)" />
+            <MudTextField Label="Description" T="string" @bind-Value="@_model.Description" Lines="5" Variant="Variant.Outlined" Required="true" For="@(() => _model.Description)" />
+            <MudExpansionPanel Text="Advanced">
+                <section class="gr-dialog-checkbox-section">
+                    <MudCheckBox Label="IsPrivate" @bind-Checked="@_model.IsPrivate" Required="false" For="@(() => _model.IsPrivate)" />
+                    <MudCheckBox Label="IsTemplate" @bind-Checked="@_model.IsTemplate" Required="false" For="@(() => _model.IsTemplate)" />
+                    <MudCheckBox Label="AllowAutoMerge" @bind-Checked="@_model.AllowAutoMerge" Required="false" For="@(() => _model.AllowAutoMerge)" />
+                    <div>
+                        Require One of these
+                        <MudCheckBox Label="AllowMergeCommit" @bind-Checked="@_model.AllowMergeCommit" Required="false" For="@(() => _model.AllowMergeCommit)" />
+                        <MudCheckBox Label="AllowRebaseMerge" @bind-Checked="@_model.AllowRebaseMerge" Required="false" For="@(() => _model.AllowRebaseMerge)" />
+                        <MudCheckBox Label="AllowSquashMerge" @bind-Checked="@_model.AllowSquashMerge" Required="false" For="@(() => _model.AllowSquashMerge)" />
+                    </div>
+                    <MudCheckBox Label="AutoInit" @bind-Checked="@_model.AutoInit" Required="false" For="@(() => _model.AutoInit)" />
+                    <MudCheckBox Label="DeleteBranchOnMerge" @bind-Checked="@_model.DeleteBranchOnMerge" Required="false" For="@(() => _model.DeleteBranchOnMerge)" />
+                </section>
+                <MudSelect T="string" Label="GitIgnoreTemplate" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.GitignoreTemplate" MultiSelection="false" Required="false" For="@(() => _model.GitignoreTemplate)">
+                    @foreach (string gitIgnoreTemplate in _gitIgnoretemplates)
+                    {
+                        <MudSelectItem Value="@gitIgnoreTemplate" />
+                    }
+                </MudSelect>
+                <section class="gr-dialog-checkbox-section">
+                    <MudCheckBox Label="HasDownloads" @bind-Checked="@_model.HasDownloads" Required="false" For="@(() => _model.HasDownloads)" />
+                    <MudCheckBox Label="HasIssues" @bind-Checked="@_model.HasIssues" Required="false" For="@(() => _model.HasIssues)" />
+                    <MudCheckBox Label="HasProjects" @bind-Checked="@_model.HasProjects" Required="false" For="@(() => _model.HasProjects)" />
+                    <MudCheckBox Label="HasWiki" @bind-Checked="@_model.HasWiki" Required="false" For="@(() => _model.HasWiki)" />
+                </section>
+                <MudTextField Label="Homepage" @bind-Value="@_model.Homepage" Required="false" For="@(() => _model.Homepage)" />
+                <MudSelect T="string" Label="License" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.LicenseTemplate" MultiSelection="false" Required="false" For="@(() => _model.LicenseTemplate)">
+                    @foreach (GithubProjectLicense license in _licenses)
+                    {
+                        <MudSelectItem Value="@license.Key">@license.Name</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudNumericField HideSpinButtons="true" Label="TeamId" @bind-Value="@_model.TeamId" Required="false" For="@(() => _model.TeamId)" />
+                <MudCheckBox Label="UseSquashPrTitleAsDefault" @bind-Checked="@_model.UseSquashPrTitleAsDefault" Required="false" For="@(() => _model.UseSquashPrTitleAsDefault)" />
+            </MudExpansionPanel>
+            <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit">Create</MudButton>
         </EditForm>
-        <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" >Create</MudButton>
     </DialogContent>
 </MudDialog>
