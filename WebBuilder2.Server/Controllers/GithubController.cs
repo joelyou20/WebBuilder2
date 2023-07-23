@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Controllers
 {
@@ -20,34 +22,68 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpGet("/github/repos")]
-        public async Task<RespositoryResponse> Get()
+        public async Task<ActionResult<ValidationResponse<RespositoryResponse>>> Get()
         {
-            return await _githubService.GetRespositoriesAsync();
+            try
+            {
+                return Ok(await _githubService.GetRespositoriesAsync());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ValidationResponseHelper<RespositoryResponse>.BuildFailedResponse(ex));
+            }
         }
 
         [HttpGet("/github/gitignore")]
-        public async Task<IEnumerable<string>> GetGitIgnoreTemplates()
+        public async Task<ActionResult<ValidationResponse<string>>> GetGitIgnoreTemplates()
         {
-            return await _githubService.GetGitIgnoreTemplatesAsync();
+            try
+            {
+                return Ok(await _githubService.GetGitIgnoreTemplatesAsync());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ValidationResponseHelper<string>.BuildFailedResponse(ex));
+            }
         }
 
         [HttpGet("/github/license")]
-        public async Task<IEnumerable<GithubProjectLicense>> GetLicenseTemplates()
+        public async Task<ActionResult<ValidationResponse<GithubProjectLicense>>> GetLicenseTemplates()
         {
-            return await _githubService.GetLicenseTemplatesAsync();
+            try
+            {
+                return Ok(await _githubService.GetLicenseTemplatesAsync());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ValidationResponseHelper<GithubProjectLicense>.BuildFailedResponse(ex));
+            }
         }
 
         [HttpPost("/github/repos/create")]
-        public async Task<ActionResult<GithubCreateRepoResponse>> Create([FromBody] GithubCreateRepoRequest request)
+        public async Task<ActionResult<Repository>> Create([FromBody] GithubCreateRepoRequest request)
         {
-            var result = await _githubService.CreateRepoAsync(request);
-            return result.Errors.Any() ? BadRequest(result) : Ok(result);
+            try
+            {
+                return Ok(await _githubService.CreateRepoAsync(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ValidationResponseHelper<GithubCreateRepoRequest>.BuildFailedResponse(request, ex));
+            }
         }
 
         [HttpPost("/github/auth")]
-        public async Task<GithubAuthenticationResponse> Authenticate([FromBody] GithubAuthenticationRequest request)
+        public async Task<ActionResult<ValidationResponse>> Authenticate([FromBody] GithubAuthenticationRequest request)
         {
-            return await _githubService.AuthenticateUserAsync(request);
+            try
+            {
+                return Ok(await _githubService.AuthenticateUserAsync(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ValidationResponseHelper<GithubAuthenticationRequest>.BuildFailedResponse(request, ex));
+            }
         }
     }
 }

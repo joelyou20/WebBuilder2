@@ -9,5 +9,8 @@ namespace WebBuilder2.Shared.Models.Projections;
 public class GithubAuthenticationResponse
 {
     public bool IsAuthenticated { get; set; } = false;
-    public string Message { get; set; } = string.Empty;
+
+    public GithubAuthenticationResponse() { }
+
+    public GithubAuthenticationResponse(bool isAuthenticated) { IsAuthenticated = isAuthenticated; }
 }

@@ -1,9 +1,11 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Octokit;
 using System.Net;
+using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
@@ -16,7 +18,7 @@ public class GithubService : IGithubService
         _client = client;
     }
 
-    public async Task<RespositoryResponse> GetRespositoriesAsync()
+    public async Task<ValidationResponse<RespositoryResponse>> GetRespositoriesAsync()
     {
         List<Shared.Models.Repository> repos = new();
 
@@ -36,46 +38,47 @@ public class GithubService : IGithubService
             Repositories = repos
         };
 
-        return response;
+        return ValidationResponse<RespositoryResponse>.Success(response);
     }
 
-    public async Task<GithubAuthenticationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request)
+    public async Task<ValidationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request)
     {
         try
         {
             // Check if client is already authenticated. _client.User.Current() will throw an AuthorizationException if the client is not authenticated
             User user = await _client.User.Current();
-            return new GithubAuthenticationResponse
+            return new ValidationResponse
             {
-                IsAuthenticated = true,
-                Message = "Success"
+                IsSuccessful = true,
+                Message = "Success",
             };
         }
         catch (AuthorizationException)
         {
             // IF client is not authenticated and there is no PAT in the request, throw an error
             // ELSE attempt to authorize client with PAT
-            if (request == null || request.PersonalAccessToken.IsNullOrEmpty()) {
-                return new GithubAuthenticationResponse
+            if (request == null || request.PersonalAccessToken.IsNullOrEmpty())
+            {
+                return new ValidationResponse
                 {
-                    IsAuthenticated = false,
-                    Message = "Failed to Authenticate"
+                    IsSuccessful = false,
+                    Message = "Failed to Authenticate",
                 };
             }
             else
             {
                 _client.Credentials = new Credentials(request.PersonalAccessToken);
                 User user = await _client.User.Current();
-                return new GithubAuthenticationResponse
+                return new ValidationResponse
                 {
-                    IsAuthenticated = user != null,
+                    IsSuccessful = user != null,
                     Message = user == null ? "Failed to Authenticate" : $"Success: User {user.Email} is authenticated"
                 };
             }
         }
     }
 
-    public async Task<GithubCreateRepoResponse> CreateRepoAsync(GithubCreateRepoRequest request)
+    public async Task<ValidationResponse<Shared.Models.Repository>> CreateRepoAsync(GithubCreateRepoRequest request)
     {
         try
         {
@@ -111,17 +114,40 @@ public class GithubService : IGithubService
 
             var createResult = await _client.Repository.Create(newRepo);
 
-            GithubCreateRepoResponse result = new()
+            return ValidationResponse<Shared.Models.Repository>.Success(new Shared.Models.Repository
             {
+                AllowAutoMerge = createResult.AllowAutoMerge != null,
+                AllowMergeCommit = createResult.AllowMergeCommit != null,
+                AllowRebaseMerge = createResult.AllowRebaseMerge != null,
+                AllowSquashMerge = createResult.AllowSquashMerge != null,
+                AutoInit = request.AutoInit,
+                CreatedDateTime = createResult.CreatedAt.DateTime,
+                DeleteBranchOnMerge = createResult.DeleteBranchOnMerge != null,
+                DeletedDateTime = null,
+                Description = createResult.Description,
+                GitIgnoreTemplate = request.GitignoreTemplate,
+                HasDownloads = createResult.HasDownloads,
+                HasIssues = createResult.HasIssues,
+                HasProjects = request.HasProjects,
+                HasWiki = createResult.HasWiki,
+                Homepage = createResult.Homepage,
                 Id = createResult.Id,
-                Name = createResult.Name
-            };
-
-            return result;
+                IsPrivate = createResult.Private,
+                IsTemplate = createResult.IsTemplate,
+                LicenseTemplate = request.LicenseTemplate,
+                ModifiedDateTime = createResult.CreatedAt.DateTime,
+                Name = createResult.Name,
+                RepoName = createResult.FullName,
+                TeamId = request.TeamId,
+                UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault,
+                Visibility = request.Visibility,
+                Url = createResult.Url,
+                GitUrl = createResult.GitUrl,
+            });
         }
         catch(ApiException ex)
         {
-            var response = new GithubCreateRepoResponse();
+            var response = new ValidationResponse<Shared.Models.Repository>();
             response.Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError
             {
                 Message = error.Message,
@@ -134,21 +160,52 @@ public class GithubService : IGithubService
         }
     }
 
-    public async Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync()
+    public async Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync()
     {
-        return await _client.GitIgnore.GetAllGitIgnoreTemplates();
+        IReadOnlyList<string> templates = await _client.GitIgnore.GetAllGitIgnoreTemplates();
+        GitIgnoreTemplateResponse response = new(templates);
+        return ValidationResponse<GitIgnoreTemplateResponse>.Success(response);
     }
 
-    public async Task<IEnumerable<GithubProjectLicense>> GetLicenseTemplatesAsync()
+    public async Task<ValidationResponse<GithubProjectLicense>> GetLicenseTemplatesAsync()
     {
         var licenses = await _client.Licenses.GetAllLicenses();
 
-        return licenses.Select(license => new GithubProjectLicense
+        return ValidationResponse<GithubProjectLicense>.Success(licenses.Select(license => new GithubProjectLicense
         {
             Featured = license.Featured,
             Key = license.Key,
             Name = license.Name,
             Url = license.Url
-        });
+        }));
     }
+
+    public RepositoryDTO ToDto(Shared.Models.Repository repo) => new()
+    {
+        Id = repo.Id,
+        Name = repo.Name,
+        AllowAutoMerge = repo.AllowAutoMerge,
+        AllowMergeCommit = repo.AllowMergeCommit,
+        AllowRebaseMerge = repo.AllowRebaseMerge,
+        AllowSquashMerge = repo.AllowSquashMerge,
+        AutoInit = repo.AutoInit,
+        CreatedDateTime = repo.CreatedDateTime,
+        DeleteBranchOnMerge = repo.DeleteBranchOnMerge,
+        DeletedDateTime = repo.DeletedDateTime,
+        Description = repo.Description,
+        GitIgnoreTemplate = repo.GitIgnoreTemplate,
+        HasDownloads = repo.HasDownloads,
+        HasIssues = repo.HasIssues,
+        HasProjects = repo.HasProjects,
+        HasWiki = repo.HasWiki,
+        Homepage = repo.Homepage,
+        IsPrivate = repo.IsPrivate,
+        IsTemplate = repo.IsTemplate,
+        LicenseTemplate = repo.LicenseTemplate,
+        ModifiedDateTime = repo.ModifiedDateTime,
+        RepoName = repo.RepoName,
+        TeamId = repo.TeamId,
+        UseSquashPrTitleAsDefault = repo.UseSquashPrTitleAsDefault,
+        Visibility = repo.Visibility
+    };
 }

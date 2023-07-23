@@ -2,6 +2,7 @@
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services
 {
@@ -14,27 +15,23 @@ namespace WebBuilder2.Client.Services
             _client = client;
         }
 
-        public async Task<RespositoryResponse> GetRepositoriesAsync()
+        public async Task<ValidationResponse<Repository>> GetRepositoriesAsync()
         {
             return await _client.GetRepositoriesAsync();
         }
-        public async Task<GithubTemplateResponse> GetTemplatesAsync()
-        {
-            return await _client.GetTemplatesAsync();
-        }
-        public async Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync()
+        public async Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync()
         {
             return await _client.GetGitIgnoreTemplatesAsync();
         }
-        public async Task<IEnumerable<GithubProjectLicense>> GetGithubProjectLicensesAsync()
+        public async Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync()
         {
             return await _client.GetGithubProjectLicensesAsync();
         }
-        public async Task<GithubAuthenticationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
+        public async Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
         {
             return await _client.PostAuthenticateAsync(request);
         }
-        public async Task<GithubCreateRepoResponse> PostCreateRepoAsync(GithubCreateRepoRequest request)
+        public async Task<ValidationResponse<Repository>> PostCreateRepoAsync(GithubCreateRepoRequest request)
         {
             return await _client.PostCreateRepoAsync(request);
         }

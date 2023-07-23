@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
 using System.Net;
@@ -22,6 +23,9 @@ WebAssemblyHostConfiguration configuration = builder.Configuration;
 
 Settings settings = configuration.GetSection("Settings").Get<Settings>()!;
 
+builder.Logging.SetMinimumLevel(LogLevel.Warning);
+builder.Services.AddLogging();
+
 // CLIENTS ==========================>
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
@@ -34,20 +38,10 @@ builder.Services.AddHttpClient<IDatabaseClient, JsonClient>(client =>
      new MediaTypeWithQualityHeaderValue("application/json"));
 });
 // <--- END OF HACK --->
-builder.Services.AddHttpClient<ISiteClient, SiteClient>(client =>
-{
-    client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!);
-});
-
-builder.Services.AddHttpClient<IGithubClient, GithubClient>(client =>
-{
-    client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!);
-});
-
-builder.Services.AddHttpClient<IAwsClient, AwsClient>(client =>
-{
-    client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!);
-});
+builder.Services.AddHttpClient<ISiteClient, SiteClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddHttpClient<IGithubClient, GithubClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddHttpClient<IAwsClient, AwsClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddHttpClient<IRepositoryClient, RepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 
 // <================== END OF CLIENTS
 
@@ -55,6 +49,7 @@ builder.Services.AddHttpClient<IAwsClient, AwsClient>(client =>
 
 builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
 builder.Services.AddScoped<ISiteManager, SiteManager>();
+builder.Services.AddScoped<IGithubTemplateManager, GithubTemplateManager>();
 
 // <================== END OF MANAGERS
 
@@ -64,6 +59,7 @@ builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<ISiteService, SiteService>();
 builder.Services.AddScoped<IDialogService, DialogService>();
 builder.Services.AddScoped<IAwsService, AwsService>();
+builder.Services.AddScoped<IRepositoryService, RepositoryService>();
 
 // <================== END OF SERVICES
 

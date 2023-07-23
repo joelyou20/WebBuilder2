@@ -4,7 +4,7 @@
 <MudDialog>
     <DialogContent>
         <MudCard>
-            @foreach(ApiError error in _response.Errors)
+            @foreach(ApiError error in _errors)
             {
                 <MudAlert Severity="Severity.Error">@error.Message</MudAlert>
             }

@@ -4,7 +4,7 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services.Contracts;
 
-public interface ISiteDbService : IDbService<Site>
+public interface ISiteDbService : IDbService<Site, SiteDTO>
 {
 
 }

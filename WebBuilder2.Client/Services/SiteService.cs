@@ -1,6 +1,8 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Json;
 using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Managers;
+using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
@@ -16,14 +18,14 @@ namespace WebBuilder2.Client.Services
         {
             _siteClient = siteClient;
         }
+
         public async Task<List<Site>?> GetSitesAsync()
         {
             ValidationResponse<Site>? response = await _siteClient.GetSitesAsync();
 
             if (response == null || !response.IsSuccessful || response.Values == null || !response.Values.Any())
             {
-                // Handle error -> response.Message
-                return null;
+                throw new Exception(response?.Message ?? "Failed to get site Data");
             }
 
             return response.Values!.ToList();
@@ -38,7 +40,7 @@ namespace WebBuilder2.Client.Services
 
             if(!response.IsSuccessful)
             {
-                // Handle error -> response.Message
+                throw new Exception(response?.Message ?? "Failed to get site Data");
             }
 
             return response.Values!.SingleOrDefault();
@@ -54,7 +56,7 @@ namespace WebBuilder2.Client.Services
 
             if (!response.IsSuccessful)
             {
-                // Handle error -> response.Message
+                throw new Exception(response?.Message ?? "Failed to add site");
             }
 
             return response.Values!.SingleOrDefault();

@@ -1,8 +1,8 @@
 ﻿<div class="grtv-container">
-    @foreach(GithubTemplate template in Templates)
+    @foreach(Repository templateRepo in TemplateRepositories)
     {
         <MudCard>
-            <MudText>Template Name: @template.Name</MudText>
+            <MudText>Template Name: @templateRepo.Name</MudText>
             <label>
                 <MudIcon Icon="@Icons.Material.Filled.Dangerous" />
                 <MudText>Test</MudText>

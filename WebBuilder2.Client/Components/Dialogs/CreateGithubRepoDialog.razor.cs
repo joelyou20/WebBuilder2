@@ -16,18 +16,22 @@ public partial class CreateGithubRepoDialog
     private GithubCreateRepoRequest _model = new();
     private List<string> _gitIgnoretemplates = new();
     private List<GithubProjectLicense> _licenses = new();
-    private GithubCreateRepoResponse _response = new();
+
+    private List<ApiError> _errors = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _gitIgnoretemplates = (await GithubService.GetGitIgnoreTemplatesAsync()).ToList();
-        _licenses = (await GithubService.GetGithubProjectLicensesAsync()).ToList();
+        _gitIgnoretemplates = (await GithubService.GetGitIgnoreTemplatesAsync()).GetValues().SelectMany(x => x.Templates).ToList();
+        _licenses = (await GithubService.GetGithubProjectLicensesAsync()).GetValues();
     }
 
     public void OnValidSubmit() => InvokeAsync(async () =>
     {
-        _response = await GithubService.PostCreateRepoAsync(_model);
-        if(!_response.Errors.Any()) MudDialog.Close(DialogResult.Ok(true));
+        var createRepoResponse = await GithubService.PostCreateRepoAsync(_model);
+
+        _errors.AddRange(createRepoResponse.Errors);
+
+        if (!_errors.Any()) MudDialog.Close(DialogResult.Ok(true));
         StateHasChanged();
     });
 }

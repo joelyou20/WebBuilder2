@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Amazon.Runtime.Internal.Transform;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WebBuilder2.Client.Components;
 using WebBuilder2.Client.Components.Dialogs;
@@ -7,6 +8,7 @@ using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Pages;
 
@@ -17,33 +19,13 @@ public partial class GithubConnection
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
     private List<Repository> _githubRepositories { get; set; } = new List<Repository>();
-    private List<GithubTemplate> _templates = new();
+    private List<Repository> _templates => _githubRepositories.Where(x => x.IsTemplate).ToList();
 
     private bool _isTableLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         await UpdateReposAsync();
-        await UpdateTemplatesAsync();
-    }
-
-    private async Task UpdateTemplatesAsync()
-    {
-        _templates = new List<GithubTemplate>
-        {
-            new GithubTemplate
-            {
-                Name = "TEST1"
-            },
-            new GithubTemplate
-            {
-                Name = "TEST2"
-            },
-            new GithubTemplate
-            {
-                Name = "TEST3"
-            }
-        };
     }
 
     public async Task OnCreateRepoBtnClick()
@@ -66,19 +48,34 @@ public partial class GithubConnection
         await UpdateReposAsync();
     }
 
-    public async Task OnCreateTemplateBtnClick()
+    public async Task OnImportRepoBtnClick()
     {
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center,
+            FullWidth = true
+        };
 
+        var dialog = await DialogService.ShowAsync<CreateGithubRepoDialog>(
+            title: "Create New Repo",
+            options: options
+        );
+
+        await dialog.Result;
+
+        await UpdateReposAsync();
     }
 
     public async Task UpdateReposAsync()
     {
-        var authenticateResponse = await GithubService.PostAuthenticateAsync(new GithubAuthenticationRequest(""));
+        ValidationResponse authenticateResponse = await GithubService.PostAuthenticateAsync(new GithubAuthenticationRequest(""));
 
-        if (authenticateResponse != null && authenticateResponse.IsAuthenticated)
+        if (authenticateResponse != null && authenticateResponse.IsSuccessful)
         {
             var response = await GithubService.GetRepositoriesAsync();
-            _githubRepositories = response.Repositories.ToList();
+            _githubRepositories = response.GetValues();
             _isTableLoading = false;
             StateHasChanged();
         }

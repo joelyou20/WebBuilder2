@@ -33,4 +33,5 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<SiteDTO> Sites { get; set; }
+    public DbSet<RepositoryDTO> Repositories { get; set; }
 }

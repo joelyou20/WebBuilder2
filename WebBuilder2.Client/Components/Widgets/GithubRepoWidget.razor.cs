@@ -25,10 +25,10 @@ public partial class GithubRepoWidget
     {
         var authenticateResponse = await GithubService.PostAuthenticateAsync(new GithubAuthenticationRequest(""));
 
-        if (authenticateResponse != null && authenticateResponse.IsAuthenticated)
+        if (authenticateResponse != null && authenticateResponse.IsSuccessful)
         {
             var response = await GithubService.GetRepositoriesAsync();
-            _githubRepositories = response.Repositories.ToList();
+            _githubRepositories = response.GetValues();
             _isTableLoading = false;
             StateHasChanged();
         }

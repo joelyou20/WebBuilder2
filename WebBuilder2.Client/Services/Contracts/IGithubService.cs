@@ -1,14 +1,14 @@
 ﻿using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services.Contracts;
 
 public interface IGithubService
 {
-    Task<RespositoryResponse> GetRepositoriesAsync();
-    Task<GithubTemplateResponse> GetTemplatesAsync();
-    Task<IEnumerable<string>> GetGitIgnoreTemplatesAsync();
-    Task<IEnumerable<GithubProjectLicense>> GetGithubProjectLicensesAsync();
-    Task<GithubAuthenticationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
-    Task<GithubCreateRepoResponse> PostCreateRepoAsync(GithubCreateRepoRequest request);
+    Task<ValidationResponse<Repository>> GetRepositoriesAsync();
+    Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
+    Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
+    Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
+    Task<ValidationResponse<Repository>> PostCreateRepoAsync(GithubCreateRepoRequest request);
 }

@@ -5,15 +5,13 @@
         <MudText Class="gc-section-header">Repositories</MudText>
         <div class="gc-button-row">
             <MudButton Variant="Variant.Filled" OnClick="@OnCreateRepoBtnClick">Create Repository</MudButton>
+            <MudButton Variant="Variant.Filled" OnClick="@OnImportRepoBtnClick">Import Repository</MudButton>
         </div>
         <GithubRepoTable ValueChanged="@UpdateReposAsync" Repositories="@_githubRepositories" IsLoading="@_isTableLoading" ShowConnectButton="true" ShowDeleteButton="true" />
     </section>
     <MudDivider />
     <section>
-        <div class="gc-button-row">
-            <MudButton Variant="Variant.Filled" OnClick="@OnCreateTemplateBtnClick">Create Template</MudButton>
-        </div>
         <MudText Class="gc-section-header">Templates</MudText>
-        <GithubRepoTemplateView Templates="@_templates" />
+        <GithubRepoTemplateView TemplateRepositories="@_templates" />
     </section>
 </div>

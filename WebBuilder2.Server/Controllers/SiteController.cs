@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Validation;
 
@@ -22,20 +23,41 @@ public class SiteController : ControllerBase
     }
 
     [HttpGet("/site/{id?}")]
-    public async Task<ValidationResponse<Site>> Get([FromRoute] long? id)
+    public async Task<ActionResult<ValidationResponse<Site>>> Get([FromRoute] long? id)
     {
-        return id == null ? await _siteService.GetAllAsync() : await _siteService.GetSingleAsync(id.Value);
+        try
+        {
+            return Ok(id == null ? await _siteService.GetAllAsync() : await _siteService.GetSingleAsync(id.Value));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(ex));
+        }
     }
 
     [HttpPut("/site")]
-    public async Task<ValidationResponse<Site>> Put([FromBody] Site site)
+    public async Task<ActionResult<ValidationResponse<Site>>> Put([FromBody] Site site)
     {
-        return await _siteService.UpsertAsync(site);
+        try
+        {
+            return Ok(await _siteService.UpsertAsync(site));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(site, ex));
+        }
     }
 
     [HttpPost("/site/delete")]
-    public async Task<ValidationResponse<Site>> SoftDelete([FromBody] Site site)
+    public async Task<ActionResult<ValidationResponse<Site>>> SoftDelete([FromBody] Site site)
     {
-        return await _siteService.SoftDeleteAsync(site);
+        try
+        {
+            return Ok(await _siteService.SoftDeleteAsync(site));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(site, ex));
+        }
     }
 }

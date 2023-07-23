@@ -11,8 +11,6 @@ public class Site : AuditableEntity
     public long Id { get; set; }
     [JsonPropertyName("name")]
     public string Name { get; set; } = "";
-    [JsonPropertyName("deletedDateTime")]
-    public DateTime? DeletedDateTime { get; set; }
 
     public Site() { }
 
