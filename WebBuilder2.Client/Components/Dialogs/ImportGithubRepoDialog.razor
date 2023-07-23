@@ -1,0 +1,20 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudList>
+            @foreach (KeyValuePair<Repository, bool> repo in _githubRepositories)
+            {
+                <MudListItem>
+                    <MudCard>
+                        <MudText>@($"Name: {repo.Key.Name}")</MudText>
+                        <MudText>@($"Description: {repo.Key.Description}")</MudText>
+                        <MudText>@($"Id: {repo.Key.Id}")</MudText>
+                        <MudCheckBox T="bool" Checked="@repo.Value" CheckedChanged="@(() => OnCheckboxChecked(repo.Key))" />
+                    </MudCard>
+                </MudListItem>
+            }
+        </MudList>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@OnImportBtnClick">Import</MudButton>
+    </DialogActions>
+</MudDialog>

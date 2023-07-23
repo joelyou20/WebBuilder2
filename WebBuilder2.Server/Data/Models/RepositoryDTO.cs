@@ -9,7 +9,7 @@ namespace WebBuilder2.Server.Data.Models
     public class RepositoryDTO : AuditableEntity, IDto<Repository>
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string RepoName { get; set; } = string.Empty;
@@ -61,6 +61,9 @@ namespace WebBuilder2.Server.Data.Models
             Visibility = Visibility,
             Url = Url,
             GitUrl = GitUrl,
+            CreatedDateTime = CreatedDateTime,
+            DeletedDateTime = DeletedDateTime,
+            ModifiedDateTime = ModifiedDateTime
         };
     }
 }

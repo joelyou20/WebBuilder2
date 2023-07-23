@@ -18,6 +18,7 @@ public class Repository : AuditableEntity
     [JsonPropertyName("repoName")]
     public string RepoName { get; set; } = string.Empty;
     [JsonPropertyName("description")]
+    [Required]
     public string Description { get; set; } = string.Empty;
     [JsonPropertyName("visibility")]
     public RepoVisibility Visibility { get; set; } = RepoVisibility.Public;
@@ -48,6 +49,7 @@ public class Repository : AuditableEntity
     [JsonPropertyName("hasWiki")]
     public bool HasWiki { get; set; } = true;
     [JsonPropertyName("homepage")]
+    [Required]
     public string Homepage { get; set; } = string.Empty;
     [JsonPropertyName("licenseTemplate")]
     public string LicenseTemplate { get; set; } = string.Empty;

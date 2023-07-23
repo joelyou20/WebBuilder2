@@ -23,7 +23,7 @@ namespace WebBuilder2.Client.Services
         {
             ValidationResponse<Site> response = await _siteClient.GetSitesAsync();
 
-            if (response == null || !response.IsSuccessful || response.Values == null || !response.Values.Any())
+            if (response == null || !response.IsSuccessful)
             {
                 throw new Exception(response?.Message ?? "Failed to get site Data");
             }

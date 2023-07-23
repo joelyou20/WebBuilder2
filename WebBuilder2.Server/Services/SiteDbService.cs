@@ -29,9 +29,7 @@ namespace WebBuilder2.Server.Services
             var sites = (await _appDBContext.Sites.ToListAsync())
                 .Select(site => site.FromDto())
                 .Where(site => site.DeletedDateTime == null);
-            return sites.Any() ? 
-                ValidationResponse<Site>.Success(sites) :
-                ValidationResponse<Site>.Failure(sites);
+            return ValidationResponse<Site>.Success(sites);
         }
         
         public async Task<ValidationResponse<Site>> InsertAsync(Site value)

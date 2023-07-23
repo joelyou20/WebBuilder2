@@ -22,15 +22,15 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpGet("/github/repos")]
-        public async Task<ActionResult<ValidationResponse<RespositoryResponse>>> Get()
+        public async Task<ActionResult<ValidationResponse<Repository>>> Get()
         {
             try
             {
-                return Ok(await _githubService.GetRespositoriesAsync());
+                return Ok(await _githubService.GetRepositoriesAsync());
             }
             catch (Exception ex)
             {
-                return BadRequest(ValidationResponseHelper<RespositoryResponse>.BuildFailedResponse(ex));
+                return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(ex));
             }
         }
 

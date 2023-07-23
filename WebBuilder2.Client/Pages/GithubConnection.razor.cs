@@ -15,11 +15,12 @@ namespace WebBuilder2.Client.Pages;
 public partial class GithubConnection
 {
     [Inject] public IGithubService GithubService { get; set; } = default!;
+    [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    private List<Repository> _githubRepositories { get; set; } = new List<Repository>();
-    private List<Repository> _templates => _githubRepositories.Where(x => x.IsTemplate).ToList();
+    private List<Repository> _repositories { get; set; } = new List<Repository>();
+    private List<Repository> _templates => _repositories.Where(x => x.IsTemplate).ToList();
 
     private bool _isTableLoading = true;
 
@@ -58,8 +59,8 @@ public partial class GithubConnection
             FullWidth = true
         };
 
-        var dialog = await DialogService.ShowAsync<CreateGithubRepoDialog>(
-            title: "Create New Repo",
+        var dialog = await DialogService.ShowAsync<ImportGithubRepoDialog>(
+            title: "Import Repository from Github Account",
             options: options
         );
 
@@ -70,19 +71,10 @@ public partial class GithubConnection
 
     public async Task UpdateReposAsync()
     {
-        ValidationResponse authenticateResponse = await GithubService.PostAuthenticateAsync(new GithubAuthenticationRequest(""));
-
-        if (authenticateResponse != null && authenticateResponse.IsSuccessful)
-        {
-            var response = await GithubService.GetRepositoriesAsync();
-            _githubRepositories = response.GetValues();
-            _isTableLoading = false;
-            StateHasChanged();
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/github/auth/{Uri.EscapeDataString(NavigationManager.Uri)}");
-        }
+        var response = await RepositoryService.GetRepositoriesAsync();
+        _repositories = response;
+        _isTableLoading = false;
+        StateHasChanged();
     }
 
     public void OnRepoTableValueChanged() => InvokeAsync(UpdateReposAsync);

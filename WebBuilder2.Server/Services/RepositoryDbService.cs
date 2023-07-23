@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Services.Contracts;
@@ -18,70 +19,117 @@ public class RepositoryDbService : IRepositoryDbService
 
     public async Task<ValidationResponse<Repository>> GetSingleAsync(long id)
     {
-        RepositoryDTO? dto = await _appDBContext.Repositories
-            .FirstOrDefaultAsync(c => c.Id.Equals(id) && c.DeletedDateTime == null);
+        try
+        {
+            RepositoryDTO? dto = await _appDBContext.Repositories
+                .FirstOrDefaultAsync(c => c.Id.Equals(id) && c.DeletedDateTime == null);
 
-        return dto == null ? new ValidationResponse<Repository>() : ValidationResponse<Repository>.Success(new List<Repository> { dto!.FromDto() });
+            return dto == null ? new ValidationResponse<Repository>() : ValidationResponse<Repository>.Success(new List<Repository> { dto!.FromDto() });
+        }
+        catch (Exception ex)
+        {
+            return ValidationResponse<Repository>.Failure(message: $"Error: {ex.Message}. EXCEPTION: {ex.InnerException}");
+        }
     }
 
     public async Task<ValidationResponse<Repository>> GetAllAsync()
     {
-        var githubTemplates = (await _appDBContext.Repositories.ToListAsync())
-            .Select(githubTemplate => githubTemplate.FromDto())
-            .Where(githubTemplate => githubTemplate.DeletedDateTime == null);
-        return githubTemplates.Any() ?
-            ValidationResponse<Repository>.Success(githubTemplates) :
-            ValidationResponse<Repository>.Failure(githubTemplates);
+        try
+        {
+            var repositories = (await _appDBContext.Repositories.ToListAsync())
+                .Select(githubTemplate => githubTemplate.FromDto())
+                .Where(githubTemplate => githubTemplate.DeletedDateTime == null);
+            return ValidationResponse<Repository>.Success(repositories);
+        }
+        catch (Exception ex)
+        {
+            return ValidationResponse<Repository>.Failure(new List<Repository>(), message: $"Error: {ex.Message}. EXCEPTION: {ex.InnerException}");
+        }
     }
 
     public async Task<ValidationResponse<Repository>> InsertAsync(Repository value)
     {
-        ValidationResponse<Repository> response = await GetSingleAsync(value.Id);
+        try
+        {
+            ValidationResponse<Repository> response = await GetSingleAsync(value.Id);
 
-        if (response.IsSuccessful) return ValidationResponse<Repository>.EntityAlreadyExists(new List<Repository> { value });
+            if (response.IsSuccessful) return ValidationResponse<Repository>.EntityAlreadyExists(new List<Repository> { value });
 
-        await _appDBContext.Repositories.AddAsync(ToDto(value));
-        var result = await _appDBContext.SaveChangesAsync();
+            await _appDBContext.Repositories.AddAsync(ToDto(value));
+            var result = await _appDBContext.SaveChangesAsync();
 
-        return result == 0 ? ValidationResponse<Repository>.Failure(new List<Repository> { value }) : ValidationResponse<Repository>.Success(new List<Repository> { value });
+            return result == 0 ? ValidationResponse<Repository>.Failure(new List<Repository> { value }) : ValidationResponse<Repository>.Success(new List<Repository> { value });
+        }
+        catch (Exception ex)
+        {
+            return ValidationResponse<Repository>.Failure(new List<Repository> { value }, message: $"Error: {ex.Message}. EXCEPTION: {ex.InnerException}");
+        }
     }
 
     public async Task<ValidationResponse<Repository>> UpdateAsync(Repository value)
     {
-        _appDBContext.Repositories.Update(ToDto(value));
-        var result = await _appDBContext.SaveChangesAsync();
-        return result == 0 ? ValidationResponse<Repository>.Failure(new List<Repository> { value }) : ValidationResponse<Repository>.Success(new List<Repository> { value });
+        try
+        {
+            _appDBContext.Repositories.Update(ToDto(value));
+            var result = await _appDBContext.SaveChangesAsync();
+            return result == 0 ? ValidationResponse<Repository>.Failure(new List<Repository> { value }) : ValidationResponse<Repository>.Success(new List<Repository> { value });
+        }
+        catch (DbUpdateException ex)
+        {
+            return ValidationResponse<Repository>.Failure(value, message: $"Error: {ex.Message}. EXCEPTION: {ex.InnerException}");
+        }
     }
 
     public async Task<ValidationResponse<Repository>> UpsertAsync(Repository value)
     {
-        ValidationResponse<Repository> response = await GetSingleAsync(value.Id);
+        try
+        {
+            ValidationResponse<Repository> response = await GetSingleAsync(value.Id);
 
-        if (response.IsSuccessful) _appDBContext.Repositories.Update(ToDto(value));
-        else await _appDBContext.Repositories.AddAsync(ToDto(value));
+            if (response.IsSuccessful) _appDBContext.Repositories.Update(ToDto(value));
+            else await _appDBContext.Repositories.AddAsync(ToDto(value));
 
-        var result = await _appDBContext.SaveChangesAsync();
+            var result = await _appDBContext.SaveChangesAsync();
 
-        return result == 0 ? ValidationResponse<Repository>.Failure(new List<Repository> { value }) : ValidationResponse<Repository>.Success(new List<Repository> { value });
+            return result == 0 ? ValidationResponse<Repository>.Failure(new List<Repository> { value }) : ValidationResponse<Repository>.Success(new List<Repository> { value });
+        }
+        catch (DbUpdateException ex)
+        {
+            return ValidationResponse<Repository>.Failure(value, message: $"Error: {ex.Message}. EXCEPTION: {ex.InnerException}");
+        }
     }
 
     public async Task<ValidationResponse<Repository>> DeleteAsync(Repository value)
     {
-        _appDBContext.Remove(ToDto(value));
-        var result = await _appDBContext.SaveChangesAsync();
-        return result == 0 ?
-            ValidationResponse<Repository>.Failure(new List<Repository> { value }) :
-            ValidationResponse<Repository>.Success(new List<Repository> { value });
+        try
+        {
+            _appDBContext.Remove(ToDto(value));
+            var result = await _appDBContext.SaveChangesAsync();
+            return result == 0 ?
+                ValidationResponse<Repository>.Failure(new List<Repository> { value }) :
+                ValidationResponse<Repository>.Success(new List<Repository> { value });
+        }
+        catch (DbUpdateException ex)
+        {
+            return ValidationResponse<Repository>.Failure(value, message: $"Error: {ex.Message}. EXCEPTION: {ex.InnerException}");
+        }
     }
 
     public async Task<ValidationResponse<Repository>> SoftDeleteAsync(Repository value)
     {
-        value.DeletedDateTime = DateTime.UtcNow;
-        _appDBContext.Repositories.Update(ToDto(value));
-        var result = await _appDBContext.SaveChangesAsync();
-        return result == 0 ?
-            ValidationResponse<Repository>.Failure(new List<Repository> { value }) :
-            ValidationResponse<Repository>.Success(new List<Repository> { value });
+        try
+        {
+            value.DeletedDateTime = DateTime.UtcNow;
+            _appDBContext.Repositories.Update(ToDto(value));
+            var result = await _appDBContext.SaveChangesAsync();
+            return result == 0 ?
+                ValidationResponse<Repository>.Failure(new List<Repository> { value }) :
+                ValidationResponse<Repository>.Success(new List<Repository> { value });
+        }
+        catch (DbUpdateException ex)
+        {
+            return ValidationResponse<Repository>.Failure(value, message: $"Error: {ex.Message}. EXCEPTION: {ex.InnerException}");
+        }
     }
 
     public RepositoryDTO ToDto(Repository repository) => new()

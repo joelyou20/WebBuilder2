@@ -27,7 +27,9 @@ public class SiteController : ControllerBase
     {
         try
         {
-            return Ok(id == null ? await _siteService.GetAllAsync() : await _siteService.GetSingleAsync(id.Value));
+            var response = id == null ? await _siteService.GetAllAsync() : await _siteService.GetSingleAsync(id.Value);
+            if (!response.IsSuccessful) throw new Exception("GET failed. See Error.");
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -40,7 +42,9 @@ public class SiteController : ControllerBase
     {
         try
         {
-            return Ok(await _siteService.UpsertAsync(site));
+            var response = await _siteService.UpsertAsync(site);
+            if (!response.IsSuccessful) throw new Exception("PUT failed. See Error.");
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -53,7 +57,9 @@ public class SiteController : ControllerBase
     {
         try
         {
-            return Ok(await _siteService.SoftDeleteAsync(site));
+            var response = await _siteService.SoftDeleteAsync(site);
+            if (!response.IsSuccessful) throw new Exception("DELETE failed. See Error.");
+            return Ok(response);
         }
         catch (Exception ex)
         {

@@ -12,8 +12,8 @@ using WebBuilder2.Server.Data;
 namespace WebBuilder2.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230723161440_ChangeGithubRepoToJustRepo")]
-    partial class ChangeGithubRepoToJustRepo
+    [Migration("20230723190026_InitMigrations")]
+    partial class InitMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,10 +28,7 @@ namespace WebBuilder2.Server.Migrations
             modelBuilder.Entity("WebBuilder2.Server.Data.Models.RepositoryDTO", b =>
                 {
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AllowAutoMerge")
                         .HasColumnType("bit");

@@ -25,6 +25,10 @@ namespace WebBuilder2.Client.Clients
             {
                 // Handle error
             }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse<Site>>(message);
+            return result;
         }
 
         public async Task<ValidationResponse<Site>> GetSingleSiteAsync(long id)

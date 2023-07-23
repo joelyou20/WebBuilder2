@@ -24,6 +24,7 @@ builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<ISiteDbService, SiteDbService>();
+builder.Services.AddScoped<IRepositoryDbService, RepositoryDbService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 
 builder.Services.AddGitHubClient(configuration);

@@ -19,7 +19,7 @@ namespace WebBuilder2.Client.Services
         {
             ValidationResponse<Repository> response = await _client.GetRepositoriesAsync();
 
-            if (response == null || !response.IsSuccessful || response.Values == null || !response.Values.Any())
+            if (response == null || !response.IsSuccessful)
             {
                 throw new Exception(response?.Message ?? "Failed to get repository Data");
             }

@@ -25,10 +25,7 @@ namespace WebBuilder2.Server.Migrations
             modelBuilder.Entity("WebBuilder2.Server.Data.Models.RepositoryDTO", b =>
                 {
                     b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AllowAutoMerge")
                         .HasColumnType("bit");

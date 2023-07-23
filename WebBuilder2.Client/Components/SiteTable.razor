@@ -1,4 +1,10 @@
 ﻿<div>
+    @if(!Sites.Any())
+    {
+        <MudCard>
+            No sites found
+        </MudCard>
+    }
     @foreach (Site site in Sites)
     {
         <MudCard Class="site-card" @onclick="@(() => OnSiteCardClicked(site))">

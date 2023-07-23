@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Octokit;
 using System.Net;
 using WebBuilder2.Server.Data.Models;
@@ -18,7 +19,7 @@ public class GithubService : IGithubService
         _client = client;
     }
 
-    public async Task<ValidationResponse<RespositoryResponse>> GetRespositoriesAsync()
+    public async Task<ValidationResponse<Shared.Models.Repository>> GetRepositoriesAsync()
     {
         List<Shared.Models.Repository> repos = new();
 
@@ -26,19 +27,10 @@ public class GithubService : IGithubService
 
         foreach (var repo in repositories)
         {
-            repos.Add(new Shared.Models.Repository
-            {
-                Id = repo.Id,
-                Name = repo.Name,
-            });
+            repos.Add(ParseRepository(repo));
         }
 
-        var response = new RespositoryResponse
-        {
-            Repositories = repos
-        };
-
-        return ValidationResponse<RespositoryResponse>.Success(response);
+        return ValidationResponse<Shared.Models.Repository>.Success(repos);
     }
 
     public async Task<ValidationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request)
@@ -114,47 +106,30 @@ public class GithubService : IGithubService
 
             var createResult = await _client.Repository.Create(newRepo);
 
-            return ValidationResponse<Shared.Models.Repository>.Success(new Shared.Models.Repository
-            {
-                AllowAutoMerge = createResult.AllowAutoMerge != null,
-                AllowMergeCommit = createResult.AllowMergeCommit != null,
-                AllowRebaseMerge = createResult.AllowRebaseMerge != null,
-                AllowSquashMerge = createResult.AllowSquashMerge != null,
-                AutoInit = request.AutoInit,
-                CreatedDateTime = createResult.CreatedAt.DateTime,
-                DeleteBranchOnMerge = createResult.DeleteBranchOnMerge != null,
-                DeletedDateTime = null,
-                Description = createResult.Description,
-                GitIgnoreTemplate = request.GitignoreTemplate,
-                HasDownloads = createResult.HasDownloads,
-                HasIssues = createResult.HasIssues,
-                HasProjects = request.HasProjects,
-                HasWiki = createResult.HasWiki,
-                Homepage = createResult.Homepage,
-                Id = createResult.Id,
-                IsPrivate = createResult.Private,
-                IsTemplate = createResult.IsTemplate,
-                LicenseTemplate = request.LicenseTemplate,
-                ModifiedDateTime = createResult.CreatedAt.DateTime,
-                Name = createResult.Name,
-                RepoName = createResult.FullName,
-                TeamId = request.TeamId,
-                UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault,
-                Visibility = request.Visibility,
-                Url = createResult.Url,
-                GitUrl = createResult.GitUrl,
-            });
+            var response = ParseRepository(createResult);
+
+            response.AutoInit = request.AutoInit;
+            response.GitIgnoreTemplate = request.GitignoreTemplate;
+            response.HasProjects = request.HasProjects;
+            response.LicenseTemplate = request.LicenseTemplate;
+            response.TeamId = request.TeamId;
+            response.UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault;
+            response.Visibility = request.Visibility;
+
+            return ValidationResponse<Shared.Models.Repository>.Success(response);
         }
-        catch(ApiException ex)
+        catch (ApiException ex)
         {
-            var response = new ValidationResponse<Shared.Models.Repository>();
-            response.Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError
+            var response = new ValidationResponse<Shared.Models.Repository>
             {
-                Message = error.Message,
-                Code = error.Code,
-                Resource = error.Resource,
-                Field = error.Field
-            }).ToList();
+                Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError
+                {
+                    Message = error.Message,
+                    Code = error.Code,
+                    Resource = error.Resource,
+                    Field = error.Field
+                }).ToList()
+            };
 
             return response;
         }
@@ -179,6 +154,30 @@ public class GithubService : IGithubService
             Url = license.Url
         }));
     }
+
+    public Shared.Models.Repository ParseRepository(Octokit.Repository repo) => new Shared.Models.Repository
+    {
+        AllowAutoMerge = repo.AllowAutoMerge != null,
+        AllowMergeCommit = repo.AllowMergeCommit != null,
+        AllowRebaseMerge = repo.AllowRebaseMerge != null,
+        AllowSquashMerge = repo.AllowSquashMerge != null,
+        CreatedDateTime = repo.CreatedAt.DateTime,
+        DeleteBranchOnMerge = repo.DeleteBranchOnMerge != null,
+        DeletedDateTime = null,
+        Description = repo.Description ?? "No description", // This is added to solve issues when importing repos that don't have existing values
+        HasDownloads = repo.HasDownloads,
+        HasIssues = repo.HasIssues,
+        HasWiki = repo.HasWiki,
+        Homepage = repo.Homepage ?? "No homepage", // This is added to solve issues when importing repos that don't have existing values
+        Id = repo.Id,
+        IsPrivate = repo.Private,
+        IsTemplate = repo.IsTemplate,
+        ModifiedDateTime = repo.CreatedAt.DateTime,
+        Name = repo.Name,
+        RepoName = repo.FullName,
+        Url = repo.Url,
+        GitUrl = repo.GitUrl,
+    };
 
     public RepositoryDTO ToDto(Shared.Models.Repository repo) => new()
     {

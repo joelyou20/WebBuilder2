@@ -23,7 +23,9 @@ public class RepositoryController : ControllerBase
     {
         try
         {
-            return Ok(id == null ? await _repositoryDbService.GetAllAsync() : await _repositoryDbService.GetSingleAsync(id.Value));
+            var result = id == null ? await _repositoryDbService.GetAllAsync() : await _repositoryDbService.GetSingleAsync(id.Value);
+            if (!result.IsSuccessful) throw new Exception("GET failed. See Error.");
+            return Ok(result);
         }
         catch (Exception ex)
         {
@@ -32,28 +34,32 @@ public class RepositoryController : ControllerBase
     }
 
     [HttpPut("/repository")]
-    public async Task<ActionResult<ValidationResponse<Repository>>> Put([FromBody] Repository site)
+    public async Task<ActionResult<ValidationResponse<Repository>>> Put([FromBody] Repository repo)
     {
         try
         {
-            return Ok(await _repositoryDbService.UpsertAsync(site));
+            var result = await _repositoryDbService.UpsertAsync(repo);
+            if (!result.IsSuccessful) throw new Exception("PUT failed. See Error.");
+            return Ok(result);
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(site, ex));
+            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repo, ex));
         }
     }
 
     [HttpPost("/repository/delete")]
-    public async Task<ActionResult<ValidationResponse<Repository>>> SoftDelete([FromBody] Repository site)
+    public async Task<ActionResult<ValidationResponse<Repository>>> SoftDelete([FromBody] Repository repo)
     {
         try
         {
-            return Ok(await _repositoryDbService.SoftDeleteAsync(site));
+            var result = await _repositoryDbService.SoftDeleteAsync(repo);
+            if (!result.IsSuccessful) throw new Exception("DELETE failed. See Error.");
+            return Ok(result);
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(site, ex));
+            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repo, ex));
         }
     }
 }
