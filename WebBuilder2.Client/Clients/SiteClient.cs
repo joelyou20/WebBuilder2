@@ -17,7 +17,7 @@ namespace WebBuilder2.Client.Clients
             _httpClient = httpClient;
         }
 
-        public async Task AddSiteAsync(Site site)
+        public async Task<ValidationResponse<Site>> AddSiteAsync(Site site)
         {
             var content = JsonContent.Create(site);
             HttpResponseMessage response = await _httpClient.PutAsync($"{_httpClient.BaseAddress}site", content);
@@ -27,7 +27,7 @@ namespace WebBuilder2.Client.Clients
             }
         }
 
-        public async Task<ValidationResponse<Site>?> GetSingleSiteAsync(long id)
+        public async Task<ValidationResponse<Site>> GetSingleSiteAsync(long id)
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site/{id}");
             if (!response.IsSuccessStatusCode)
@@ -40,7 +40,7 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
-        public async Task<ValidationResponse<Site>?> GetSitesAsync()
+        public async Task<ValidationResponse<Site>> GetSitesAsync()
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site");
             if(!response.IsSuccessStatusCode)
@@ -53,7 +53,7 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
-        public async Task<ValidationResponse<Site>?> SoftDeleteSiteAsync(Site site)
+        public async Task<ValidationResponse<Site>> SoftDeleteSiteAsync(Site site)
         {
             var content = JsonContent.Create(site);
             HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}site/delete", content);

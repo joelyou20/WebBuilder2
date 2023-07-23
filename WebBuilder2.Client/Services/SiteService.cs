@@ -19,16 +19,16 @@ namespace WebBuilder2.Client.Services
             _siteClient = siteClient;
         }
 
-        public async Task<List<Site>?> GetSitesAsync()
+        public async Task<List<Site>> GetSitesAsync()
         {
-            ValidationResponse<Site>? response = await _siteClient.GetSitesAsync();
+            ValidationResponse<Site> response = await _siteClient.GetSitesAsync();
 
             if (response == null || !response.IsSuccessful || response.Values == null || !response.Values.Any())
             {
                 throw new Exception(response?.Message ?? "Failed to get site Data");
             }
 
-            return response.Values!.ToList();
+            return response.GetValues();
 
         }
 
@@ -43,14 +43,26 @@ namespace WebBuilder2.Client.Services
                 throw new Exception(response?.Message ?? "Failed to get site Data");
             }
 
-            return response.Values!.SingleOrDefault();
+            return response.GetValues().SingleOrDefault();
         }
 
-        public async Task AddSiteAsync(Site site) => await _siteClient.AddSiteAsync(site);
+        public async Task<Site?> AddSiteAsync(Site site)
+        {
+            ValidationResponse<Site> response = await _siteClient.AddSiteAsync(site);
+
+            if (response == null) return null;
+
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response?.Message ?? "Failed to add site Data");
+            }
+
+            return response.GetValues().SingleOrDefault();
+        }
 
         public async Task<Site?> SoftDeleteSiteAsync(Site site)
         {
-            ValidationResponse<Site>? response = await _siteClient.SoftDeleteSiteAsync(site);
+            ValidationResponse<Site> response = await _siteClient.SoftDeleteSiteAsync(site);
 
             if (response == null) return null;
 
@@ -59,7 +71,7 @@ namespace WebBuilder2.Client.Services
                 throw new Exception(response?.Message ?? "Failed to add site");
             }
 
-            return response.Values!.SingleOrDefault();
+            return response.GetValues().SingleOrDefault();
         }
     }
 }
