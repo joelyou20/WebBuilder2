@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
@@ -11,25 +12,26 @@ namespace WebBuilder2.Server.Controllers;
 [Route("[controller]")]
 public class SiteController : ControllerBase
 {
-    private readonly ILogger<SiteController> _logger;
-    private IAwsS3Service _awsS3Service;
-    private ISiteDbService _siteService;
+    private ISiteRepository _siteRepository;
 
-    public SiteController(ILogger<SiteController> logger, IAwsS3Service awsS3Service, ISiteDbService siteService)
+    public SiteController(ISiteRepository siteRepository)
     {
-        _logger = logger;
-        _awsS3Service = awsS3Service;
-        _siteService = siteService;
+        _siteRepository = siteRepository;
     }
 
     [HttpGet("/site/{id?}")]
-    public async Task<ActionResult<ValidationResponse<Site>>> Get([FromRoute] long? id)
+    public ActionResult<ValidationResponse<Site>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
         try
         {
-            var response = id == null ? await _siteService.GetAllAsync() : await _siteService.GetSingleAsync(id.Value);
-            if (!response.IsSuccessful) throw new Exception("GET failed. See Error.");
-            return Ok(response);
+            var result = _siteRepository.Get(exclude);
+            if (id != null) result = result?.Where(x => x.Id == id);
+
+            if (result == null) throw new Exception(id == null ? 
+                "Failed to get site data from database." :
+                $"Failed to retrieve site data with ID value of: {id}");
+
+            return Ok(ValidationResponse<Site>.Success(result.ToList()));
         }
         catch (Exception ex)
         {
@@ -38,32 +40,30 @@ public class SiteController : ControllerBase
     }
 
     [HttpPut("/site")]
-    public async Task<ActionResult<ValidationResponse<Site>>> Put([FromBody] Site site)
+    public ActionResult<ValidationResponse<Site>> Put([FromBody] IEnumerable<Site> sites)
     {
         try
         {
-            var response = await _siteService.UpsertAsync(site);
-            if (!response.IsSuccessful) throw new Exception("PUT failed. See Error.");
-            return Ok(response);
+            _siteRepository.UpsertRange(sites);
+            return Ok();
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(site, ex));
+            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(sites, ex));
         }
     }
 
     [HttpPost("/site/delete")]
-    public async Task<ActionResult<ValidationResponse<Site>>> SoftDelete([FromBody] Site site)
+    public ActionResult<ValidationResponse<Site>> SoftDelete([FromBody] IEnumerable<Site> sites)
     {
         try
         {
-            var response = await _siteService.SoftDeleteAsync(site);
-            if (!response.IsSuccessful) throw new Exception("DELETE failed. See Error.");
-            return Ok(response);
+            _siteRepository.SoftDeleteRange(sites);
+            return Ok();
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(site, ex));
+            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(sites, ex));
         }
     }
 }

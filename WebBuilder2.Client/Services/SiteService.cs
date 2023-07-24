@@ -19,9 +19,9 @@ namespace WebBuilder2.Client.Services
             _siteClient = siteClient;
         }
 
-        public async Task<List<Site>> GetSitesAsync()
+        public async Task<List<Site>> GetSitesAsync(IEnumerable<long>? exclude = null)
         {
-            ValidationResponse<Site> response = await _siteClient.GetSitesAsync();
+            ValidationResponse<Site> response = await _siteClient.GetSitesAsync(exclude);
 
             if (response == null || !response.IsSuccessful)
             {
@@ -29,7 +29,6 @@ namespace WebBuilder2.Client.Services
             }
 
             return response.GetValues();
-
         }
 
         public async Task<Site?> GetSingleSiteAsync(long id)
@@ -68,7 +67,7 @@ namespace WebBuilder2.Client.Services
 
             if (!response.IsSuccessful)
             {
-                throw new Exception(response?.Message ?? "Failed to add site");
+                throw new Exception(response?.Message ?? "Failed to delete site");
             }
 
             return response.GetValues().SingleOrDefault();

@@ -58,10 +58,15 @@ public partial class GithubConnection
             Position = DialogPosition.Center,
             FullWidth = true
         };
+        DialogParameters dialogParameters = new()
+        {
+            { "ExistingIds", _repositories.Select(x => x.Id).ToList() }
+        };
 
         var dialog = await DialogService.ShowAsync<ImportGithubRepoDialog>(
             title: "Import Repository from Github Account",
-            options: options
+            options: options,
+            parameters: dialogParameters
         );
 
         await dialog.Result;

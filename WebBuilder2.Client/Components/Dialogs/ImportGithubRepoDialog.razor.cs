@@ -14,6 +14,7 @@ public partial class ImportGithubRepoDialog
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
+    [Parameter] public IEnumerable<long> ExistingIds { get; set; } = default!;
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private Dictionary<Repository, bool> _githubRepositories = new();
@@ -32,7 +33,10 @@ public partial class ImportGithubRepoDialog
         if (authenticateResponse != null && authenticateResponse.IsSuccessful)
         {
             var response = await GithubService.GetRepositoriesAsync();
-            response.GetValues().ForEach(x => _githubRepositories.Add(x, false));
+            response.GetValues().ForEach(x =>
+            {
+                if(!ExistingIds.Contains(x.Id)) _githubRepositories.Add(x, false);
+            });
             _dataIsLoading = false;
             StateHasChanged();
         }
