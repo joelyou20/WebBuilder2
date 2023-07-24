@@ -43,7 +43,7 @@ public partial class Sites
 
     private async Task UpdateSitesAsync()
     {
-        var sites = await SiteService.GetSitesAsync();
+        var sites = await SiteService.GetSitesAsync(_siteList.Select(x => x.Id));
 
         if (sites == null) return;
 

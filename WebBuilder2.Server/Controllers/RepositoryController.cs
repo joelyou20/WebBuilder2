@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services;
-using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Validation;
@@ -11,21 +11,26 @@ namespace WebBuilder2.Server.Controllers;
 [Route("[controller]")]
 public class RepositoryController : ControllerBase
 {
-    private IRepositoryDbService _repositoryDbService;
+    private IRepositoryRepository _repositoryRepository;
 
-    public RepositoryController(IRepositoryDbService repositoryDbService)
+    public RepositoryController(IRepositoryRepository repositoryRepository)
     {
-        _repositoryDbService = repositoryDbService;
+        _repositoryRepository = repositoryRepository;
     }
 
     [HttpGet("/repository/{id?}")]
-    public async Task<ActionResult<ValidationResponse<Repository>>> Get([FromRoute] long? id)
+    public ActionResult<ValidationResponse<Repository>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
         try
         {
-            var result = id == null ? await _repositoryDbService.GetAllAsync() : await _repositoryDbService.GetSingleAsync(id.Value);
-            if (!result.IsSuccessful) throw new Exception("GET failed. See Error.");
-            return Ok(result);
+            var result = _repositoryRepository.Get(exclude);
+            if (id != null) result = result?.Where(x => x.Id == id);
+
+            if (result == null) throw new Exception(id == null ?
+                "Failed to get repository data from database." :
+                $"Failed to retrieve repository data with ID value of: {id}");
+
+            return Ok(ValidationResponse<Repository>.Success(result.ToList()));
         }
         catch (Exception ex)
         {
@@ -34,32 +39,30 @@ public class RepositoryController : ControllerBase
     }
 
     [HttpPut("/repository")]
-    public async Task<ActionResult<ValidationResponse<Repository>>> Put([FromBody] Repository repo)
+    public ActionResult<ValidationResponse<Repository>> Put([FromBody] IEnumerable<Repository> repos)
     {
         try
         {
-            var result = await _repositoryDbService.UpsertAsync(repo);
-            if (!result.IsSuccessful) throw new Exception("PUT failed. See Error.");
-            return Ok(result);
+            _repositoryRepository.UpsertRange(repos);
+            return Ok();
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repo, ex));
+            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repos, ex));
         }
     }
 
     [HttpPost("/repository/delete")]
-    public async Task<ActionResult<ValidationResponse<Repository>>> SoftDelete([FromBody] Repository repo)
+    public ActionResult<ValidationResponse<Repository>> SoftDelete([FromBody] IEnumerable<Repository> repos)
     {
         try
         {
-            var result = await _repositoryDbService.SoftDeleteAsync(repo);
-            if (!result.IsSuccessful) throw new Exception("DELETE failed. See Error.");
-            return Ok(result);
+            _repositoryRepository.SoftDeleteRange(repos);
+            return Ok();
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repo, ex));
+            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repos, ex));
         }
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Octokit;
 using WebBuilder2.Server.Data;
+using WebBuilder2.Server.Repositories;
+using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
@@ -16,6 +18,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddLogging();
 
 builder.Services.AddScoped<DbContextOptions<AppDbContext>>();
 builder.Services.AddScoped<AppDbContextFactory>();
@@ -23,8 +26,8 @@ builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContex
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
-builder.Services.AddScoped<ISiteDbService, SiteDbService>();
-builder.Services.AddScoped<IRepositoryDbService, RepositoryDbService>();
+builder.Services.AddScoped<ISiteRepository, SiteRepository>();
+builder.Services.AddScoped<IRepositoryRepository, RepositoryRepository>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 
 builder.Services.AddGitHubClient(configuration);
