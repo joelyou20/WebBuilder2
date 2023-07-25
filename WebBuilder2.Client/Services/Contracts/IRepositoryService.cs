@@ -7,6 +7,8 @@ namespace WebBuilder2.Client.Services.Contracts
         Task<List<Repository>> GetRepositoriesAsync();
         Task<Repository?> GetSingleRepositoryAsync(long id);
         Task<Repository?> AddRepositoryAsync(Repository repository);
-        Task<Repository?> SoftDeleteSiteAsync(Repository repository);
+        Task<Repository?> AddRepositoriesAsync(IEnumerable<Repository> repositories);
+        Task<Repository?> SoftDeleteRepositoryAsync(Repository repository);
+        Task<Repository?> UpdateRepositoryAsync(Repository repository);
     }
 }

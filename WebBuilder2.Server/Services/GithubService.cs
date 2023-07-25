@@ -168,15 +168,15 @@ public class GithubService : IGithubService
         HasDownloads = repo.HasDownloads,
         HasIssues = repo.HasIssues,
         HasWiki = repo.HasWiki,
-        Homepage = repo.Homepage ?? "No homepage", // This is added to solve issues when importing repos that don't have existing values
+        Homepage = repo.Homepage.IsNullOrEmpty() ? "No homepage" : repo.Homepage, // This is added to solve issues when importing repos that don't have existing values
         Id = repo.Id,
         IsPrivate = repo.Private,
         IsTemplate = repo.IsTemplate,
         ModifiedDateTime = repo.CreatedAt.DateTime,
         Name = repo.Name,
         RepoName = repo.FullName,
-        Url = repo.Url,
         GitUrl = repo.GitUrl,
+        HtmlUrl = repo.HtmlUrl,
     };
 
     public RepositoryDTO ToDto(Shared.Models.Repository repo) => new()

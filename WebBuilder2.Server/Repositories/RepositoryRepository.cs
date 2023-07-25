@@ -22,100 +22,87 @@ public class RepositoryRepository : IRepositoryRepository
 
     public IQueryable<Repository>? Get(IEnumerable<long>? exclude = null)
     {
-        try
-        {
-            var query = _db.Repositories.Where(s => s.DeletedDateTime == null);
+        var query = _db.Repositories.Where(s => s.DeletedDateTime == null);
 
-            if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
+        if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
 
-            return query.Select(s => s.FromDto());
-        }
-        catch (Exception ex)
+        return query.Select(r => new Repository()
         {
-            _logger.LogError(ex, "Failed to retrieve repositories from database");
-            return null;
-        }
+            Id = r.Id,
+            AllowAutoMerge = r.AllowAutoMerge,
+            AllowMergeCommit = r.AllowMergeCommit,
+            AllowRebaseMerge = r.AllowRebaseMerge,
+            AllowSquashMerge = r.AllowSquashMerge,
+            AutoInit = r.AutoInit,
+            DeleteBranchOnMerge = r.DeleteBranchOnMerge,
+            GitIgnoreTemplate = r.GitIgnoreTemplate,
+            HasDownloads = r.HasDownloads,
+            HasIssues = r.HasIssues,
+            HasProjects = r.HasProjects,
+            HasWiki = r.HasWiki,
+            Homepage = r.Homepage,
+            Description = r.Description,
+            IsPrivate = r.IsPrivate,
+            IsTemplate = r.IsTemplate,
+            LicenseTemplate = r.LicenseTemplate,
+            TeamId = r.TeamId,
+            Name = r.Name,
+            RepoName = r.RepoName,
+            UseSquashPrTitleAsDefault = r.UseSquashPrTitleAsDefault,
+            Visibility = r.Visibility,
+            HtmlUrl = r.HtmlUrl,
+            GitUrl = r.GitUrl,
+            CreatedDateTime = r.CreatedDateTime,
+            DeletedDateTime = r.DeletedDateTime,
+            ModifiedDateTime = r.ModifiedDateTime
+        });
     }
 
     public void AddRange(IEnumerable<Repository> values)
     {
-        try
-        {
-            if (!values.Any()) return;
-            _db.AddRange(values);
-            var result = _db.SaveChanges();
-            if (result <= 0) throw new DbUpdateException("Failed to save changes.");
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "Failed to add repositories to database");
-        }
+        if (!values.Any()) return;
+        _db.AddRange(values.Select(ToDto));
+        var result = _db.SaveChanges();
+        if (result <= 0) throw new DbUpdateException("Failed to save changes.");
     }
 
     public void UpdateRange(IEnumerable<Repository> values)
     {
-        try
-        {
-            var dtos = values.Select(ToDto);
-            _db.Repositories.UpdateRange(dtos);
-            var result = _db.SaveChanges();
-            if (result <= 0) throw new DbUpdateException("Failed to save changes.");
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "Failed to retrieve repositories from database");
-        }
+        var dtos = values.Select(ToDto);
+        _db.Repositories.UpdateRange(dtos);
+        var result = _db.SaveChanges();
+        if (result <= 0) throw new DbUpdateException("Failed to save changes.");
     }
 
     public void UpsertRange(IEnumerable<Repository> values)
     {
-        try
-        {
-            List<Repository> existingValues = Get()?.Where(x => values.Select(y => y.Id == x.Id).Any()).ToList() ?? new List<Repository>();
-            List<Repository> newValues = values.Where(x => !existingValues.Select(y => y.Id == x.Id).Any()).ToList();
+        IEnumerable<long> valuesList = values.Select(x => x.Id);
+        List<Repository> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<Repository>();
+        List<Repository> newValues = values.Where(x => !existingValues.Any(y => y.Id.Equals(x.Id))).ToList();
 
-            if (existingValues.Any()) UpdateRange(values);
-            if (newValues.Any()) AddRange(newValues);
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "Failed to upsert repositories");
-        }
+        if (existingValues.Any()) UpdateRange(values);
+        if (newValues.Any()) AddRange(newValues);
     }
 
     public void DeleteRange(IEnumerable<Repository> values)
     {
-        try
-        {
-            var dtos = values.Select(ToDto);
-            _db.RemoveRange(dtos);
-            var result = _db.SaveChanges();
-            if (result <= 0) throw new DbUpdateException("Failed to save changes.");
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "Failed to delete repositories from database");
-        }
+        var dtos = values.Select(ToDto);
+        _db.RemoveRange(dtos);
+        var result = _db.SaveChanges();
+        if (result <= 0) throw new DbUpdateException("Failed to save changes.");
     }
 
     public void SoftDeleteRange(IEnumerable<Repository> values)
     {
-        try
+        var softDeletedValues = values.Select(x =>
         {
-            var softDeletedValues = values.Select(x =>
-            {
-                var copy = ToDto(x);
-                copy.DeletedDateTime = DateTime.UtcNow;
-                return copy;
-            });
-            _db.Repositories.UpdateRange(softDeletedValues);
-            var result = _db.SaveChanges();
-            if (result <= 0) throw new DbUpdateException("Failed to save changes.");
-        }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "Failed to soft delete repositories from database");
-        }
+            var copy = ToDto(x);
+            copy.DeletedDateTime = DateTime.UtcNow;
+            return copy;
+        });
+        _db.Repositories.UpdateRange(softDeletedValues);
+        var result = _db.SaveChanges();
+        if (result <= 0) throw new DbUpdateException("Failed to save changes.");
     }
 
     public RepositoryDTO ToDto(Repository repository) => new()
@@ -145,7 +132,7 @@ public class RepositoryRepository : IRepositoryRepository
         TeamId = repository.TeamId,
         UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault,
         Visibility = repository.Visibility,
-        Url = repository.Url,
+        HtmlUrl = repository.HtmlUrl,
         GitUrl = repository.GitUrl
     };
 }

@@ -46,6 +46,15 @@ public class ValidationResponse<T> where T : class
 
     public static ValidationResponse<T> EntityAlreadyExists(T value, string? message = null) => EntityAlreadyExists(new List<T>() { value }, message);
 
+    public static ValidationResponse<T> NotAuthenticated(IEnumerable<T>? values = null, string? message = null) => new()
+    {
+        IsSuccessful = false,
+        Message = message ?? "User not Authenticated",
+        Values = values
+    };
+
+    public static ValidationResponse<T> NotAuthenticated(T value, string? message = null) => NotAuthenticated(new List<T>() { value }, message);
+
     public List<T> GetValues() => Values?.ToList() ?? new List<T>();
 }
 
@@ -79,5 +88,11 @@ public class ValidationResponse
     {
         IsSuccessful = false,
         Message = "Entity already exists in database",
+    };
+
+    public static ValidationResponse NotAuthenticated() => new()
+    {
+        IsSuccessful = false,
+        Message = "User not Authenticated",
     };
 }

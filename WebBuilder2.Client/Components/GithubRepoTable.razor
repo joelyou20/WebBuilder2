@@ -4,7 +4,7 @@
         <MudTh>Name</MudTh>
         <MudTh>RepoName</MudTh>
         <MudTh>Description</MudTh>
-        <MudTh>Url</MudTh>
+        <MudTh>HtmlUrl</MudTh>
         <MudTh>GitUrl</MudTh>
         <MudTh>IsPrivate</MudTh>
         <MudTh>Visibility</MudTh>
@@ -26,7 +26,7 @@
         <MudTh>HasWiki</MudTh>
         <MudTh>Homepage</MudTh>
         <MudTh>TeamId</MudTh>
-        @if (ShowConnectButton || ShowDeleteButton)
+        @if (ShowConnectButton || ShowDeleteButton || ShowAddTemplateButton)
         {
             <MudTh></MudTh>
         }
@@ -36,7 +36,7 @@
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="IsConnected">@context.RepoName</MudTd>
         <MudTd DataLabel="IsConnected">@context.Description</MudTd>
-        <MudTd DataLabel="IsConnected">@context.Url</MudTd>
+        <MudTd DataLabel="IsConnected"><MudLink Href="@context.HtmlUrl">@context.HtmlUrl</MudLink></MudTd>
         <MudTd DataLabel="IsConnected">@context.GitUrl</MudTd>
         <MudTd DataLabel="IsConnected">@context.IsPrivate</MudTd>
         <MudTd DataLabel="IsConnected">@context.Visibility</MudTd>
@@ -68,6 +68,10 @@
                 @if (ShowDeleteButton)
                 {
                     <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => OnDeleteRepoButtonClicked(context))">Delete</MudButton>
+                }
+                @if (ShowAddTemplateButton)
+                {
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" Disabled="@context.IsTemplate" OnClick="@(() => OnAddTemplateButtonClicked(context))">Add Template</MudButton>
                 }
             </MudTd>
         }

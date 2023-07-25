@@ -21,6 +21,8 @@ public class ClientBase<T> where T : AuditableEntity
     public async Task<ValidationResponse<T>> GetSingleAsync(long id) => await GetAsync(path: id.ToString());
     public async Task<ValidationResponse<T>> SoftDeleteAsync(T value) => await SoftDeleteRangeAsync(new T[] { value });
     public async Task<ValidationResponse<T>> SoftDeleteRangeAsync(IEnumerable<T> values) => await PostAsync("delete", JsonContent.Create(values));
+    public async Task<ValidationResponse<T>> UpdateAsync(T value) => await UpdateRangeAsync(new T[] { value });
+    public async Task<ValidationResponse<T>> UpdateRangeAsync(IEnumerable<T> values) => await PostAsync("update", JsonContent.Create(values));
 
     public async Task<ValidationResponse<T>> GetAsync(IEnumerable<long>? exclude = null, string? path = null)
     {

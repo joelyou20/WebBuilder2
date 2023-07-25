@@ -53,10 +53,11 @@ public partial class ImportGithubRepoDialog
 
     private void OnImportBtnClick() => InvokeAsync(async () =>
     {
-        foreach (Repository? repo in _githubRepositories.Where(x => x.Value).Select(x => x.Key))
-        {
-            if(repo != null) await RepositoryService.AddRepositoryAsync(repo);
-        }
+        IEnumerable<Repository> repos = _githubRepositories.Where(x => x.Value).Select(x => x.Key);
+
+        if (!repos.Any()) return;
+
+        await RepositoryService.AddRepositoriesAsync(repos);
 
         MudDialog.Close(DialogResult.Ok(true));
     });

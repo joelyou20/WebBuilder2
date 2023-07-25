@@ -32,7 +32,7 @@ namespace WebBuilder2.Server.Data.Models
         public string LicenseTemplate { get; set; } = string.Empty;
         public int? TeamId { get; set; }
         public bool UseSquashPrTitleAsDefault { get; set; } = false;
-        public string Url { get; set; } = string.Empty;
+        public string HtmlUrl { get; set; } = string.Empty;
         public string GitUrl { get; set; } = string.Empty;
 
         public Repository FromDto() => new()
@@ -59,7 +59,7 @@ namespace WebBuilder2.Server.Data.Models
             RepoName = RepoName,
             UseSquashPrTitleAsDefault = UseSquashPrTitleAsDefault,
             Visibility = Visibility,
-            Url = Url,
+            HtmlUrl = HtmlUrl,
             GitUrl = GitUrl,
             CreatedDateTime = CreatedDateTime,
             DeletedDateTime = DeletedDateTime,

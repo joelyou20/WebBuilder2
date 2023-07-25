@@ -18,17 +18,17 @@ public class GithubCreateRepoRequest
     public RepoVisibility Visibility { get; set; } = RepoVisibility.Public;
     public bool IsPrivate { get; set; } = false;
     public bool IsTemplate { get; set; } = false;
-    public bool AllowAutoMerge { get; set; } = false;
-    public bool AllowMergeCommit { get; set; } = false;
-    public bool AllowRebaseMerge { get; set; } = false;
-    public bool AllowSquashMerge { get; set; } = false;
-    public bool AutoInit { get; set; } = false;
+    public bool AllowAutoMerge { get; set; } = true;
+    public bool AllowMergeCommit { get; set; } = true;
+    public bool AllowRebaseMerge { get; set; } = true;
+    public bool AllowSquashMerge { get; set; } = true;
+    public bool AutoInit { get; set; } = true;
     public bool DeleteBranchOnMerge { get; set; }
     public string GitignoreTemplate { get; set; } = string.Empty;
-    public bool HasDownloads { get; set; } = false;
-    public bool HasIssues { get; set; } = false;
-    public bool HasProjects { get; set; } = false;
-    public bool HasWiki { get; set; } = false;
+    public bool HasDownloads { get; set; } = true;
+    public bool HasIssues { get; set; } = true;
+    public bool HasProjects { get; set; } = true;
+    public bool HasWiki { get; set; } = true;
     public string Homepage { get; set; } = string.Empty;
     public string LicenseTemplate { get; set; } = string.Empty;
     public int? TeamId { get; set; }

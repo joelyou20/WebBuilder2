@@ -65,4 +65,18 @@ public class RepositoryController : ControllerBase
             return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repos, ex));
         }
     }
+
+    [HttpPost("/repository/update")]
+    public ActionResult<ValidationResponse<Repository>> Update([FromBody] IEnumerable<Repository> repos)
+    {
+        try
+        {
+            _repositoryRepository.UpdateRange(repos);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repos, ex));
+        }
+    }
 }

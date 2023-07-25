@@ -9,5 +9,7 @@ namespace WebBuilder2.Client.Clients.Contracts
         Task<ValidationResponse<Repository>> GetSingleRepositoryAsync(long id);
         Task<ValidationResponse<Repository>> SoftDeleteRepositoryAsync(Repository repository);
         Task<ValidationResponse<Repository>> AddRepositoryAsync(Repository repository);
+        Task<ValidationResponse<Repository>> AddRepositoriesAsync(IEnumerable<Repository> repositories);
+        Task<ValidationResponse<Repository>> UpdateRepositoryAsync(Repository repository);
     }
 }

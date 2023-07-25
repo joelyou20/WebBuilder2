@@ -13,6 +13,12 @@
             <DataAnnotationsValidator />
             <MudTextField Label="Repo Name" T="string" @bind-Value="@_model.RepoName" Required="true" For="@(() => _model.RepoName)" />
             <MudTextField Label="Description" T="string" @bind-Value="@_model.Description" Lines="5" Variant="Variant.Outlined" Required="true" For="@(() => _model.Description)" />
+            <MudSelect T="Repository" Label="Template" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_templateSelectConverter" Required="false" ValueChanged="OnTemplateSelected">
+                @foreach (Repository templateRepository in TemplateRepositories)
+                {
+                    <MudSelectItem Value="@templateRepository" />
+                }
+            </MudSelect>
             <MudExpansionPanel Text="Advanced">
                 <section class="gr-dialog-checkbox-section">
                     <MudCheckBox Label="IsPrivate" @bind-Checked="@_model.IsPrivate" Required="false" For="@(() => _model.IsPrivate)" />
@@ -28,7 +34,7 @@
                     <MudCheckBox Label="DeleteBranchOnMerge" @bind-Checked="@_model.DeleteBranchOnMerge" Required="false" For="@(() => _model.DeleteBranchOnMerge)" />
                 </section>
                 <MudSelect T="string" Label="GitIgnoreTemplate" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.GitignoreTemplate" MultiSelection="false" Required="false" For="@(() => _model.GitignoreTemplate)">
-                    @foreach (string gitIgnoreTemplate in _gitIgnoretemplates)
+                    @foreach (string gitIgnoreTemplate in _gitIgnoreTemplates)
                     {
                         <MudSelectItem Value="@gitIgnoreTemplate" />
                     }

@@ -57,8 +57,8 @@ public class Repository : AuditableEntity
     public int? TeamId { get; set; }
     [JsonPropertyName("useSquashPrTitleAsDefault")]
     public bool UseSquashPrTitleAsDefault { get; set; } = false;
-    [JsonPropertyName("url")]
-    public string Url { get; set; } = string.Empty;
+    [JsonPropertyName("htmlUrl")]
+    public string HtmlUrl { get; set; } = string.Empty;
     [JsonPropertyName("gitUrl")]
     public string GitUrl { get; set; } = string.Empty;
 }

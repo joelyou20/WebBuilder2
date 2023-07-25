@@ -14,5 +14,7 @@ namespace WebBuilder2.Client.Clients
         public async Task<ValidationResponse<Repository>> GetSingleRepositoryAsync(long id) => await GetSingleAsync(id);
         public async Task<ValidationResponse<Repository>> SoftDeleteRepositoryAsync(Repository repository) => await SoftDeleteAsync(repository);
         public async Task<ValidationResponse<Repository>> AddRepositoryAsync(Repository repository) => await AddAsync(repository);
+        public async Task<ValidationResponse<Repository>> AddRepositoriesAsync(IEnumerable<Repository> repositories) => await AddRangeAsync(repositories);
+        public async Task<ValidationResponse<Repository>> UpdateRepositoryAsync(Repository repository) => await UpdateAsync(repository);
     }
 }

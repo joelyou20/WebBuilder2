@@ -14,6 +14,7 @@
                             <MudText>@($"Name: {repo.Key.Name}")</MudText>
                                 <MudText>@($"Description: {repo.Key.Description}")</MudText>
                                 <MudText>@($"Id: {repo.Key.Id}")</MudText>
+                                <MudText>@($"Homepage: {repo.Key.Homepage}")</MudText>
                                 <MudCheckBox T="bool" Checked="@repo.Value" CheckedChanged="@(() => OnCheckboxChecked(repo.Key))" />
                             </MudCard>
                         </MudListItem>

@@ -21,7 +21,7 @@ namespace WebBuilder2.Client.Services
 
             if (response == null || !response.IsSuccessful)
             {
-                throw new Exception(response?.Message ?? "Failed to get repository Data");
+                throw new Exception(response?.Errors.First().Message ?? "Failed to get repository Data");
             }
 
             return response.GetValues();
@@ -36,7 +36,7 @@ namespace WebBuilder2.Client.Services
 
             if (!response.IsSuccessful)
             {
-                throw new Exception(response?.Message ?? "Failed to get site Data");
+                throw new Exception(response?.Message ?? "Failed to get repository Data");
             }
 
             return response.GetValues().SingleOrDefault();
@@ -50,13 +50,27 @@ namespace WebBuilder2.Client.Services
 
             if (!response.IsSuccessful)
             {
-                throw new Exception(response?.Message ?? "Failed to add site Data");
+                throw new Exception(response?.Message ?? "Failed to add repository Data");
             }
 
             return response.GetValues().SingleOrDefault();
         }
 
-        public async Task<Repository?> SoftDeleteSiteAsync(Repository repository)
+        public async Task<Repository?> AddRepositoriesAsync(IEnumerable<Repository> repositories)
+        {
+            ValidationResponse<Repository> response = await _client.AddRepositoriesAsync(repositories);
+
+            if (response == null) return null;
+
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response?.Message ?? "Failed to add repository Data");
+            }
+
+            return response.GetValues().SingleOrDefault();
+        }
+
+        public async Task<Repository?> SoftDeleteRepositoryAsync(Repository repository)
         {
             ValidationResponse<Repository> response = await _client.SoftDeleteRepositoryAsync(repository);
 
@@ -64,7 +78,21 @@ namespace WebBuilder2.Client.Services
 
             if (!response.IsSuccessful)
             {
-                throw new Exception(response?.Message ?? "Failed to add site");
+                throw new Exception(response?.Message ?? "Failed to add repository");
+            }
+
+            return response.GetValues().SingleOrDefault();
+        }
+
+        public async Task<Repository?> UpdateRepositoryAsync(Repository repository)
+        {
+            ValidationResponse<Repository> response = await _client.UpdateRepositoryAsync(repository);
+
+            if (response == null) return null;
+
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response?.Message ?? "Failed to update repository");
             }
 
             return response.GetValues().SingleOrDefault();

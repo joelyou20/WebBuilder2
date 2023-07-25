@@ -38,10 +38,15 @@ public partial class GithubConnection
             Position = DialogPosition.Center,
             FullWidth = true
         };
+        DialogParameters dialogParameters = new()
+        {
+            { "TemplateRepositories", _repositories.Where(x => x.IsTemplate).ToList() }
+        };
 
         var dialog = await DialogService.ShowAsync<CreateGithubRepoDialog>(
             title: "Create New Repo",
-            options: options
+            options: options,
+            parameters: dialogParameters
         );
 
         await dialog.Result;
