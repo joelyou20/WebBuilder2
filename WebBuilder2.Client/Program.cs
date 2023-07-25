@@ -50,6 +50,7 @@ builder.Services.AddHttpClient<IRepositoryClient, RepositoryClient>(client => { 
 builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
 builder.Services.AddScoped<ISiteManager, SiteManager>();
 builder.Services.AddScoped<IGithubTemplateManager, GithubTemplateManager>();
+builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 
 // <================== END OF MANAGERS
 

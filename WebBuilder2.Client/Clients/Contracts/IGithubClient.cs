@@ -8,7 +8,7 @@ public interface IGithubClient
 {
     Task<ValidationResponse<Repository>> GetRepositoriesAsync();
     Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
-    Task<ValidationResponse<Repository>> PostCreateRepoAsync(GithubCreateRepoRequest request);
+    Task<ValidationResponse<Repository>> PostCreateRepoAsync(Repository repository);
     Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
     Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
 }

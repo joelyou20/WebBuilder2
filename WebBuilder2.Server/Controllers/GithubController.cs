@@ -61,15 +61,15 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpPost("/github/repos/create")]
-        public async Task<ActionResult<Repository>> Create([FromBody] GithubCreateRepoRequest request)
+        public async Task<ActionResult<Repository>> Create([FromBody] Repository repository)
         {
             try
             {
-                return Ok(await _githubService.CreateRepoAsync(request));
+                return Ok(await _githubService.CreateRepoAsync(repository));
             }
             catch (Exception ex)
             {
-                return BadRequest(ValidationResponseHelper<GithubCreateRepoRequest>.BuildFailedResponse(request, ex));
+                return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repository, ex));
             }
         }
 

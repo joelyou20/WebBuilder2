@@ -17,7 +17,6 @@ public class SiteManager : ISiteManager
 
     public async Task CreateSiteAsync(CreateSiteRequest createSiteRequest)
     {
-        // TODO: WHERE ALL THE MAGIC WILL HAPPEN
 
         Site site = new()
         {

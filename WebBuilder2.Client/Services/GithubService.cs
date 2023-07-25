@@ -34,13 +34,13 @@ namespace WebBuilder2.Client.Services
         {
             return await _client.PostAuthenticateAsync(request);
         }
-        public async Task<ValidationResponse<Repository>> PostCreateRepoAsync(GithubCreateRepoRequest request)
+        public async Task<ValidationResponse<Repository>> PostCreateRepoAsync(Repository repository)
         {
             ValidationResponse authenticateResponse = await PostAuthenticateAsync(new GithubAuthenticationRequest(""));
 
             if (authenticateResponse != null && authenticateResponse.IsSuccessful)
             {
-                return await _client.PostCreateRepoAsync(request);
+                return await _client.PostCreateRepoAsync(repository);
             }
             else
             {

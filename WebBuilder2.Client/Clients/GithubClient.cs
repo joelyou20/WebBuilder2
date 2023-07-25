@@ -45,9 +45,9 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
-        public async Task<ValidationResponse<Repository>> PostCreateRepoAsync(GithubCreateRepoRequest request)
+        public async Task<ValidationResponse<Repository>> PostCreateRepoAsync(Repository repository)
         {
-            var content = JsonContent.Create(request);
+            var content = JsonContent.Create(repository);
             HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/repos/create", content);
             if (!response.IsSuccessStatusCode)
             {

@@ -3,6 +3,12 @@
 <MudDialog>
     <DialogContent>
         <MudTextField Label="Site Name" T="string" @bind-Value="@_createSiteRequest.SiteName" />
+        <MudSelect T="Repository" Label="Template" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_templateSelectConverter" Required="false" ValueChanged="OnTemplateSelected">
+            @foreach (Repository templateRepository in _templateRepositories)
+            {
+                <MudSelectItem Value="@templateRepository" />
+            }
+        </MudSelect>
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Filled" OnClick="@(() => OnCreateBtnClick())">Create</MudButton>

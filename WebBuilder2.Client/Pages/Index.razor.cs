@@ -5,6 +5,6 @@ namespace WebBuilder2.Client.Pages;
 
 public partial class Index
 {
-    private bool _gitHubWidgetEnabled = false;
-    private bool _sitesWidgetEnabled = false;
+    private bool _gitHubWidgetEnabled = true;
+    private bool _sitesWidgetEnabled = true;
 }

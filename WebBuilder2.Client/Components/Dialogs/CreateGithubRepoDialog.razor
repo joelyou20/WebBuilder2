@@ -33,7 +33,7 @@
                     <MudCheckBox Label="AutoInit" @bind-Checked="@_model.AutoInit" Required="false" For="@(() => _model.AutoInit)" />
                     <MudCheckBox Label="DeleteBranchOnMerge" @bind-Checked="@_model.DeleteBranchOnMerge" Required="false" For="@(() => _model.DeleteBranchOnMerge)" />
                 </section>
-                <MudSelect T="string" Label="GitIgnoreTemplate" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.GitignoreTemplate" MultiSelection="false" Required="false" For="@(() => _model.GitignoreTemplate)">
+                <MudSelect T="string" Label="GitIgnoreTemplate" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.GitIgnoreTemplate" MultiSelection="false" Required="false" For="@(() => _model.GitIgnoreTemplate)">
                     @foreach (string gitIgnoreTemplate in _gitIgnoreTemplates)
                     {
                         <MudSelectItem Value="@gitIgnoreTemplate" />

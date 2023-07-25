@@ -12,9 +12,9 @@ namespace WebBuilder2.Server.Services;
 
 public class GithubService : IGithubService
 {
-    private GitHubClient _client;
+    private IGitHubClient _client;
 
-    public GithubService(GitHubClient client)
+    public GithubService(IGitHubClient client)
     {
         _client = client;
     }
@@ -70,51 +70,51 @@ public class GithubService : IGithubService
         }
     }
 
-    public async Task<ValidationResponse<Shared.Models.Repository>> CreateRepoAsync(GithubCreateRepoRequest request)
+    public async Task<ValidationResponse<Shared.Models.Repository>> CreateRepoAsync(Shared.Models.Repository repository)
     {
         try
         {
-            NewRepository newRepo = new(request.RepoName)
+            NewRepository newRepo = new(repository.RepoName)
             {
-                Description = request.Description,
-                Private = request.IsPrivate,
-                Visibility = request.Visibility switch
+                Description = repository.Description,
+                Private = repository.IsPrivate,
+                Visibility = repository.Visibility switch
                 {
                     RepoVisibility.Public => RepositoryVisibility.Public,
                     RepoVisibility.Private => RepositoryVisibility.Private,
                     RepoVisibility.Internal => RepositoryVisibility.Internal,
-                    _ => throw new ArgumentOutOfRangeException(nameof(request.Visibility),
-                                                               $"Not expected request visibility value {request.Visibility}"),
+                    _ => throw new ArgumentOutOfRangeException(nameof(repository.Visibility),
+                                                               $"Not expected request visibility value {repository.Visibility}"),
                 },
-                IsTemplate = request.IsTemplate,
-                AllowAutoMerge = request.AllowAutoMerge,
-                AllowMergeCommit = request.AllowMergeCommit,
-                AllowRebaseMerge = request.AllowRebaseMerge,
-                AllowSquashMerge = request.AllowSquashMerge,
-                AutoInit = request.AutoInit,
-                DeleteBranchOnMerge = request.DeleteBranchOnMerge,
-                GitignoreTemplate = request.GitignoreTemplate,
-                HasDownloads = request.HasDownloads,
-                HasIssues = request.HasIssues,
-                HasProjects = request.HasProjects,
-                HasWiki = request.HasWiki,
-                Homepage = request.Homepage,
-                LicenseTemplate = request.LicenseTemplate,
-                TeamId = request.TeamId,
-                UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault
+                IsTemplate = repository.IsTemplate,
+                AllowAutoMerge = repository.AllowAutoMerge,
+                AllowMergeCommit = repository.AllowMergeCommit,
+                AllowRebaseMerge = repository.AllowRebaseMerge,
+                AllowSquashMerge = repository.AllowSquashMerge,
+                AutoInit = repository.AutoInit,
+                DeleteBranchOnMerge = repository.DeleteBranchOnMerge,
+                GitignoreTemplate = repository.GitIgnoreTemplate,
+                HasDownloads = repository.HasDownloads,
+                HasIssues = repository.HasIssues,
+                HasProjects = repository.HasProjects,
+                HasWiki = repository.HasWiki,
+                Homepage = repository.Homepage,
+                LicenseTemplate = repository.LicenseTemplate,
+                TeamId = repository.TeamId,
+                UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault
             };
 
             var createResult = await _client.Repository.Create(newRepo);
 
             var response = ParseRepository(createResult);
 
-            response.AutoInit = request.AutoInit;
-            response.GitIgnoreTemplate = request.GitignoreTemplate;
-            response.HasProjects = request.HasProjects;
-            response.LicenseTemplate = request.LicenseTemplate;
-            response.TeamId = request.TeamId;
-            response.UseSquashPrTitleAsDefault = request.UseSquashPrTitleAsDefault;
-            response.Visibility = request.Visibility;
+            response.AutoInit = repository.AutoInit;
+            response.GitIgnoreTemplate = repository.GitIgnoreTemplate;
+            response.HasProjects = repository.HasProjects;
+            response.LicenseTemplate = repository.LicenseTemplate;
+            response.TeamId = repository.TeamId;
+            response.UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault;
+            response.Visibility = repository.Visibility;
 
             return ValidationResponse<Shared.Models.Repository>.Success(response);
         }

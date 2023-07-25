@@ -2,6 +2,7 @@
 using MudBlazor;
 using WebBuilder2.Client.Components.Dialogs;
 using WebBuilder2.Client.Managers.Contracts;
+using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 
@@ -10,6 +11,7 @@ namespace WebBuilder2.Client.Pages;
 public partial class Sites
 {
     [Inject] public ISiteService SiteService { get; set; } = default!; // Eventually all calls will go through manager
+    [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
     [Inject] public ISiteManager SiteManager { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IDialogService DialogService { get; set; } = default!;
