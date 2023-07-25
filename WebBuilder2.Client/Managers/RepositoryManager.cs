@@ -24,8 +24,12 @@ public class RepositoryManager : IRepositoryManager
 
         if (!createRepoResponse.Errors.Any() && createRepoResponse.Values != null && createRepoResponse.Values.Any())
         {
-            await _repositoryService.AddRepositoriesAsync(createRepoResponse.Values);
-            createRepoResponse.Values.Single().Id = repo.Id;
+            var addRepoResponse = await _repositoryService.AddRepositoriesAsync(createRepoResponse.Values);
+
+            return addRepoResponse != null ? 
+                ValidationResponse<Repository>.Success(addRepoResponse) :
+                ValidationResponse<Repository>.Failure();
+
         }
         
         return createRepoResponse;

@@ -13,5 +13,12 @@ public class ApiError
     public string Code { get; set; } = string.Empty;
     public string Resource { get; set; } = string.Empty;
     public string Field { get; set; } = string.Empty; 
-    public Exception? Exception { get; set; } 
+    public Exception? Exception { get; set; }
+
+    public ApiError() { }
+
+    public ApiError(string message)
+    {
+        Message = message;
+    }
 }

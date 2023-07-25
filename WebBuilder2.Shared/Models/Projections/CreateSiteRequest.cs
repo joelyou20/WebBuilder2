@@ -10,5 +10,4 @@ public class CreateSiteRequest
 {
     public string SiteName { get; set; } = string.Empty;
     public Repository TemplateRepository { get; set; } = new Repository();
-    public long RepoId { get; set; }
 }

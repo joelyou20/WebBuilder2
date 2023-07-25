@@ -31,7 +31,9 @@ public class SiteController : ControllerBase
                 "Failed to get site data from database." :
                 $"Failed to retrieve site data with ID value of: {id}");
 
-            return Ok(ValidationResponse<Site>.Success(result.ToList()));
+            var listResult = result.ToList();
+
+            return Ok(ValidationResponse<Site>.Success(listResult));
         }
         catch (Exception ex)
         {

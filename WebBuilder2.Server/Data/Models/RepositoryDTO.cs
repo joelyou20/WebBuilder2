@@ -11,6 +11,8 @@ namespace WebBuilder2.Server.Data.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+        public long SiteId { get; set; }
+        public SiteDTO Site { get; set; } = default!;
         public long ExternalId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string RepoName { get; set; } = string.Empty;
@@ -39,6 +41,7 @@ namespace WebBuilder2.Server.Data.Models
         public Repository FromDto() => new()
         {
             Id = Id,
+            SiteId = SiteId,
             ExternalId = ExternalId,
             AllowAutoMerge = AllowAutoMerge,
             AllowMergeCommit = AllowMergeCommit,

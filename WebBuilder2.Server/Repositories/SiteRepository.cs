@@ -20,7 +20,9 @@ namespace WebBuilder2.Server.Repositories
 
         public IQueryable<Site>? Get(IEnumerable<long>? exclude = null)
         {
-            var query = _db.Sites.Where(s => s.DeletedDateTime == null);
+            var query = _db.Site
+                .Include(s => s.Repository)
+                .Where(s => s.DeletedDateTime == null);
 
             if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
 
@@ -28,6 +30,7 @@ namespace WebBuilder2.Server.Repositories
             {
                 Id = s.Id,
                 Name = s.Name,
+                Repository = s.Repository,
                 CreatedDateTime = s.CreatedDateTime,
                 ModifiedDateTime = s.ModifiedDateTime,
                 DeletedDateTime = s.DeletedDateTime
@@ -38,7 +41,7 @@ namespace WebBuilder2.Server.Repositories
         {
             if (!values.Any()) throw new ArgumentNullException(paramName: "values");
             var dtos = values.Select(ToDto);
-            _db.AddRange();
+            _db.AddRange(dtos);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
             return dtos.Select(x => x.FromDto());
@@ -47,7 +50,7 @@ namespace WebBuilder2.Server.Repositories
         public IEnumerable<Site> UpdateRange(IEnumerable<Site> values)
         {
             var dtos = values.Select(ToDto);
-            _db.Sites.UpdateRange(dtos);
+            _db.Site.UpdateRange(dtos);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
             return dtos.Select(x => x.FromDto());
@@ -83,7 +86,7 @@ namespace WebBuilder2.Server.Repositories
                 copy.DeletedDateTime = DateTime.UtcNow;
                 return copy;
             });
-            _db.Sites.UpdateRange(softDeletedValues);
+            _db.Site.UpdateRange(softDeletedValues);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
             return softDeletedValues.Select(x => x.FromDto());

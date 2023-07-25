@@ -22,13 +22,14 @@ public class RepositoryRepository : IRepositoryRepository
 
     public IQueryable<Repository>? Get(IEnumerable<long>? exclude = null)
     {
-        var query = _db.Repositories.Where(s => s.DeletedDateTime == null);
+        var query = _db.Repository.Where(s => s.DeletedDateTime == null);
 
         if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
 
         return query.Select(r => new Repository()
         {
             Id = r.Id,
+            SiteId = r.SiteId,
             ExternalId = r.ExternalId,
             AllowAutoMerge = r.AllowAutoMerge,
             AllowMergeCommit = r.AllowMergeCommit,
@@ -72,8 +73,8 @@ public class RepositoryRepository : IRepositoryRepository
 
     public IEnumerable<Repository> UpdateRange(IEnumerable<Repository> values)
     {
-        var dtos = values.Select(ToDto).ToArray(); ;
-        _db.Repositories.UpdateRange(dtos);
+        var dtos = values.Select(ToDto).ToArray();
+        _db.Repository.UpdateRange(dtos);
         var result = _db.SaveChanges();
         if (result <= 0) throw new DbUpdateException("Failed to save changes.");
         return dtos.Select(x => x.FromDto());
@@ -109,7 +110,7 @@ public class RepositoryRepository : IRepositoryRepository
             copy.DeletedDateTime = DateTime.UtcNow;
             return copy;
         }).ToArray();
-        _db.Repositories.UpdateRange(softDeletedValues);
+        _db.Repository.UpdateRange(softDeletedValues);
         var result = _db.SaveChanges();
         if (result <= 0) throw new DbUpdateException("Failed to save changes.");
         return softDeletedValues.Select(x => x.FromDto());
@@ -118,6 +119,7 @@ public class RepositoryRepository : IRepositoryRepository
     public RepositoryDTO ToDto(Repository repository) => new()
     {
         Id = repository.Id,
+        SiteId = repository.SiteId,
         ExternalId = repository.ExternalId,
         Name = repository.Name,
         AllowAutoMerge = repository.AllowAutoMerge,

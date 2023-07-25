@@ -60,10 +60,20 @@ public partial class CreateSiteDialog
 
     public void OnCreateBtnClick() => InvokeAsync(async () =>
     {
+        var site = await SiteManager.CreateSiteAsync(_createSiteRequest);
+
+        if (site == null)
+        {
+            _errors.Add(new ApiError("Failed to create site"));
+            StateHasChanged();
+            return;
+        }
+
         var repo = _createSiteRequest.TemplateRepository;
         repo.RepoName = $"{_createSiteRequest.SiteName}-repo";
         repo.Description = $"{_createSiteRequest.SiteName}-repo description";
         repo.Homepage = $"{_createSiteRequest.SiteName}-repo Homepage";
+        repo.SiteId = site.Id;
 
         var createRepoResponse = await RepositoryManager.CreateRepoAsync(repo);
 
@@ -73,9 +83,6 @@ public partial class CreateSiteDialog
             {
                 throw new Exception("ERROR: Repo response reports successful, but no values were returned.");
             }
-
-            _createSiteRequest.RepoId = createRepoResponse.Values.Single().Id;
-            await SiteManager.CreateSiteAsync(_createSiteRequest);
             MudDialog.Close(DialogResult.Ok(true));
         }
         else
