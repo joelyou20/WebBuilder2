@@ -47,26 +47,11 @@ public class GithubService : IGithubService
         }
         catch (AuthorizationException)
         {
-            // IF client is not authenticated and there is no PAT in the request, throw an error
-            // ELSE attempt to authorize client with PAT
-            if (request == null || request.PersonalAccessToken.IsNullOrEmpty())
+            return new ValidationResponse
             {
-                return new ValidationResponse
-                {
-                    IsSuccessful = false,
-                    Message = "Failed to Authenticate",
-                };
-            }
-            else
-            {
-                _client.Credentials = new Credentials(request.PersonalAccessToken);
-                User user = await _client.User.Current();
-                return new ValidationResponse
-                {
-                    IsSuccessful = user != null,
-                    Message = user == null ? "Failed to Authenticate" : $"Success: User {user.Email} is authenticated"
-                };
-            }
+                IsSuccessful = false,
+                Message = "Failed to Authenticate",
+            };
         }
     }
 

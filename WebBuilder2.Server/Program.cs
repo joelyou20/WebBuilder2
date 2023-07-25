@@ -26,14 +26,16 @@ builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContex
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
+builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>();
 builder.Services.AddScoped<ISiteRepository, SiteRepository>();
 builder.Services.AddScoped<IRepositoryRepository, RepositoryRepository>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 
-builder.Services.AddGitHubClient(configuration);
+builder.Services.AddAwsSecretsManagerClient();
 builder.Services.AddAwsS3Client();
 builder.Services.AddAwsRoute53Client();
 builder.Services.AddAwsCostExplorerClient();
+builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 
 var app = builder.Build();
 

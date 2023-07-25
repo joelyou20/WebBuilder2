@@ -1,25 +1,29 @@
 ﻿using Amazon.CostExplorer;
 using Amazon.Route53;
-using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.Util;
+using Amazon.SecretsManager;
 using Microsoft.Extensions.DependencyInjection;
 using Octokit;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Settings;
 
 namespace WebBuilder2.Server.Utils.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddGitHubClient(this IServiceCollection services, ConfigurationManager configuration)
+        public static IServiceCollection AddGitHubClient(this IServiceCollection services, Func<IServiceProvider, IAwsSecretsManagerService> serviceProvider, ConfigurationManager configuration)
         {
-            var githubSettings = configuration.GetSection("GithubSettings").Get<GithubSettings>()!;
-            services.AddSingleton(sp =>
-            {
-                var client = new GitHubClient(new ProductHeaderValue(githubSettings.OrganizationName));
+            var awsSecretsManagerService = serviceProvider.Invoke(services.BuildServiceProvider());
+            
+            var pat = awsSecretsManagerService.GetSecretAsync("github-pat").Result;
 
+            var githubSettings = configuration.GetSection("GithubSettings").Get<GithubSettings>()!;
+            services.AddSingleton<IGitHubClient, GitHubClient>(sp =>
+            {
+                var client = new GitHubClient(new ProductHeaderValue(githubSettings.OrganizationName))
+                {
+                    Credentials = new Credentials(pat)
+                };
                 return client;
             });
 
@@ -64,5 +68,19 @@ namespace WebBuilder2.Server.Utils.Extensions
 
             return services.AddScoped(sp => new AmazonCostExplorerClient(credentials, awsConfig));
         }
+
+        public static IServiceCollection AddAwsSecretsManagerClient(this IServiceCollection services)
+        {
+            AmazonSecretsManagerConfig awsConfig = new()
+            {
+                UseAlternateUserAgentHeader = AwsConfig.UseAlternateUserAgentHeader,
+                RegionEndpoint = AwsConfig.RegionEndpoint
+            };
+
+            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
+
+            return services.AddScoped(sp => new AmazonSecretsManagerClient(credentials, awsConfig));
+        }
+
     }
 }
