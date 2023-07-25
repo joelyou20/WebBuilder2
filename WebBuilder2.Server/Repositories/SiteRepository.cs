@@ -34,41 +34,48 @@ namespace WebBuilder2.Server.Repositories
             });
         }
 
-        public void AddRange(IEnumerable<Site> values)
+        public IEnumerable<Site> AddRange(IEnumerable<Site> values)
         {
-            if (!values.Any()) return;
-            _db.AddRange(values.Select(ToDto));
+            if (!values.Any()) throw new ArgumentNullException(paramName: "values");
+            var dtos = values.Select(ToDto);
+            _db.AddRange();
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+            return dtos.Select(x => x.FromDto());
         }
 
-        public void UpdateRange(IEnumerable<Site> values)
+        public IEnumerable<Site> UpdateRange(IEnumerable<Site> values)
         {
             var dtos = values.Select(ToDto);
             _db.Sites.UpdateRange(dtos);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+            return dtos.Select(x => x.FromDto());
         }
 
-        public void UpsertRange(IEnumerable<Site> values)
+        public IEnumerable<Site> UpsertRange(IEnumerable<Site> values)
         {
             IEnumerable<long> valuesList = values.Select(x => x.Id);
             List<Site> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<Site>();
             List<Site> newValues = values.Where(x => !existingValues.Select(y => y.Id == x.Id).Any()).ToList();
 
-            if (existingValues.Any()) UpdateRange(values);
-            if (newValues.Any()) AddRange(newValues);
+            var result = new List<Site>();
+
+            if (existingValues.Any()) result.AddRange(UpdateRange(values));
+            if (newValues.Any()) result.AddRange(AddRange(newValues));
+            return result;
         }
 
-        public void DeleteRange(IEnumerable<Site> values)
+        public IEnumerable<Site> DeleteRange(IEnumerable<Site> values)
         {
             var dtos = values.Select(ToDto);
             _db.RemoveRange(dtos);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+            return dtos.Select(x => x.FromDto());
         }
 
-        public void SoftDeleteRange(IEnumerable<Site> values)
+        public IEnumerable<Site> SoftDeleteRange(IEnumerable<Site> values)
         {
             var softDeletedValues = values.Select(x =>
             {
@@ -79,6 +86,7 @@ namespace WebBuilder2.Server.Repositories
             _db.Sites.UpdateRange(softDeletedValues);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+            return softDeletedValues.Select(x => x.FromDto());
         }
 
         public SiteDTO ToDto(Site site) => new()

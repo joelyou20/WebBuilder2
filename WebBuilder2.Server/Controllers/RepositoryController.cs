@@ -43,8 +43,8 @@ public class RepositoryController : ControllerBase
     {
         try
         {
-            _repositoryRepository.UpsertRange(repos);
-            return Ok();
+            var result = _repositoryRepository.UpsertRange(repos);
+            return Ok(ValidationResponse<Repository>.Success(result));
         }
         catch (Exception ex)
         {
@@ -57,8 +57,8 @@ public class RepositoryController : ControllerBase
     {
         try
         {
-            _repositoryRepository.SoftDeleteRange(repos);
-            return Ok();
+            var result = _repositoryRepository.SoftDeleteRange(repos);
+            return Ok(ValidationResponse<Repository>.Success(result));
         }
         catch (Exception ex)
         {
@@ -71,8 +71,8 @@ public class RepositoryController : ControllerBase
     {
         try
         {
-            _repositoryRepository.UpdateRange(repos);
-            return Ok();
+            var result = _repositoryRepository.UpdateRange(repos);
+            return Ok(ValidationResponse<Repository>.Success(result));
         }
         catch (Exception ex)
         {

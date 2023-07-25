@@ -9,8 +9,9 @@ namespace WebBuilder2.Server.Data.Models
     public class RepositoryDTO : AuditableEntity, IDto<Repository>
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+        public long ExternalId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string RepoName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -38,6 +39,7 @@ namespace WebBuilder2.Server.Data.Models
         public Repository FromDto() => new()
         {
             Id = Id,
+            ExternalId = ExternalId,
             AllowAutoMerge = AllowAutoMerge,
             AllowMergeCommit = AllowMergeCommit,
             AllowRebaseMerge = AllowRebaseMerge,

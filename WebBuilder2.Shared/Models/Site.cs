@@ -11,6 +11,8 @@ public class Site : AuditableEntity
     public long Id { get; set; }
     [JsonPropertyName("name")]
     public string Name { get; set; } = "";
+    [JsonPropertyName("repoId")]
+    public long RepoId { get; set; }
 
     public Site() { }
 

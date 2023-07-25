@@ -44,8 +44,8 @@ public class SiteController : ControllerBase
     {
         try
         {
-            _siteRepository.UpsertRange(sites);
-            return Ok();
+            var result = _siteRepository.UpsertRange(sites);
+            return Ok(ValidationResponse<Site>.Success(result));
         }
         catch (Exception ex)
         {
@@ -58,8 +58,8 @@ public class SiteController : ControllerBase
     {
         try
         {
-            _siteRepository.SoftDeleteRange(sites);
-            return Ok();
+            var result = _siteRepository.SoftDeleteRange(sites);
+            return Ok(ValidationResponse<Site>.Success(result));
         }
         catch (Exception ex)
         {

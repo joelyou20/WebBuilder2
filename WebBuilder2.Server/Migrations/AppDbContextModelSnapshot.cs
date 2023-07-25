@@ -25,7 +25,10 @@ namespace WebBuilder2.Server.Migrations
             modelBuilder.Entity("WebBuilder2.Server.Data.Models.RepositoryDTO", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AllowAutoMerge")
                         .HasColumnType("bit");
@@ -54,6 +57,9 @@ namespace WebBuilder2.Server.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("ExternalId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("GitIgnoreTemplate")
                         .IsRequired()
@@ -138,6 +144,9 @@ namespace WebBuilder2.Server.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("RepositoryId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 

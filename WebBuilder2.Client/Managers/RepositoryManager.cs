@@ -25,6 +25,7 @@ public class RepositoryManager : IRepositoryManager
         if (!createRepoResponse.Errors.Any() && createRepoResponse.Values != null && createRepoResponse.Values.Any())
         {
             await _repositoryService.AddRepositoriesAsync(createRepoResponse.Values);
+            createRepoResponse.Values.Single().Id = repo.Id;
         }
         
         return createRepoResponse;

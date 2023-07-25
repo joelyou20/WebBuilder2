@@ -9,7 +9,6 @@ namespace WebBuilder2.Client.Components;
 public partial class SiteTable
 {
     [Inject] public ISiteService SiteService { get; set; } = default!; // Eventually all calls will go through manager
-    [Inject] public ISiteManager SiteManager { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter] public List<Site> Sites { get; set; } = new();

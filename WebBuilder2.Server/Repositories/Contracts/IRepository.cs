@@ -9,11 +9,11 @@ public interface IRepository<T1, T2>
     where T2 : IDto<T1>
 {
     IQueryable<T1>? Get(IEnumerable<long>? exclude = null);
-    void AddRange(IEnumerable<T1> values);
-    void UpdateRange(IEnumerable<T1> values);
-    void UpsertRange(IEnumerable<T1> values);
-    void DeleteRange(IEnumerable<T1> values);
-    void SoftDeleteRange(IEnumerable<T1> values);
+    IEnumerable<T1> AddRange(IEnumerable<T1> values);
+    IEnumerable<T1> UpdateRange(IEnumerable<T1> values);
+    IEnumerable<T1> UpsertRange(IEnumerable<T1> values);
+    IEnumerable<T1> DeleteRange(IEnumerable<T1> values);
+    IEnumerable<T1> SoftDeleteRange(IEnumerable<T1> values);
 
     T2 ToDto(T1 site);
 }

@@ -3,12 +3,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudCard>
-            @foreach(ApiError error in _errors)
-            {
-                <MudAlert Severity="Severity.Error">@error.Message</MudAlert>
-            }
-        </MudCard>
+        <ErrorContainer Errors="@_errors" />
         <EditForm OnValidSubmit="@OnValidSubmit" Model="@_model" >
             <DataAnnotationsValidator />
             <MudTextField Label="Repo Name" T="string" @bind-Value="@_model.RepoName" Required="true" For="@(() => _model.RepoName)" />
@@ -45,7 +40,7 @@
                     <MudCheckBox Label="HasProjects" @bind-Checked="@_model.HasProjects" Required="false" For="@(() => _model.HasProjects)" />
                     <MudCheckBox Label="HasWiki" @bind-Checked="@_model.HasWiki" Required="false" For="@(() => _model.HasWiki)" />
                 </section>
-                <MudTextField Label="Homepage" @bind-Value="@_model.Homepage" Required="false" For="@(() => _model.Homepage)" />
+                <MudTextField Label="Homepage" @bind-Value="@_model.Homepage" Required="true" For="@(() => _model.Homepage)" />
                 <MudSelect T="string" Label="License" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.LicenseTemplate" MultiSelection="false" Required="false" For="@(() => _model.LicenseTemplate)">
                     @foreach (GithubProjectLicense license in _licenses)
                     {

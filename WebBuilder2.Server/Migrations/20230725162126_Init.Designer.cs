@@ -12,8 +12,8 @@ using WebBuilder2.Server.Data;
 namespace WebBuilder2.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230723190026_InitMigrations")]
-    partial class InitMigrations
+    [Migration("20230725162126_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,10 @@ namespace WebBuilder2.Server.Migrations
             modelBuilder.Entity("WebBuilder2.Server.Data.Models.RepositoryDTO", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AllowAutoMerge")
                         .HasColumnType("bit");
@@ -58,6 +61,9 @@ namespace WebBuilder2.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("ExternalId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("GitIgnoreTemplate")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -79,6 +85,10 @@ namespace WebBuilder2.Server.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Homepage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HtmlUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -105,10 +115,6 @@ namespace WebBuilder2.Server.Migrations
 
                     b.Property<int?>("TeamId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("UseSquashPrTitleAsDefault")
                         .HasColumnType("bit");
@@ -141,6 +147,9 @@ namespace WebBuilder2.Server.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("RepositoryId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 

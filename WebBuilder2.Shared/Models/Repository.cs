@@ -13,6 +13,8 @@ public class Repository : AuditableEntity
     [Key]
     [JsonPropertyName("id")]
     public long Id { get; set; }
+    [JsonPropertyName("externalId")]
+    public long ExternalId { get; set; }
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
     [JsonPropertyName("repoName")]

@@ -154,7 +154,7 @@ public class GithubService : IGithubService
         HasIssues = repo.HasIssues,
         HasWiki = repo.HasWiki,
         Homepage = repo.Homepage.IsNullOrEmpty() ? "No homepage" : repo.Homepage, // This is added to solve issues when importing repos that don't have existing values
-        Id = repo.Id,
+        ExternalId = repo.Id,
         IsPrivate = repo.Private,
         IsTemplate = repo.IsTemplate,
         ModifiedDateTime = repo.CreatedAt.DateTime,

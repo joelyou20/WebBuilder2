@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebBuilder2.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigrations : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +15,9 @@ namespace WebBuilder2.Server.Migrations
                 name: "Repositories",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExternalId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RepoName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -37,7 +39,7 @@ namespace WebBuilder2.Server.Migrations
                     LicenseTemplate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TeamId = table.Column<int>(type: "int", nullable: true),
                     UseSquashPrTitleAsDefault = table.Column<bool>(type: "bit", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HtmlUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GitUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -55,6 +57,7 @@ namespace WebBuilder2.Server.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RepositoryId = table.Column<long>(type: "bigint", nullable: false),
                     CreatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeletedDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)

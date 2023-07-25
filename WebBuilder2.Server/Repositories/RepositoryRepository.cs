@@ -29,6 +29,7 @@ public class RepositoryRepository : IRepositoryRepository
         return query.Select(r => new Repository()
         {
             Id = r.Id,
+            ExternalId = r.ExternalId,
             AllowAutoMerge = r.AllowAutoMerge,
             AllowMergeCommit = r.AllowMergeCommit,
             AllowRebaseMerge = r.AllowRebaseMerge,
@@ -58,56 +59,66 @@ public class RepositoryRepository : IRepositoryRepository
         });
     }
 
-    public void AddRange(IEnumerable<Repository> values)
+    public IEnumerable<Repository> AddRange(IEnumerable<Repository> values)
     {
-        if (!values.Any()) return;
-        _db.AddRange(values.Select(ToDto));
+        if (!values.Any()) throw new ArgumentNullException(paramName: "values");
+        var dtos = values.Select(ToDto).ToArray();
+
+        _db.AddRange(dtos);
         var result = _db.SaveChanges();
         if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+        return dtos.Select(x => x.FromDto());
     }
 
-    public void UpdateRange(IEnumerable<Repository> values)
+    public IEnumerable<Repository> UpdateRange(IEnumerable<Repository> values)
     {
-        var dtos = values.Select(ToDto);
+        var dtos = values.Select(ToDto).ToArray(); ;
         _db.Repositories.UpdateRange(dtos);
         var result = _db.SaveChanges();
         if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+        return dtos.Select(x => x.FromDto());
     }
 
-    public void UpsertRange(IEnumerable<Repository> values)
+    public IEnumerable<Repository> UpsertRange(IEnumerable<Repository> values)
     {
         IEnumerable<long> valuesList = values.Select(x => x.Id);
         List<Repository> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<Repository>();
         List<Repository> newValues = values.Where(x => !existingValues.Any(y => y.Id.Equals(x.Id))).ToList();
 
-        if (existingValues.Any()) UpdateRange(values);
-        if (newValues.Any()) AddRange(newValues);
+        var result = new List<Repository>();
+
+        if (existingValues.Any()) result.AddRange(UpdateRange(values));
+        if (newValues.Any()) result.AddRange(AddRange(newValues));
+        return result;
     }
 
-    public void DeleteRange(IEnumerable<Repository> values)
+    public IEnumerable<Repository> DeleteRange(IEnumerable<Repository> values)
     {
-        var dtos = values.Select(ToDto);
+        var dtos = values.Select(ToDto).ToArray(); ;
         _db.RemoveRange(dtos);
         var result = _db.SaveChanges();
         if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+        return dtos.Select(x => x.FromDto());
     }
 
-    public void SoftDeleteRange(IEnumerable<Repository> values)
+    public IEnumerable<Repository> SoftDeleteRange(IEnumerable<Repository> values)
     {
         var softDeletedValues = values.Select(x =>
         {
             var copy = ToDto(x);
             copy.DeletedDateTime = DateTime.UtcNow;
             return copy;
-        });
+        }).ToArray();
         _db.Repositories.UpdateRange(softDeletedValues);
         var result = _db.SaveChanges();
         if (result <= 0) throw new DbUpdateException("Failed to save changes.");
+        return softDeletedValues.Select(x => x.FromDto());
     }
 
     public RepositoryDTO ToDto(Repository repository) => new()
     {
         Id = repository.Id,
+        ExternalId = repository.ExternalId,
         Name = repository.Name,
         AllowAutoMerge = repository.AllowAutoMerge,
         AllowMergeCommit = repository.AllowMergeCommit,
