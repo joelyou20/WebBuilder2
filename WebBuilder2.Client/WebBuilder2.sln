@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBuilder2.Server", "..\We
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBuilder2.Shared", "..\WebBuilder2.Shared\WebBuilder2.Shared.csproj", "{6383A4EF-7926-4A14-A51B-330495F9F8BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Webbuilder2.Server.Tests", "..\Webbuilder2.Server.Tests\Webbuilder2.Server.Tests.csproj", "{4E06CD05-5771-462D-ABC5-7D013273E05F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webbuilder2.Server.Tests", "..\Webbuilder2.Server.Tests\Webbuilder2.Server.Tests.csproj", "{4E06CD05-5771-462D-ABC5-7D013273E05F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

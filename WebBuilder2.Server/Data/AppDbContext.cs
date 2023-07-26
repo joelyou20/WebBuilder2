@@ -54,5 +54,6 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Site> Site { get; set; }
+    public DbSet<Script> Script { get; set; }
     public DbSet<Repository> Repository { get; set; }
 }

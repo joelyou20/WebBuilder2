@@ -1,0 +1,7 @@
+﻿@page "/scripts"
+
+<MudText>Scripts</MudText>
+<div class="s-btn-row">
+    <MudButton Variant="Variant.Filled" OnClick="@OnCreateScriptBtnClick">Create Script</MudButton>
+</div>
+<ScriptList Scripts="@_scripts" />

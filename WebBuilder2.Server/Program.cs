@@ -27,9 +27,11 @@ builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>();
+builder.Services.AddScoped<IGithubService, GithubService>();
+
 builder.Services.AddScoped<ISiteRepository, SiteRepository>();
 builder.Services.AddScoped<IRepositoryRepository, RepositoryRepository>();
-builder.Services.AddScoped<IGithubService, GithubService>();
+builder.Services.AddScoped<IScriptRepository, ScriptRepository>();
 
 builder.Services.AddAwsSecretsManagerClient();
 builder.Services.AddAwsS3Client();

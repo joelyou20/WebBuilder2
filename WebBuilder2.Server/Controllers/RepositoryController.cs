@@ -31,7 +31,9 @@ public class RepositoryController : ControllerBase
                 "Failed to get repository data from database." :
                 $"Failed to retrieve repository data with ID value of: {id}");
 
-            return Ok(ValidationResponse<RepositoryModel>.Success(result.ToList()));
+            List<RepositoryModel> resultList = result.ToList();
+
+            return Ok(ValidationResponse<RepositoryModel>.Success(resultList));
         }
         catch (Exception ex)
         {

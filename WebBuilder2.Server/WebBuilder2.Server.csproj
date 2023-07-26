@@ -25,6 +25,7 @@
     </PackageReference>
     <PackageReference Include="Octokit" Version="7.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="TinyMCE" Version="6.5.1" />
   </ItemGroup>
 
   <ItemGroup>

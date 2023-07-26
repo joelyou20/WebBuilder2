@@ -1,0 +1,7 @@
+﻿div > ::deep .editor_container {
+    height: 20rem;
+}
+
+::deep .ace_content {
+    font-size: larger;
+}

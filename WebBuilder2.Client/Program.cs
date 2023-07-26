@@ -42,6 +42,7 @@ builder.Services.AddHttpClient<ISiteClient, SiteClient>(client => { client.BaseA
 builder.Services.AddHttpClient<IGithubClient, GithubClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 builder.Services.AddHttpClient<IAwsClient, AwsClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 builder.Services.AddHttpClient<IRepositoryClient, RepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddHttpClient<IScriptClient, ScriptClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 
 // <================== END OF CLIENTS
 
@@ -61,11 +62,10 @@ builder.Services.AddScoped<ISiteService, SiteService>();
 builder.Services.AddScoped<IDialogService, DialogService>();
 builder.Services.AddScoped<IAwsService, AwsService>();
 builder.Services.AddScoped<IRepositoryService, RepositoryService>();
+builder.Services.AddScoped<IScriptService, ScriptService>();
 
 // <================== END OF SERVICES
 
 builder.Services.AddMudServices();
-
 var app = builder.Build();
-
 await app.RunAsync();

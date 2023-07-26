@@ -1,0 +1,10 @@
+﻿<MudList>
+    @foreach(ScriptModel script in Scripts)
+    {
+        <MudListItem>
+            <MudCard>
+                @script.Data
+            </MudCard>
+        </MudListItem>
+    }
+</MudList>
