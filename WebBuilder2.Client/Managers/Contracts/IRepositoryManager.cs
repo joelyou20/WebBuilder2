@@ -5,5 +5,5 @@ namespace WebBuilder2.Client.Managers.Contracts;
 
 public interface IRepositoryManager
 {
-    Task<ValidationResponse<Repository>> CreateRepoAsync(Repository repo);
+    Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repo, SiteModel site);
 }

@@ -7,7 +7,7 @@
         else
         {
             <MudList>
-                @foreach (KeyValuePair<Repository, bool> repo in _githubRepositories)
+                @foreach (KeyValuePair<RepositoryModel, bool> repo in _githubRepositories)
                 {
                     <MudListItem>
                         <MudCard>

@@ -18,7 +18,7 @@ namespace WebBuilder2.Client.Clients
             _httpClient = httpClient;
         }
 
-        public async Task<ValidationResponse<Repository>> GetRepositoriesAsync()
+        public async Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync()
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/repos");
             if (!response.IsSuccessStatusCode)
@@ -27,7 +27,7 @@ namespace WebBuilder2.Client.Clients
             }
 
             var message = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<ValidationResponse<Repository>>(message);
+            var result = JsonConvert.DeserializeObject<ValidationResponse<RepositoryModel>>(message);
             return result;
         }
 
@@ -45,7 +45,7 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
-        public async Task<ValidationResponse<Repository>> PostCreateRepoAsync(Repository repository)
+        public async Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository)
         {
             var content = JsonContent.Create(repository);
             HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/repos/create", content);
@@ -55,7 +55,7 @@ namespace WebBuilder2.Client.Clients
             }
 
             var message = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<ValidationResponse<Repository>>(message);
+            var result = JsonConvert.DeserializeObject<ValidationResponse<RepositoryModel>>(message);
             return result;
         }
 

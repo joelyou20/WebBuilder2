@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 
 namespace WebBuilder2.Shared.Models;
 
-public class Repository : AuditableEntity
+public class RepositoryModel : AuditableEntity
 {
     [Key]
     [JsonPropertyName("id")]
     public long Id { get; set; }
     [JsonPropertyName("siteId")]
     public long SiteId { get; set; }
+    [JsonIgnore]
+    public SiteModel? Site { get; set; }
     [JsonPropertyName("externalId")]
     public long ExternalId { get; set; }
     [JsonPropertyName("name")]

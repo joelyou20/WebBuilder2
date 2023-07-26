@@ -11,17 +11,17 @@ public partial class SiteTable
     [Inject] public ISiteService SiteService { get; set; } = default!; // Eventually all calls will go through manager
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
-    [Parameter] public List<Site> Sites { get; set; } = new();
+    [Parameter] public List<SiteModel> Sites { get; set; } = new();
     [Parameter] public EventCallback ValuedChanged { get; set; } = new();
 
-    public void OnDeleteSiteBtnClicked(Site site) => InvokeAsync(async () =>
+    public void OnDeleteSiteBtnClicked(SiteModel site) => InvokeAsync(async () =>
     {
         Sites.Remove(site);
         await SiteService.SoftDeleteSiteAsync(site);
         await ValuedChanged.InvokeAsync();
     });
 
-    public void OnSiteCardClicked(Site site)
+    public void OnSiteCardClicked(SiteModel site)
     {
         NavigationManager.NavigateTo($"site/{site.Id}");
     }

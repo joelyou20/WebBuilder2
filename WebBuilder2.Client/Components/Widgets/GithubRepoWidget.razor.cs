@@ -13,7 +13,7 @@ public partial class GithubRepoWidget
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
-    List<Repository> _repositories { get; set; } = new List<Repository>();
+    List<RepositoryModel> _repositories { get; set; } = new List<RepositoryModel>();
 
     private bool _isTableLoading = true;
 

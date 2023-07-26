@@ -15,10 +15,10 @@ public class SiteManager : ISiteManager
         _siteService = siteService;
     }
 
-    public async Task<Site?> CreateSiteAsync(CreateSiteRequest createSiteRequest)
+    public async Task<SiteModel?> CreateSiteAsync(CreateSiteRequest createSiteRequest)
     {
 
-        Site site = new()
+        SiteModel site = new()
         {
             Name = createSiteRequest.SiteName,
         };

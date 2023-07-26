@@ -12,7 +12,7 @@ public partial class GithubRepoTable
 {
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
 
-    [Parameter, EditorRequired] public List<Repository> Repositories { get; set; } = new();
+    [Parameter, EditorRequired] public List<RepositoryModel> Repositories { get; set; } = new();
     [Parameter] public bool ShowConnectButton { get; set; } = false;
     [Parameter] public bool ShowDeleteButton { get; set; } = false;
     [Parameter] public bool ShowAddTemplateButton { get; set; } = false;
@@ -20,19 +20,19 @@ public partial class GithubRepoTable
     [Parameter] public bool IsLoading { get; set; } = true; 
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> Attributes { get; set; } = new();
 
-    public async Task OnConnectRepoButtonClicked(Repository repository)
+    public async Task OnConnectRepoButtonClicked(RepositoryModel repository)
     {
         await ValueChanged.InvokeAsync();
     }
 
-    public async Task OnDeleteRepoButtonClicked(Repository repository)
+    public async Task OnDeleteRepoButtonClicked(RepositoryModel repository)
     {
         await RepositoryService.SoftDeleteRepositoryAsync(repository);
 
         await ValueChanged.InvokeAsync();
     }
 
-    public async Task OnAddTemplateButtonClicked(Repository repository)
+    public async Task OnAddTemplateButtonClicked(RepositoryModel repository)
     {
         repository.IsTemplate = true;
         await RepositoryService.UpdateRepositoryAsync(repository);

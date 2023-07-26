@@ -6,7 +6,7 @@ namespace WebBuilder2.Server.Repositories.Contracts;
 
 public interface IRepository<T1, T2>
     where T1 : AuditableEntity
-    where T2 : IDto<T1>
+    where T2 : IEntity<T1>
 {
     IQueryable<T1>? Get(IEnumerable<long>? exclude = null);
     IEnumerable<T1> AddRange(IEnumerable<T1> values);

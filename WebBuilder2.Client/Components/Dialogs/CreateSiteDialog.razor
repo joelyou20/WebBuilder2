@@ -4,8 +4,8 @@
     <DialogContent>
         <ErrorContainer Errors="@_errors" />
         <MudTextField Label="Site Name" T="string" @bind-Value="@_createSiteRequest.SiteName" />
-        <MudSelect T="Repository" Label="Template" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_templateSelectConverter" Required="false" ValueChanged="OnTemplateSelected">
-            @foreach (Repository templateRepository in _templateRepositories)
+        <MudSelect T="RepositoryModel" Label="Template" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_templateSelectConverter" Required="false" ValueChanged="OnTemplateSelected">
+            @foreach (RepositoryModel templateRepository in _templateRepositories)
             {
                 <MudSelectItem Value="@templateRepository" />
             }

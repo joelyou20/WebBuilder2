@@ -20,7 +20,7 @@ public class SiteController : ControllerBase
     }
 
     [HttpGet("/site/{id?}")]
-    public ActionResult<ValidationResponse<Site>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
+    public ActionResult<ValidationResponse<SiteModel>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
         try
         {
@@ -33,39 +33,39 @@ public class SiteController : ControllerBase
 
             var listResult = result.ToList();
 
-            return Ok(ValidationResponse<Site>.Success(listResult));
+            return Ok(ValidationResponse<SiteModel>.Success(listResult));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(ex));
+            return BadRequest(ValidationResponseHelper<SiteModel>.BuildFailedResponse(ex));
         }
     }
 
     [HttpPut("/site")]
-    public ActionResult<ValidationResponse<Site>> Put([FromBody] IEnumerable<Site> sites)
+    public ActionResult<ValidationResponse<SiteModel>> Put([FromBody] IEnumerable<SiteModel> sites)
     {
         try
         {
             var result = _siteRepository.UpsertRange(sites);
-            return Ok(ValidationResponse<Site>.Success(result));
+            return Ok(ValidationResponse<SiteModel>.Success(result));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(sites, ex));
+            return BadRequest(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex));
         }
     }
 
     [HttpPost("/site/delete")]
-    public ActionResult<ValidationResponse<Site>> SoftDelete([FromBody] IEnumerable<Site> sites)
+    public ActionResult<ValidationResponse<SiteModel>> SoftDelete([FromBody] IEnumerable<SiteModel> sites)
     {
         try
         {
             var result = _siteRepository.SoftDeleteRange(sites);
-            return Ok(ValidationResponse<Site>.Success(result));
+            return Ok(ValidationResponse<SiteModel>.Success(result));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Site>.BuildFailedResponse(sites, ex));
+            return BadRequest(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex));
         }
     }
 }

@@ -19,9 +19,9 @@ public class GithubService : IGithubService
         _client = client;
     }
 
-    public async Task<ValidationResponse<Shared.Models.Repository>> GetRepositoriesAsync()
+    public async Task<ValidationResponse<Shared.Models.RepositoryModel>> GetRepositoriesAsync()
     {
-        List<Shared.Models.Repository> repos = new();
+        List<Shared.Models.RepositoryModel> repos = new();
 
         var repositories = await _client.Repository.GetAllForCurrent();
 
@@ -30,7 +30,7 @@ public class GithubService : IGithubService
             repos.Add(ParseRepository(repo));
         }
 
-        return ValidationResponse<Shared.Models.Repository>.Success(repos);
+        return ValidationResponse<Shared.Models.RepositoryModel>.Success(repos);
     }
 
     public async Task<ValidationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request)
@@ -55,7 +55,7 @@ public class GithubService : IGithubService
         }
     }
 
-    public async Task<ValidationResponse<Shared.Models.Repository>> CreateRepoAsync(Shared.Models.Repository repository)
+    public async Task<ValidationResponse<Shared.Models.RepositoryModel>> CreateRepoAsync(Shared.Models.RepositoryModel repository)
     {
         try
         {
@@ -101,11 +101,11 @@ public class GithubService : IGithubService
             response.UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault;
             response.Visibility = repository.Visibility;
 
-            return ValidationResponse<Shared.Models.Repository>.Success(response);
+            return ValidationResponse<Shared.Models.RepositoryModel>.Success(response);
         }
         catch (ApiException ex)
         {
-            var response = new ValidationResponse<Shared.Models.Repository>
+            var response = new ValidationResponse<Shared.Models.RepositoryModel>
             {
                 Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError
                 {
@@ -140,7 +140,7 @@ public class GithubService : IGithubService
         }));
     }
 
-    public Shared.Models.Repository ParseRepository(Octokit.Repository repo) => new Shared.Models.Repository
+    public Shared.Models.RepositoryModel ParseRepository(Octokit.Repository repo) => new Shared.Models.RepositoryModel
     {
         AllowAutoMerge = repo.AllowAutoMerge != null,
         AllowMergeCommit = repo.AllowMergeCommit != null,
@@ -164,7 +164,7 @@ public class GithubService : IGithubService
         HtmlUrl = repo.HtmlUrl,
     };
 
-    public RepositoryDTO ToDto(Shared.Models.Repository repo) => new()
+    public Data.Models.Repository ToDto(Shared.Models.RepositoryModel repo) => new()
     {
         Id = repo.Id,
         Name = repo.Name,

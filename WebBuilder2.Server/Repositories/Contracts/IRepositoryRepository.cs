@@ -4,7 +4,7 @@ using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Server.Repositories.Contracts
 {
-    public interface IRepositoryRepository : IRepository<Repository, RepositoryDTO>
+    public interface IRepositoryRepository : IRepository<RepositoryModel, Repository>
     {
     }
 }

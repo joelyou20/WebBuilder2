@@ -19,7 +19,7 @@ public class RepositoryController : ControllerBase
     }
 
     [HttpGet("/repository/{id?}")]
-    public ActionResult<ValidationResponse<Repository>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
+    public ActionResult<ValidationResponse<RepositoryModel>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
         try
         {
@@ -30,53 +30,53 @@ public class RepositoryController : ControllerBase
                 "Failed to get repository data from database." :
                 $"Failed to retrieve repository data with ID value of: {id}");
 
-            return Ok(ValidationResponse<Repository>.Success(result.ToList()));
+            return Ok(ValidationResponse<RepositoryModel>.Success(result.ToList()));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(ex));
+            return BadRequest(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(ex));
         }
     }
 
     [HttpPut("/repository")]
-    public ActionResult<ValidationResponse<Repository>> Put([FromBody] IEnumerable<Repository> repos)
+    public ActionResult<ValidationResponse<RepositoryModel>> Put([FromBody] IEnumerable<RepositoryModel> repos)
     {
         try
         {
             var result = _repositoryRepository.UpsertRange(repos);
-            return Ok(ValidationResponse<Repository>.Success(result));
+            return Ok(ValidationResponse<RepositoryModel>.Success(result));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repos, ex));
+            return BadRequest(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repos, ex));
         }
     }
 
     [HttpPost("/repository/delete")]
-    public ActionResult<ValidationResponse<Repository>> SoftDelete([FromBody] IEnumerable<Repository> repos)
+    public ActionResult<ValidationResponse<RepositoryModel>> SoftDelete([FromBody] IEnumerable<RepositoryModel> repos)
     {
         try
         {
             var result = _repositoryRepository.SoftDeleteRange(repos);
-            return Ok(ValidationResponse<Repository>.Success(result));
+            return Ok(ValidationResponse<RepositoryModel>.Success(result));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repos, ex));
+            return BadRequest(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repos, ex));
         }
     }
 
     [HttpPost("/repository/update")]
-    public ActionResult<ValidationResponse<Repository>> Update([FromBody] IEnumerable<Repository> repos)
+    public ActionResult<ValidationResponse<RepositoryModel>> Update([FromBody] IEnumerable<RepositoryModel> repos)
     {
         try
         {
             var result = _repositoryRepository.UpdateRange(repos);
-            return Ok(ValidationResponse<Repository>.Success(result));
+            return Ok(ValidationResponse<RepositoryModel>.Success(result));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repos, ex));
+            return BadRequest(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repos, ex));
         }
     }
 }

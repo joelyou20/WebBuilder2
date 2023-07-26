@@ -19,8 +19,8 @@ public partial class GithubConnection
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    private List<Repository> _repositories { get; set; } = new List<Repository>();
-    private List<Repository> _templates => _repositories.Where(x => x.IsTemplate).ToList();
+    private List<RepositoryModel> _repositories { get; set; } = new List<RepositoryModel>();
+    private List<RepositoryModel> _templates => _repositories.Where(x => x.IsTemplate).ToList();
 
     private bool _isTableLoading = true;
 

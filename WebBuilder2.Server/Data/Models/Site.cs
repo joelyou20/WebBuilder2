@@ -6,19 +6,19 @@ using WebBuilder2.Server.Data.Models.Contracts;
 namespace WebBuilder2.Server.Data.Models
 {
     // Top-level entity
-    public class SiteDTO : AuditableEntity, IDto<Site>
+    public class Site : AuditableEntity, IEntity<SiteModel>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public Repository Repository { get; set; } = default!;
+        public Repository? Repository { get; set; }
 
-        public Site FromDto() => new() 
+        public SiteModel FromDto() => new() 
         { 
             Id = Id, 
             Name = Name,
-            Repository = Repository,
+            Repository = Repository?.FromDto(),
             CreatedDateTime = CreatedDateTime,
             ModifiedDateTime = ModifiedDateTime,
             DeletedDateTime = DeletedDateTime,

@@ -16,7 +16,7 @@ public partial class Sites
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    private List<Site> _siteList = new();
+    private List<SiteModel> _siteList = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,9 +49,9 @@ public partial class Sites
 
         if (sites == null) return;
 
-        List<Site> newSiteList = new();
+        List<SiteModel> newSiteList = new();
 
-        foreach (Site site in sites)
+        foreach (SiteModel site in sites)
         {
             newSiteList.Add(site);
         }

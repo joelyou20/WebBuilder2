@@ -17,7 +17,7 @@ public partial class ImportGithubRepoDialog
     [Parameter] public IEnumerable<long> ExistingIds { get; set; } = default!;
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    private Dictionary<Repository, bool> _githubRepositories = new();
+    private Dictionary<RepositoryModel, bool> _githubRepositories = new();
 
     private bool _dataIsLoading = true;
 
@@ -46,14 +46,14 @@ public partial class ImportGithubRepoDialog
         }
     }
 
-    private void OnCheckboxChecked(Repository repo)
+    private void OnCheckboxChecked(RepositoryModel repo)
     {
         _githubRepositories[repo] = !_githubRepositories[repo];
     }
 
     private void OnImportBtnClick() => InvokeAsync(async () =>
     {
-        IEnumerable<Repository> repos = _githubRepositories.Where(x => x.Value).Select(x => x.Key);
+        IEnumerable<RepositoryModel> repos = _githubRepositories.Where(x => x.Value).Select(x => x.Key);
 
         if (!repos.Any()) return;
 

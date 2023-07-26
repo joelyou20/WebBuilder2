@@ -6,9 +6,9 @@ namespace WebBuilder2.Client.Services.Contracts
 {
     public interface ISiteService
     {
-        Task<List<Site>> GetSitesAsync(IEnumerable<long>? exclude = null);
-        Task<Site?> GetSingleSiteAsync(long id);
-        Task<Site?> AddSiteAsync(Site site);
-        Task<Site?> SoftDeleteSiteAsync(Site site);
+        Task<List<SiteModel>> GetSitesAsync(IEnumerable<long>? exclude = null);
+        Task<SiteModel?> GetSingleSiteAsync(long id);
+        Task<SiteModel?> AddSiteAsync(SiteModel site);
+        Task<SiteModel?> SoftDeleteSiteAsync(SiteModel site);
     }
 }

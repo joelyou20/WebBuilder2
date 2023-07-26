@@ -6,13 +6,14 @@ using System.Text.Json.Serialization;
 
 namespace WebBuilder2.Server.Data.Models
 {
-    public class RepositoryDTO : AuditableEntity, IDto<Repository>
+    public class Repository : AuditableEntity, IEntity<RepositoryModel>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public long SiteId { get; set; }
-        public SiteDTO Site { get; set; } = default!;
+        [ForeignKey("SiteId")]
+        public Site Site { get; set; } = default!;
         public long ExternalId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string RepoName { get; set; } = string.Empty;
@@ -38,7 +39,9 @@ namespace WebBuilder2.Server.Data.Models
         public string HtmlUrl { get; set; } = string.Empty;
         public string GitUrl { get; set; } = string.Empty;
 
-        public Repository FromDto() => new()
+        public Repository() { }
+
+        public RepositoryModel FromDto() => new()
         {
             Id = Id,
             SiteId = SiteId,

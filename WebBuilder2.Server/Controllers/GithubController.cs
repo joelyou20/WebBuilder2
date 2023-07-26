@@ -22,7 +22,7 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpGet("/github/repos")]
-        public async Task<ActionResult<ValidationResponse<Repository>>> Get()
+        public async Task<ActionResult<ValidationResponse<RepositoryModel>>> Get()
         {
             try
             {
@@ -30,7 +30,7 @@ namespace WebBuilder2.Server.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(ex));
+                return BadRequest(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(ex));
             }
         }
 
@@ -61,7 +61,7 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpPost("/github/repos/create")]
-        public async Task<ActionResult<Repository>> Create([FromBody] Repository repository)
+        public async Task<ActionResult<RepositoryModel>> Create([FromBody] RepositoryModel repository)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace WebBuilder2.Server.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ValidationResponseHelper<Repository>.BuildFailedResponse(repository, ex));
+                return BadRequest(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repository, ex));
             }
         }
 

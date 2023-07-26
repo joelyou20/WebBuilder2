@@ -31,12 +31,12 @@ builder.Services.AddLogging();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 // HACK: Currently using JSON file as a stand in for a DB until I set one up
-builder.Services.AddHttpClient<IDatabaseClient, JsonClient>(client =>
-{
-    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
-    client.DefaultRequestHeaders.Accept.Add(
-     new MediaTypeWithQualityHeaderValue("application/json"));
-});
+//builder.Services.AddHttpClient<IDatabaseClient, JsonClient>(client =>
+//{
+//    client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
+//    client.DefaultRequestHeaders.Accept.Add(
+//     new MediaTypeWithQualityHeaderValue("application/json"));
+//});
 // <--- END OF HACK --->
 builder.Services.AddHttpClient<ISiteClient, SiteClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 builder.Services.AddHttpClient<IGithubClient, GithubClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });

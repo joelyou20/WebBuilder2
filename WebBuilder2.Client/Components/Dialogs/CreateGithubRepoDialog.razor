@@ -8,10 +8,16 @@
             <DataAnnotationsValidator />
             <MudTextField Label="Repo Name" T="string" @bind-Value="@_model.RepoName" Required="true" For="@(() => _model.RepoName)" />
             <MudTextField Label="Description" T="string" @bind-Value="@_model.Description" Lines="5" Variant="Variant.Outlined" Required="true" For="@(() => _model.Description)" />
-            <MudSelect T="Repository" Label="Template" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_templateSelectConverter" Required="false" ValueChanged="OnTemplateSelected">
-                @foreach (Repository templateRepository in TemplateRepositories)
+            <MudSelect T="RepositoryModel" Label="Template" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_templateSelectConverter" Required="false" ValueChanged="OnTemplateSelected">
+                @foreach (RepositoryModel templateRepository in TemplateRepositories)
                 {
                     <MudSelectItem Value="@templateRepository" />
+                }
+            </MudSelect>
+            <MudSelect T="SiteModel" Label="Connected Site" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_siteSelectConverter" Required="false" ValueChanged="OnSiteSelected">
+                @foreach (SiteModel site in _sites)
+                {
+                    <MudSelectItem Value="@site" />
                 }
             </MudSelect>
             <MudExpansionPanel Text="Advanced">

@@ -4,11 +4,11 @@ namespace WebBuilder2.Client.Services.Contracts
 {
     public interface IRepositoryService
     {
-        Task<List<Repository>> GetRepositoriesAsync();
-        Task<Repository?> GetSingleRepositoryAsync(long id);
-        Task<Repository?> AddRepositoryAsync(Repository repository);
-        Task<Repository?> AddRepositoriesAsync(IEnumerable<Repository> repositories);
-        Task<Repository?> SoftDeleteRepositoryAsync(Repository repository);
-        Task<Repository?> UpdateRepositoryAsync(Repository repository);
+        Task<List<RepositoryModel>> GetRepositoriesAsync();
+        Task<RepositoryModel?> GetSingleRepositoryAsync(long id);
+        Task<RepositoryModel?> AddRepositoryAsync(RepositoryModel repository);
+        Task<RepositoryModel?> AddRepositoriesAsync(IEnumerable<RepositoryModel> repositories);
+        Task<RepositoryModel?> SoftDeleteRepositoryAsync(RepositoryModel repository);
+        Task<RepositoryModel?> UpdateRepositoryAsync(RepositoryModel repository);
     }
 }

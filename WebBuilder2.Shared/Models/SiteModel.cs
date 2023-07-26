@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace WebBuilder2.Shared.Models;
 
 [Serializable]
-public class Site : AuditableEntity
+public class SiteModel : AuditableEntity
 {
     [Key]
     [JsonPropertyName("id")]
@@ -14,11 +14,11 @@ public class Site : AuditableEntity
     [JsonPropertyName("repositoryId")]
     public long RepoId { get; set; }
     [JsonIgnore]
-    public Repository Repository { get; set; } = default!;
+    public RepositoryModel? Repository { get; set; }
 
-    public Site() { }
+    public SiteModel() { }
 
-    public Site(string name)
+    public SiteModel(string name)
     {
         Name = name;
     }

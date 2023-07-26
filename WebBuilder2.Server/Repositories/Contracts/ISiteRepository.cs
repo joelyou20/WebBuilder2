@@ -5,7 +5,7 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Repositories.Contracts;
 
-public interface ISiteRepository : IRepository<Site, SiteDTO>
+public interface ISiteRepository : IRepository<SiteModel, Site>
 {
 
 }

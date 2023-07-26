@@ -8,15 +8,15 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Clients
 {
-    public class SiteClient : ClientBase<Site>, ISiteClient
+    public class SiteClient : ClientBase<SiteModel>, ISiteClient
     {
         public SiteClient(HttpClient httpClient) : base(httpClient, "site") { }
 
-        public async Task<ValidationResponse<Site>> AddSiteAsync(Site site) => await AddAsync(site);
-        public async Task<ValidationResponse<Site>> AddRangeSiteAsync(IEnumerable<Site> sites) => await AddRangeAsync(sites);
-        public async Task<ValidationResponse<Site>> GetSingleSiteAsync(long id) => await GetSingleAsync(id);
-        public async Task<ValidationResponse<Site>> GetSitesAsync(IEnumerable<long>? exclude = null) => await GetAsync(exclude);
-        public async Task<ValidationResponse<Site>> SoftDeleteSiteAsync(Site site) => await SoftDeleteAsync(site);
-        public async Task<ValidationResponse<Site>> SoftDeleteRangeSiteAsync(IEnumerable<Site> sites) => await SoftDeleteRangeAsync(sites);
+        public async Task<ValidationResponse<SiteModel>> AddSiteAsync(SiteModel site) => await AddAsync(site);
+        public async Task<ValidationResponse<SiteModel>> AddRangeSiteAsync(IEnumerable<SiteModel> sites) => await AddRangeAsync(sites);
+        public async Task<ValidationResponse<SiteModel>> GetSingleSiteAsync(long id) => await GetSingleAsync(id);
+        public async Task<ValidationResponse<SiteModel>> GetSitesAsync(IEnumerable<long>? exclude = null) => await GetAsync(exclude);
+        public async Task<ValidationResponse<SiteModel>> SoftDeleteSiteAsync(SiteModel site) => await SoftDeleteAsync(site);
+        public async Task<ValidationResponse<SiteModel>> SoftDeleteRangeSiteAsync(IEnumerable<SiteModel> sites) => await SoftDeleteRangeAsync(sites);
     }
 }

@@ -5,11 +5,11 @@ namespace WebBuilder2.Client.Clients.Contracts
 {
     public interface IRepositoryClient
     {
-        Task<ValidationResponse<Repository>> GetRepositoriesAsync();
-        Task<ValidationResponse<Repository>> GetSingleRepositoryAsync(long id);
-        Task<ValidationResponse<Repository>> SoftDeleteRepositoryAsync(Repository repository);
-        Task<ValidationResponse<Repository>> AddRepositoryAsync(Repository repository);
-        Task<ValidationResponse<Repository>> AddRepositoriesAsync(IEnumerable<Repository> repositories);
-        Task<ValidationResponse<Repository>> UpdateRepositoryAsync(Repository repository);
+        Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync();
+        Task<ValidationResponse<RepositoryModel>> GetSingleRepositoryAsync(long id);
+        Task<ValidationResponse<RepositoryModel>> SoftDeleteRepositoryAsync(RepositoryModel repository);
+        Task<ValidationResponse<RepositoryModel>> AddRepositoryAsync(RepositoryModel repository);
+        Task<ValidationResponse<RepositoryModel>> AddRepositoriesAsync(IEnumerable<RepositoryModel> repositories);
+        Task<ValidationResponse<RepositoryModel>> UpdateRepositoryAsync(RepositoryModel repository);
     }
 }

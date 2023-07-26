@@ -9,5 +9,5 @@ namespace WebBuilder2.Shared.Models.Projections;
 public class CreateSiteRequest
 {
     public string SiteName { get; set; } = string.Empty;
-    public Repository TemplateRepository { get; set; } = new Repository();
+    public RepositoryModel TemplateRepository { get; set; } = new RepositoryModel();
 }

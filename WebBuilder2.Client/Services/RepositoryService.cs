@@ -15,9 +15,9 @@ namespace WebBuilder2.Client.Services
             _client = client;
         }
 
-        public async Task<List<Repository>> GetRepositoriesAsync()
+        public async Task<List<RepositoryModel>> GetRepositoriesAsync()
         {
-            ValidationResponse<Repository> response = await _client.GetRepositoriesAsync();
+            ValidationResponse<RepositoryModel> response = await _client.GetRepositoriesAsync();
 
             if (response == null || !response.IsSuccessful)
             {
@@ -28,9 +28,9 @@ namespace WebBuilder2.Client.Services
 
         }
 
-        public async Task<Repository?> GetSingleRepositoryAsync(long id)
+        public async Task<RepositoryModel?> GetSingleRepositoryAsync(long id)
         {
-            ValidationResponse<Repository>? response = await _client.GetSingleRepositoryAsync(id);
+            ValidationResponse<RepositoryModel>? response = await _client.GetSingleRepositoryAsync(id);
 
             if (response == null) return null;
 
@@ -42,9 +42,9 @@ namespace WebBuilder2.Client.Services
             return response.GetValues().SingleOrDefault();
         }
 
-        public async Task<Repository?> AddRepositoryAsync(Repository repository)
+        public async Task<RepositoryModel?> AddRepositoryAsync(RepositoryModel repository)
         {
-            ValidationResponse<Repository> response = await _client.AddRepositoryAsync(repository);
+            ValidationResponse<RepositoryModel> response = await _client.AddRepositoryAsync(repository);
 
             if (response == null) return null;
 
@@ -56,9 +56,9 @@ namespace WebBuilder2.Client.Services
             return response.GetValues().SingleOrDefault();
         }
 
-        public async Task<Repository?> AddRepositoriesAsync(IEnumerable<Repository> repositories)
+        public async Task<RepositoryModel?> AddRepositoriesAsync(IEnumerable<RepositoryModel> repositories)
         {
-            ValidationResponse<Repository> response = await _client.AddRepositoriesAsync(repositories);
+            ValidationResponse<RepositoryModel> response = await _client.AddRepositoriesAsync(repositories);
 
             if (response == null) return null;
 
@@ -70,9 +70,9 @@ namespace WebBuilder2.Client.Services
             return response.GetValues().SingleOrDefault();
         }
 
-        public async Task<Repository?> SoftDeleteRepositoryAsync(Repository repository)
+        public async Task<RepositoryModel?> SoftDeleteRepositoryAsync(RepositoryModel repository)
         {
-            ValidationResponse<Repository> response = await _client.SoftDeleteRepositoryAsync(repository);
+            ValidationResponse<RepositoryModel> response = await _client.SoftDeleteRepositoryAsync(repository);
 
             if (response == null) return null;
 
@@ -84,9 +84,9 @@ namespace WebBuilder2.Client.Services
             return response.GetValues().SingleOrDefault();
         }
 
-        public async Task<Repository?> UpdateRepositoryAsync(Repository repository)
+        public async Task<RepositoryModel?> UpdateRepositoryAsync(RepositoryModel repository)
         {
-            ValidationResponse<Repository> response = await _client.UpdateRepositoryAsync(repository);
+            ValidationResponse<RepositoryModel> response = await _client.UpdateRepositoryAsync(repository);
 
             if (response == null) return null;
 

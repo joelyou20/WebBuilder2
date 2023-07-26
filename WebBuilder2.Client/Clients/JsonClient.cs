@@ -14,7 +14,7 @@ namespace WebBuilder2.Client.Clients;
 //  1. The JSON file (i.e. temporary DB of static data)
 //  2. AWS -> This will be to serve real data for testing, and later any data pulled from here will be updated in the DB? Maybe...
 
-public class JsonClient : IDatabaseClient
+public class JsonClient
 {
     private HttpClient _httpClient;
 
@@ -23,18 +23,8 @@ public class JsonClient : IDatabaseClient
         _httpClient = httpClient;
     }
 
-    public async Task<SiteRepository?> GetSingleSiteRepositoryBySiteNameAsync(string siteName)
-    {
-        return (await GetSiteRepositoriesAsync())?.SingleOrDefault(site => site.Site.Name.Equals(siteName));
-    }
-
-    public async Task<SiteRepository?> GetSingleSiteRepositoryByRepositoryIdAsync(long repoId)
-    {
-        return (await GetSiteRepositoriesAsync())?.SingleOrDefault(site => site.Repository.Id == repoId);
-    }
-
-    public async Task<IEnumerable<SiteRepository>?> GetSiteRepositoriesAsync()
-    {
+    //public async Task<IEnumerable<SiteRepository>?> GetSiteRepositoriesAsync()
+    //{
         //var response = await _httpClient.GetAsync("./site-repositories.json");
         //var message = (await response.Content.ReadAsStringAsync()).Replace("\r\n", "");
         //IEnumerable<SiteConnection> siteConnections = JsonConvert.DeserializeObject<IEnumerable<SiteConnection>>(message);
@@ -50,12 +40,6 @@ public class JsonClient : IDatabaseClient
 
         //repos.Foreach
 
-        return null;
-    }
-}
-
-public class SiteConnection
-{
-    public string SiteName { get; set; } = "";
-    public long RepositoryId { get; set; } 
+    //    return null;
+    //}
 }

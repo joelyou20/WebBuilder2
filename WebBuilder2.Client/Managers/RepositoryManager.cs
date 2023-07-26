@@ -18,18 +18,22 @@ public class RepositoryManager : IRepositoryManager
         _repositoryService = repositoryService;
     }
 
-    public async Task<ValidationResponse<Repository>> CreateRepoAsync(Repository repo)
+    public async Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repo, SiteModel site)
     {
         var createRepoResponse = await _githubService.PostCreateRepoAsync(repo);
 
         if (!createRepoResponse.Errors.Any() && createRepoResponse.Values != null && createRepoResponse.Values.Any())
         {
-            var addRepoResponse = await _repositoryService.AddRepositoriesAsync(createRepoResponse.Values);
+            // Add Site data to github created repo response
+            var createdRepo = createRepoResponse.Values.Single();
+            createdRepo.Site = site;
+            createdRepo.SiteId = site.Id;
+
+            var addRepoResponse = await _repositoryService.AddRepositoriesAsync(new List<RepositoryModel> { createdRepo });
 
             return addRepoResponse != null ? 
-                ValidationResponse<Repository>.Success(addRepoResponse) :
-                ValidationResponse<Repository>.Failure();
-
+                ValidationResponse<RepositoryModel>.Success(addRepoResponse) :
+                ValidationResponse<RepositoryModel>.Failure();
         }
         
         return createRepoResponse;

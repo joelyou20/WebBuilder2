@@ -53,6 +53,6 @@ public class AppDbContext : DbContext
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    public DbSet<SiteDTO> Site { get; set; }
-    public DbSet<RepositoryDTO> Repository { get; set; }
+    public DbSet<Site> Site { get; set; }
+    public DbSet<Repository> Repository { get; set; }
 }

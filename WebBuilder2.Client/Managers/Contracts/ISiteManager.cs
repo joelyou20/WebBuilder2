@@ -5,5 +5,5 @@ namespace WebBuilder2.Client.Managers.Contracts;
 
 public interface ISiteManager
 {
-    Task<Site?> CreateSiteAsync(CreateSiteRequest createSiteRequest);
+    Task<SiteModel?> CreateSiteAsync(CreateSiteRequest createSiteRequest);
 }

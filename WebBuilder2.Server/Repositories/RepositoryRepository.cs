@@ -20,16 +20,19 @@ public class RepositoryRepository : IRepositoryRepository
         _logger = logger;
     }
 
-    public IQueryable<Repository>? Get(IEnumerable<long>? exclude = null)
+    public IQueryable<RepositoryModel>? Get(IEnumerable<long>? exclude = null)
     {
-        var query = _db.Repository.Where(s => s.DeletedDateTime == null);
+        var query = _db.Repository
+            .Include(x => x.Site)
+            .Where(s => s.DeletedDateTime == null);
 
         if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
 
-        return query.Select(r => new Repository()
+        return query.Select(r => new RepositoryModel()
         {
             Id = r.Id,
             SiteId = r.SiteId,
+            Site = r.Site.FromDto(),
             ExternalId = r.ExternalId,
             AllowAutoMerge = r.AllowAutoMerge,
             AllowMergeCommit = r.AllowMergeCommit,
@@ -60,7 +63,7 @@ public class RepositoryRepository : IRepositoryRepository
         });
     }
 
-    public IEnumerable<Repository> AddRange(IEnumerable<Repository> values)
+    public IEnumerable<RepositoryModel> AddRange(IEnumerable<RepositoryModel> values)
     {
         if (!values.Any()) throw new ArgumentNullException(paramName: "values");
         var dtos = values.Select(ToDto).ToArray();
@@ -71,7 +74,7 @@ public class RepositoryRepository : IRepositoryRepository
         return dtos.Select(x => x.FromDto());
     }
 
-    public IEnumerable<Repository> UpdateRange(IEnumerable<Repository> values)
+    public IEnumerable<RepositoryModel> UpdateRange(IEnumerable<RepositoryModel> values)
     {
         var dtos = values.Select(ToDto).ToArray();
         _db.Repository.UpdateRange(dtos);
@@ -80,20 +83,20 @@ public class RepositoryRepository : IRepositoryRepository
         return dtos.Select(x => x.FromDto());
     }
 
-    public IEnumerable<Repository> UpsertRange(IEnumerable<Repository> values)
+    public IEnumerable<RepositoryModel> UpsertRange(IEnumerable<RepositoryModel> values)
     {
         IEnumerable<long> valuesList = values.Select(x => x.Id);
-        List<Repository> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<Repository>();
-        List<Repository> newValues = values.Where(x => !existingValues.Any(y => y.Id.Equals(x.Id))).ToList();
+        List<RepositoryModel> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<RepositoryModel>();
+        List<RepositoryModel> newValues = values.Where(x => !existingValues.Any(y => y.Id.Equals(x.Id))).ToList();
 
-        var result = new List<Repository>();
+        var result = new List<RepositoryModel>();
 
         if (existingValues.Any()) result.AddRange(UpdateRange(values));
         if (newValues.Any()) result.AddRange(AddRange(newValues));
         return result;
     }
 
-    public IEnumerable<Repository> DeleteRange(IEnumerable<Repository> values)
+    public IEnumerable<RepositoryModel> DeleteRange(IEnumerable<RepositoryModel> values)
     {
         var dtos = values.Select(ToDto).ToArray(); ;
         _db.RemoveRange(dtos);
@@ -102,7 +105,7 @@ public class RepositoryRepository : IRepositoryRepository
         return dtos.Select(x => x.FromDto());
     }
 
-    public IEnumerable<Repository> SoftDeleteRange(IEnumerable<Repository> values)
+    public IEnumerable<RepositoryModel> SoftDeleteRange(IEnumerable<RepositoryModel> values)
     {
         var softDeletedValues = values.Select(x =>
         {
@@ -116,7 +119,7 @@ public class RepositoryRepository : IRepositoryRepository
         return softDeletedValues.Select(x => x.FromDto());
     }
 
-    public RepositoryDTO ToDto(Repository repository) => new()
+    public Repository ToDto(RepositoryModel repository) => new()
     {
         Id = repository.Id,
         SiteId = repository.SiteId,

@@ -18,7 +18,7 @@ namespace WebBuilder2.Client.Services
             _navigationManager = navigationManager;
         }
 
-        public async Task<ValidationResponse<Repository>> GetRepositoriesAsync()
+        public async Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync()
         {
             return await _client.GetRepositoriesAsync();
         }
@@ -34,7 +34,7 @@ namespace WebBuilder2.Client.Services
         {
             return await _client.PostAuthenticateAsync(request);
         }
-        public async Task<ValidationResponse<Repository>> PostCreateRepoAsync(Repository repository)
+        public async Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository)
         {
             ValidationResponse authenticateResponse = await PostAuthenticateAsync(new GithubAuthenticationRequest(""));
 
@@ -45,7 +45,7 @@ namespace WebBuilder2.Client.Services
             else
             {
                 _navigationManager.NavigateTo($"/github/auth/{Uri.EscapeDataString(_navigationManager.Uri)}");
-                return ValidationResponse<Repository>.NotAuthenticated();
+                return ValidationResponse<RepositoryModel>.NotAuthenticated();
             }
         }
     }

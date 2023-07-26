@@ -6,5 +6,5 @@ namespace WebBuilder2.Client.Components;
 
 public partial class GithubRepoTemplateView
 {
-    [Parameter] public List<Repository> TemplateRepositories { get; set; } = new();
+    [Parameter] public List<RepositoryModel> TemplateRepositories { get; set; } = new();
 }

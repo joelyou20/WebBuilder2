@@ -14,24 +14,28 @@ public partial class CreateGithubRepoDialog
 {
     [Inject] public IGithubService GithubService { get; set; } = default!;
     [Inject] public IRepositoryManager RepositoryManager { get; set; } = default!;
+    [Inject] public ISiteService SiteService { get; set; } = default!;
 
-    [Parameter] public List<Repository> TemplateRepositories { get; set; } = new();
+    [Parameter] public List<RepositoryModel> TemplateRepositories { get; set; } = new();
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    private Repository _model = new();
+    private RepositoryModel _model = new();
     private List<string> _gitIgnoreTemplates = new();
     private List<GithubProjectLicense> _licenses = new();
-
-    private readonly Func<Repository, string> _templateSelectConverter = r => r.Name;
+    private List<SiteModel> _sites = new();
+    private readonly Func<RepositoryModel, string> _templateSelectConverter = r => r.Name;
+    private readonly Func<SiteModel, string> _siteSelectConverter = r => r.Name;
     private List<ApiError> _errors = new();
+    private SiteModel? _selectedSite;
 
     protected override async Task OnInitializedAsync()
     {
         _gitIgnoreTemplates = (await GithubService.GetGitIgnoreTemplatesAsync()).GetValues().SelectMany(x => x.Templates).ToList();
         _licenses = (await GithubService.GetGithubProjectLicensesAsync()).GetValues();
+        _sites = await SiteService.GetSitesAsync();
     }
 
-    public void OnTemplateSelected(Repository? templateRepository = null)
+    public void OnTemplateSelected(RepositoryModel? templateRepository = null)
     {
         if (templateRepository == null) return;
 
@@ -54,9 +58,18 @@ public partial class CreateGithubRepoDialog
         StateHasChanged();
     }
 
+    public void OnSiteSelected(SiteModel? siteModel = null)
+    {
+        if (siteModel == null) return;
+
+        _selectedSite = siteModel;
+    }
+
     public void OnValidSubmit() => InvokeAsync(async () =>
     {
-        ValidationResponse<Repository> response = await RepositoryManager.CreateRepoAsync(_model);
+        if (_selectedSite == null) throw new InvalidOperationException("No site selected.");
+
+        ValidationResponse<RepositoryModel> response = await RepositoryManager.CreateRepoAsync(_model, _selectedSite);
 
         if (response.IsSuccessful)
         {

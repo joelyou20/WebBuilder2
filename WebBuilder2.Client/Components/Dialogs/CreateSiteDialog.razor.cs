@@ -15,13 +15,13 @@ public partial class CreateSiteDialog
     [Inject] public IRepositoryManager RepositoryManager { get; set; } = default!;
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
 
-    [Parameter] public List<Repository> TemplateRepositories { get; set; } = new();
+    [Parameter] public List<RepositoryModel> TemplateRepositories { get; set; } = new();
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private CreateSiteRequest _createSiteRequest = new();
-    private readonly Func<Repository, string> _templateSelectConverter = r => r.Name;
-    private Repository? _repoModel;
-    private List<Repository> _templateRepositories = new();
+    private readonly Func<RepositoryModel, string> _templateSelectConverter = r => r.Name;
+    private RepositoryModel? _repoModel;
+    private List<RepositoryModel> _templateRepositories = new();
 
     private List<ApiError> _errors = new();
 
@@ -30,11 +30,11 @@ public partial class CreateSiteDialog
         _templateRepositories = (await RepositoryService.GetRepositoriesAsync()).Where(x => x.IsTemplate).ToList();
     }
 
-    public void OnTemplateSelected(Repository? templateRepository = null)
+    public void OnTemplateSelected(RepositoryModel? templateRepository = null)
     {
         if (templateRepository == null) return;
 
-        _repoModel = new Repository
+        _repoModel = new RepositoryModel
         {
             AllowAutoMerge = templateRepository.AllowAutoMerge,
             AllowRebaseMerge = templateRepository.AllowRebaseMerge,
@@ -73,9 +73,8 @@ public partial class CreateSiteDialog
         repo.RepoName = $"{_createSiteRequest.SiteName}-repo";
         repo.Description = $"{_createSiteRequest.SiteName}-repo description";
         repo.Homepage = $"{_createSiteRequest.SiteName}-repo Homepage";
-        repo.SiteId = site.Id;
 
-        var createRepoResponse = await RepositoryManager.CreateRepoAsync(repo);
+        var createRepoResponse = await RepositoryManager.CreateRepoAsync(repo, site);
 
         if (createRepoResponse.IsSuccessful)
         {

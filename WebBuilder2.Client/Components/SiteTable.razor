@@ -5,7 +5,7 @@
             No sites found
         </MudCard>
     }
-    @foreach (Site site in Sites)
+    @foreach (SiteModel site in Sites)
     {
         <MudCard Class="site-card" @onclick="@(() => OnSiteCardClicked(site))">
             <MudImage Src="resources/duck.jpg" />

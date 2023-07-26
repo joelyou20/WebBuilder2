@@ -19,9 +19,9 @@ namespace WebBuilder2.Client.Services
             _siteClient = siteClient;
         }
 
-        public async Task<List<Site>> GetSitesAsync(IEnumerable<long>? exclude = null)
+        public async Task<List<SiteModel>> GetSitesAsync(IEnumerable<long>? exclude = null)
         {
-            ValidationResponse<Site> response = await _siteClient.GetSitesAsync(exclude);
+            ValidationResponse<SiteModel> response = await _siteClient.GetSitesAsync(exclude);
 
             if (response == null || !response.IsSuccessful)
             {
@@ -31,9 +31,9 @@ namespace WebBuilder2.Client.Services
             return response.GetValues();
         }
 
-        public async Task<Site?> GetSingleSiteAsync(long id)
+        public async Task<SiteModel?> GetSingleSiteAsync(long id)
         {
-            ValidationResponse<Site>? response = await _siteClient.GetSingleSiteAsync(id);
+            ValidationResponse<SiteModel>? response = await _siteClient.GetSingleSiteAsync(id);
 
             if (response == null) return null;
 
@@ -45,9 +45,9 @@ namespace WebBuilder2.Client.Services
             return response.GetValues().SingleOrDefault();
         }
 
-        public async Task<Site?> AddSiteAsync(Site site)
+        public async Task<SiteModel?> AddSiteAsync(SiteModel site)
         {
-            ValidationResponse<Site> response = await _siteClient.AddSiteAsync(site);
+            ValidationResponse<SiteModel> response = await _siteClient.AddSiteAsync(site);
 
             if (response == null) return null;
 
@@ -59,9 +59,9 @@ namespace WebBuilder2.Client.Services
             return response.GetValues().SingleOrDefault();
         }
 
-        public async Task<Site?> SoftDeleteSiteAsync(Site site)
+        public async Task<SiteModel?> SoftDeleteSiteAsync(SiteModel site)
         {
-            ValidationResponse<Site> response = await _siteClient.SoftDeleteSiteAsync(site);
+            ValidationResponse<SiteModel> response = await _siteClient.SoftDeleteSiteAsync(site);
 
             if (response == null) return null;
 
