@@ -23,6 +23,6 @@ public partial class SiteTable
 
     public void OnSiteCardClicked(SiteModel site)
     {
-        NavigationManager.NavigateTo($"site/{site.Id}");
+        NavigationManager.NavigateTo($"sites/{site.Id}");
     }
 }

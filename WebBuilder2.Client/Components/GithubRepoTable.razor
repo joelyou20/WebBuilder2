@@ -37,7 +37,7 @@
         <MudTd DataLabel="Name">@context.Name</MudTd>
         @if(context.Site != null)
         {
-            <MudTd DataLabel="Site"><MudLink Href=@($"/site/{context.SiteId}")>@context.Site.Name</MudLink></MudTd>
+            <MudTd DataLabel="Site"><MudLink Href=@($"/sites/{context.SiteId}")>@context.Site.Name</MudLink></MudTd>
         }
         else
         {

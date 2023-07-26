@@ -22,7 +22,7 @@ public partial class CreateGithubRepoDialog
     private RepositoryModel _model = new();
     private List<string> _gitIgnoreTemplates = new();
     private List<GithubProjectLicense> _licenses = new();
-    private List<SiteModel> _sites = new();
+    private List<SiteModel> _disconnectedSites = new();
     private readonly Func<RepositoryModel, string> _templateSelectConverter = r => r.Name;
     private readonly Func<SiteModel, string> _siteSelectConverter = r => r.Name;
     private List<ApiError> _errors = new();
@@ -32,7 +32,7 @@ public partial class CreateGithubRepoDialog
     {
         _gitIgnoreTemplates = (await GithubService.GetGitIgnoreTemplatesAsync()).GetValues().SelectMany(x => x.Templates).ToList();
         _licenses = (await GithubService.GetGithubProjectLicensesAsync()).GetValues();
-        _sites = await SiteService.GetSitesAsync();
+        _disconnectedSites = (await SiteService.GetSitesAsync()).Where(x => x.Repository == null).ToList();
     }
 
     public void OnTemplateSelected(RepositoryModel? templateRepository = null)
