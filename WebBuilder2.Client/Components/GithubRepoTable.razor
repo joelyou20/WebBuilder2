@@ -2,6 +2,7 @@
     <HeaderContent>
         <MudTh>ID</MudTh>
         <MudTh>Name</MudTh>
+        <MudTh>Site</MudTh>
         <MudTh>Repo Name</MudTh>
         <MudTh>Description</MudTh>
         <MudTh>Html Url</MudTh>
@@ -26,7 +27,7 @@
         <MudTh>Has Wiki</MudTh>
         <MudTh>Home Page</MudTh>
         <MudTh>Team ID</MudTh>
-        @if (ShowConnectButton || ShowDeleteButton || ShowAddTemplateButton)
+        @if (ShowDeleteButton || ShowAddTemplateButton)
         {
             <MudTh></MudTh>
         }
@@ -34,6 +35,14 @@
     <RowTemplate>
         <MudTd DataLabel="Id">@context.ExternalId</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
+        @if(context.Site != null)
+        {
+            <MudTd DataLabel="Site"><MudLink Href=@($"/site/{context.SiteId}")>@context.Site.Name</MudLink></MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="Site">NULL</MudTd>
+        }
         <MudTd DataLabel="RepoName">@context.RepoName</MudTd>
         <MudTd DataLabel="Description">@context.Description</MudTd>
         <MudTd DataLabel="HtmlUrl"><MudLink Href="@context.HtmlUrl">@context.HtmlUrl</MudLink></MudTd>
@@ -58,13 +67,9 @@
         <MudTd DataLabel="HasWiki"><BooleanIcon Value="@context.HasWiki" /></MudTd>
         <MudTd DataLabel="Homepage">@context.Homepage</MudTd>
         <MudTd DataLabel="TeamId">@context.TeamId</MudTd>
-        @if (ShowConnectButton || ShowDeleteButton)
+            @if (ShowDeleteButton || ShowAddTemplateButton)
         {
             <MudTd>
-                @if (ShowConnectButton)
-                {
-                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => OnConnectRepoButtonClicked(context))">Connect</MudButton>
-                }
                 @if (ShowDeleteButton)
                 {
                     <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => OnDeleteRepoButtonClicked(context))">Delete</MudButton>

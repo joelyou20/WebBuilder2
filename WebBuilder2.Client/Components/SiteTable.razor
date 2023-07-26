@@ -7,11 +7,23 @@
     }
     @foreach (SiteModel site in Sites)
     {
-        <MudCard Class="site-card" @onclick="@(() => OnSiteCardClicked(site))">
+        <MudCard Class="st-site-card" @onclick="@(() => OnSiteCardClicked(site))">
             <MudImage Src="resources/duck.jpg" />
-            <div class="card-details">
-                <label class="card-site-name">Site Name: @site.Name</label>
-                <MudButton class="card-delete-site-btn" Variant="Variant.Filled" OnClick="@(() => OnDeleteSiteBtnClicked(site))">Delete Site</MudButton>
+            <div class="st-card-details">
+                <div class="st-card-info">
+                    <MudText class="card-site-name">Site Name: @site.Name</MudText>
+                    @if (site.Repository != null)
+                    {
+                        <MudText>Repo Name: @site.Repository.Name</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Repo Name: NULL</MudText>
+                    }
+                </div>
+                <div class="st-btn-row">
+                    <MudButton class="st-card-delete-site-btn" Variant="Variant.Filled" OnClick="@(() => OnDeleteSiteBtnClicked(site))">Delete Site</MudButton>
+                </div>
             </div>
         </MudCard>
     }

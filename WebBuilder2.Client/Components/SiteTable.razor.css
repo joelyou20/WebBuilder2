@@ -1,12 +1,21 @@
-﻿.card-details {
-    display: grid;
-    grid-template-columns: 80% 20%;
-    grid-template-rows: 20% 80%;
+﻿.st-card-details {
+    display: flex;
+    flex-direction: row;
     width: 100%;
     margin: 1rem;
+    justify-content: space-between;
 }
 
-::deep .site-card {
+.st-card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.st-btn-row {
+    display: flex;
+}
+
+::deep .st-site-card {
     padding: 1rem;
     width: 100%;
     display: flex;
@@ -14,13 +23,13 @@
     margin-bottom: 1rem;
 }
 
-    ::deep .site-card:hover {
+    ::deep .st-site-card:hover {
         cursor: pointer;
     }
 
 
-::deep .card-delete-site-btn {
+::deep .st-card-delete-site-btn {
 }
 
-::deep .card-site-name {
+::deep .st-card-site-name {
 }

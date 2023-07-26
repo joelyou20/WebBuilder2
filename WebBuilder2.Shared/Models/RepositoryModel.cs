@@ -15,7 +15,6 @@ public class RepositoryModel : AuditableEntity
     public long Id { get; set; }
     [JsonPropertyName("siteId")]
     public long SiteId { get; set; }
-    [JsonIgnore]
     public SiteModel? Site { get; set; }
     [JsonPropertyName("externalId")]
     public long ExternalId { get; set; }
