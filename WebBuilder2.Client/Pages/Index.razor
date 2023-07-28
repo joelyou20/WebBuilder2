@@ -1,7 +1,17 @@
 ﻿@page "/"
 
-<ConnectionsWidget />
+<MudCard>
+    <MudButton Variant="@Variant.Filled" OnClick="@(() => _gitHubWidgetEnabled = !_gitHubWidgetEnabled)"><MudIcon Size="@Size.Large" Icon="@Icons.Custom.Brands.GitHub" /></MudButton>
+    <MudButton Variant="@Variant.Filled" OnClick="@(() => _sitesWidgetEnabled = !_sitesWidgetEnabled)"><MudIcon Size="@Size.Large" Icon="@Icons.Custom.Brands.Chrome" /></MudButton>
+</MudCard>
 
-<div>
-    <h1>Hello, world!</h1>
+<div class="index-widget-container">
+    @if (_gitHubWidgetEnabled)
+    {
+        <GithubRepoWidget />
+    }
+    @if (_sitesWidgetEnabled)
+    {
+        <SitesWidget />
+    }
 </div>

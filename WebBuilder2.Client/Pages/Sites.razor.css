@@ -10,34 +10,8 @@
     gap: 1rem;
 }
 
-.card-details {
-    display: grid;
-    grid-template-columns: 80% 20%;
-    grid-template-rows: 20% 80%;
-    width: 100%;
-    margin: 1rem;
-}
-
 ::deep .create-site-btn, ::deep .card-delete-site-btn {
     width: fit-content;
-}
-
-::deep .card-delete-site-btn {
-}
-
-::deep .card-site-name {
-
-}
-
-::deep .site-card {
-    padding: 1rem;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-}
-
-::deep .site-card:hover {
-    cursor: pointer;
 }
 
 ::deep .toolbar {

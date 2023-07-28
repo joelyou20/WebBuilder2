@@ -8,49 +8,15 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Clients
 {
-    public class SiteClient : ISiteClient
+    public class SiteClient : ClientBase<SiteModel>, ISiteClient
     {
-        private HttpClient _httpClient;
+        public SiteClient(HttpClient httpClient) : base(httpClient, "site") { }
 
-        public SiteClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
-        public async Task AddSiteAsync(Site site)
-        {
-            var content = JsonContent.Create(site);
-            HttpResponseMessage response = await _httpClient.PutAsync($"{_httpClient.BaseAddress}site", content);
-            if (!response.IsSuccessStatusCode)
-            {
-                // Handle error
-            }
-        }
-
-        public async Task<ValidationResponse<Site>?> GetSingleSiteAsync(long id)
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site/{id}");
-            if (!response.IsSuccessStatusCode)
-            {
-                // Handle error
-            }
-
-            var message = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<ValidationResponse<Site>>(message);
-            return result;
-        }
-
-        public async Task<ValidationResponse<Site>?> GetSitesAsync()
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}site");
-            if(!response.IsSuccessStatusCode)
-            {
-                // Handle error
-            }
-
-            var message = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<ValidationResponse<Site>>(message);
-            return result;
-        }
+        public async Task<ValidationResponse<SiteModel>> AddSiteAsync(SiteModel site) => await AddAsync(site);
+        public async Task<ValidationResponse<SiteModel>> AddRangeSiteAsync(IEnumerable<SiteModel> sites) => await AddRangeAsync(sites);
+        public async Task<ValidationResponse<SiteModel>> GetSingleSiteAsync(long id) => await GetSingleAsync(id);
+        public async Task<ValidationResponse<SiteModel>> GetSitesAsync(IEnumerable<long>? exclude = null) => await GetAsync(exclude);
+        public async Task<ValidationResponse<SiteModel>> SoftDeleteSiteAsync(SiteModel site) => await SoftDeleteAsync(site);
+        public async Task<ValidationResponse<SiteModel>> SoftDeleteRangeSiteAsync(IEnumerable<SiteModel> sites) => await SoftDeleteRangeAsync(sites);
     }
 }

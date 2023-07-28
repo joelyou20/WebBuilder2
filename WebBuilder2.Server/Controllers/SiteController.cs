@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Validation;
 
@@ -9,32 +13,60 @@ namespace WebBuilder2.Server.Controllers;
 [Route("[controller]")]
 public class SiteController : ControllerBase
 {
-    private readonly ILogger<SiteController> _logger;
-    private IAwsS3Service _awsS3Service;
-    private ISiteDbService _siteService;
+    private ISiteRepository _siteRepository;
 
-    public SiteController(ILogger<SiteController> logger, IAwsS3Service awsS3Service, ISiteDbService siteService)
+    public SiteController(ISiteRepository siteRepository)
     {
-        _logger = logger;
-        _awsS3Service = awsS3Service;
-        _siteService = siteService;
+        _siteRepository = siteRepository;
     }
 
-    [HttpGet("/site")]
-    public async Task<ValidationResponse<Site>> Get()
+    [HttpGet("/site/{id?}")]
+    public IActionResult Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
-        return await _siteService.GetAllAsync();
-    }
+        try
+        {
+            var result = _siteRepository.Get(exclude);
+            if (id != null) result = result?.Where(x => x.Id == id);
 
-    [HttpGet("/site/{long}")]
-    public async Task<ValidationResponse<Site>> Get([FromRoute] long id)
-    {
-        return await _siteService.GetSingleAsync(id);
+            if (result == null) throw new Exception(id == null ? 
+                "Failed to get site data from database." :
+                $"Failed to retrieve site data with ID value of: {id}");
+
+            var listResult = result.ToList();
+
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(listResult)));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(ex)));
+        }
     }
 
     [HttpPut("/site")]
-    public async Task<ValidationResponse<Site>> Put([FromBody] Site site)
+    public IActionResult Put([FromBody] IEnumerable<SiteModel> sites)
     {
-        return await _siteService.UpsertAsync(site);
-    } 
+        try
+        {
+            var result = _siteRepository.UpsertRange(sites);
+            return Ok(ValidationResponse<SiteModel>.Success(result));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
+        }
+    }
+
+    [HttpPost("/site/delete")]
+    public IActionResult SoftDelete([FromBody] IEnumerable<SiteModel> sites)
+    {
+        try
+        {
+            var result = _siteRepository.SoftDeleteRange(sites);
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(result)));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
+        }
+    }
 }

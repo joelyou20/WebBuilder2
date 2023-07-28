@@ -1,0 +1,12 @@
+﻿<div class="grtv-container">
+    @foreach(RepositoryModel templateRepo in TemplateRepositories)
+    {
+        <MudCard>
+            <MudText>Template Name: @templateRepo.Name</MudText>
+            <label>
+                <MudIcon Icon="@Icons.Material.Filled.Dangerous" />
+                <MudText>Test</MudText>
+            </label>
+        </MudCard>
+    }
+</div>

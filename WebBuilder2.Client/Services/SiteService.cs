@@ -1,8 +1,11 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Json;
 using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Managers;
+using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services
@@ -15,34 +18,59 @@ namespace WebBuilder2.Client.Services
         {
             _siteClient = siteClient;
         }
-        public async Task<List<Site>?> GetSitesAsync()
-        {
-            ValidationResponse<Site>? response = await _siteClient.GetSitesAsync();
 
-            if (response == null || !response.IsSuccessful || response.Values == null || !response.Values.Any())
+        public async Task<List<SiteModel>> GetSitesAsync(IEnumerable<long>? exclude = null)
+        {
+            ValidationResponse<SiteModel> response = await _siteClient.GetSitesAsync(exclude);
+
+            if (response == null || !response.IsSuccessful)
             {
-                // Handle error -> response.Message
-                return null;
+                throw new Exception(response?.Message ?? "Failed to get site Data");
             }
 
-            return response.Values!.ToList();
-
+            return response.GetValues();
         }
 
-        public async Task<Site?> GetSingleSiteAsync(long id)
+        public async Task<SiteModel?> GetSingleSiteAsync(long id)
         {
-            ValidationResponse<Site>? response = await _siteClient.GetSingleSiteAsync(id);
+            ValidationResponse<SiteModel>? response = await _siteClient.GetSingleSiteAsync(id);
 
             if (response == null) return null;
 
             if(!response.IsSuccessful)
             {
-                // Handle error -> response.Message
+                throw new Exception(response?.Message ?? "Failed to get site Data");
             }
 
-            return response.Values!.SingleOrDefault();
+            return response.GetValues().SingleOrDefault();
         }
 
-        public async Task AddSiteAsync(Site site) => await _siteClient.AddSiteAsync(site);
+        public async Task<SiteModel?> AddSiteAsync(SiteModel site)
+        {
+            ValidationResponse<SiteModel> response = await _siteClient.AddSiteAsync(site);
+
+            if (response == null) return null;
+
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response?.Message ?? "Failed to add site Data");
+            }
+
+            return response.GetValues().SingleOrDefault();
+        }
+
+        public async Task<SiteModel?> SoftDeleteSiteAsync(SiteModel site)
+        {
+            ValidationResponse<SiteModel> response = await _siteClient.SoftDeleteSiteAsync(site);
+
+            if (response == null) return null;
+
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response?.Message ?? "Failed to delete site");
+            }
+
+            return response.GetValues().SingleOrDefault();
+        }
     }
 }

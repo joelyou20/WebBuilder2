@@ -1,0 +1,35 @@
+﻿.st-card-details {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin: 1rem;
+    justify-content: space-between;
+}
+
+.st-card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.st-btn-row {
+    display: flex;
+}
+
+::deep .st-site-card {
+    padding: 1rem;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1rem;
+}
+
+    ::deep .st-site-card:hover {
+        cursor: pointer;
+    }
+
+
+::deep .st-card-delete-site-btn {
+}
+
+::deep .st-card-site-name {
+}

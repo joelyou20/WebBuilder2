@@ -1,0 +1,15 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using WebBuilder2.Client.Models;
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@_script" OnValidSubmit="@OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudTextField Label="Script Name" T="string" @bind-Value="@_script.Name" Required="true" For="@(() => _script.Name)"></MudTextField>
+            <div>
+                <CodeEditor FileChanged="@OnFileChanged" />
+            </div>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Create</MudButton>
+        </EditForm>
+    </DialogContent>
+</MudDialog>

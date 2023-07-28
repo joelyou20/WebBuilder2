@@ -10,7 +10,7 @@ public partial class SiteDetails
 
     [Parameter] public long SiteId { get; set; }
 
-    private Site? _site;
+    private SiteModel? _site;
 
     protected override async Task OnInitializedAsync()
     {

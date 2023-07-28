@@ -6,4 +6,5 @@ public interface IAwsService
 {
     Task<IEnumerable<Bucket>> GetBucketsAsync();
     Task<IEnumerable<HostedZone>> GetHostedZonesAsync();
+    Task<decimal> GetForecastedCostAsync();
 }

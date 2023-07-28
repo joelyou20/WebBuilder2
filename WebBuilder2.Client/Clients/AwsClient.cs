@@ -26,6 +26,19 @@ public class AwsClient : IAwsClient
         return result;
     }
 
+    public async Task<string> GetForecastedCostAsync()
+    {
+        HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}aws/cost");
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle error
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<string>(message);
+        return result;
+    }
+
     public async Task<IEnumerable<HostedZone>> GetHostedZonesAsync()
     {
         HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}aws/hostedzones");

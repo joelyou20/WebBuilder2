@@ -1,0 +1,27 @@
+﻿::deep .mud-card {
+    width: auto;
+}
+
+.sl-btn-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.sl-top-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+::deep .sl-expand-btn {
+    margin: 0.5rem;
+    width: 1rem;
+}
+
+::deep .mud-button > .mud-button-label .mud-button-icon-start {
+    margin: unset;
+}
+
+::deep .expanded > .editor_container {
+    height: 20rem;
+}

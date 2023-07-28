@@ -22,4 +22,12 @@ public class AwsService : IAwsService
     {
         return await _client.GetHostedZonesAsync();
     }
+
+    public async Task<decimal> GetForecastedCostAsync()
+    {
+        var response = await _client.GetForecastedCostAsync();
+        decimal.TryParse(response, out decimal result);
+
+        return result;
+    }
 }

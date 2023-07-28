@@ -1,3 +1,7 @@
-﻿div {
+﻿.index-widget-container {
+    display: flex;
+}
+
+.index-widget-container > ::deep div {
     margin: 1rem;
 }

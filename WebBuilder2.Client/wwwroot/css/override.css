@@ -1,3 +1,11 @@
 ﻿.mud-paper {
     width: fit-content;
 }
+
+.mud-table {
+    height: 100%;
+}
+
+.mud-table-container {
+    height: 100%;
+}

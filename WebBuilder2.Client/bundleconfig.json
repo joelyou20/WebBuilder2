@@ -1,0 +1,12 @@
+[
+    {
+        "outputFileName": "wwwroot/js/bundle.min.js",
+        "inputFiles": [
+            "components/*.js"
+        ],
+        "minify": {
+            "enabled": true,
+            "commentMode": "all"
+        }
+    }
+]

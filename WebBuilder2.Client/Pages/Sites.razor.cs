@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WebBuilder2.Client.Components.Dialogs;
+using WebBuilder2.Client.Managers.Contracts;
+using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 
@@ -8,38 +10,56 @@ namespace WebBuilder2.Client.Pages;
 
 public partial class Sites
 {
-    [Inject] public ISiteService SiteService { get; set; } = default!;
+    [Inject] public ISiteService SiteService { get; set; } = default!; // Eventually all calls will go through manager
+    [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
+    [Inject] public ISiteManager SiteManager { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    public List<Site> siteList = new();
-
-    public int idCounter = 0; //HACK: Temporary until the ids can be stored in a db or json file
+    private List<SiteModel> _siteList = new();
 
     protected override async Task OnInitializedAsync()
     {
-        await InitializeSitesAsync();
-    }
-
-    private async Task InitializeSitesAsync()
-    {
-        var sites = await SiteService.GetSitesAsync();
-
-        if (sites == null) return;
-
-        foreach (Site site in sites)
-        {
-            siteList.Add(site);
-        }
+        await UpdateSitesAsync();
     }
 
     public void OnCreateSiteBtnClicked() => InvokeAsync(async () =>
     {
-        var site = new Site($"Test Site {idCounter}");
-        siteList.Add(site);
-        await SiteService.AddSiteAsync(site);
-        idCounter++;
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center,
+            
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateSiteDialog>(
+            title: "Create New Site",
+            options: options
+        );
+
+        await dialog.Result;
+
+        await UpdateSitesAsync();
     });
+
+    private async Task UpdateSitesAsync()
+    {
+        var sites = await SiteService.GetSitesAsync(_siteList.Select(x => x.Id));
+
+        if (sites == null) return;
+
+        List<SiteModel> newSiteList = new();
+
+        foreach (SiteModel site in sites)
+        {
+            newSiteList.Add(site);
+        }
+
+        _siteList = newSiteList;
+
+        StateHasChanged();
+    }
 
     public void OnAddExistingSiteBtnClicked() => InvokeAsync(async () =>
     {
@@ -56,13 +76,5 @@ public partial class Sites
         );
     });
 
-    public void OnDeleteSiteBtnClicked(Site site)
-    {
-        siteList.Remove(site);
-    }
-
-    public void OnSiteCardClicked(Site site)
-    {
-        NavigationManager.NavigateTo($"site/{site.Name}");
-    }
+    public void OnSiteTableValueChanged() => InvokeAsync(UpdateSitesAsync);
 }
