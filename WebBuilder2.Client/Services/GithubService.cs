@@ -30,6 +30,10 @@ namespace WebBuilder2.Client.Services
         {
             return await _client.GetGithubProjectLicensesAsync();
         }
+        public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync()
+        {
+            return await _client.GetSecretsAsync();
+        }
         public async Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
         {
             return await _client.PostAuthenticateAsync(request);

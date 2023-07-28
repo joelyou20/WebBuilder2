@@ -54,6 +54,20 @@ public class ScriptService : IScriptService
         return response.GetValues().SingleOrDefault();
     }
 
+    public async Task<ScriptModel?> UpdateScriptAsync(ScriptModel script)
+    {
+        ValidationResponse<ScriptModel> response = await _scriptClient.UpdateScriptAsync(script);
+
+        if (response == null) return null;
+
+        if (!response.IsSuccessful)
+        {
+            throw new Exception(response?.Message ?? "Failed to update script Data");
+        }
+
+        return response.GetValues().SingleOrDefault();
+    }
+
     public async Task<ScriptModel?> SoftDeleteScriptAsync(ScriptModel script)
     {
         ValidationResponse<ScriptModel> response = await _scriptClient.SoftDeleteScriptAsync(script);

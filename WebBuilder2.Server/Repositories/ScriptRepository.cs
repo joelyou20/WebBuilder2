@@ -48,7 +48,8 @@ public class ScriptRepository : IScriptRepository
 
     public IEnumerable<ScriptModel> UpdateRange(IEnumerable<ScriptModel> values)
     {
-        var dtos = values.Select(ToDto).ToArray();
+        var dtos = values.Select(ToDto).ToList();
+        dtos.ForEach(x => _db.Entry(x).Property("CreatedDateTime").IsModified = false);
         _db.Script.UpdateRange(dtos);
         var result = _db.SaveChanges();
         if (result <= 0) throw new DbUpdateException("Failed to save changes.");
@@ -95,6 +96,9 @@ public class ScriptRepository : IScriptRepository
     {
         Id = script.Id,
         Data = script.Data,
-        Name = script.Name
+        Name = script.Name,
+        ModifiedDateTime = script.ModifiedDateTime,
+        CreatedDateTime = script.CreatedDateTime,
+        DeletedDateTime = script.DeletedDateTime,
     };
 }

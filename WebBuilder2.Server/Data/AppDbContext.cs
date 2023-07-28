@@ -6,10 +6,11 @@ namespace WebBuilder2.Server.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    }
+    public DbSet<Site> Site { get; set; }
+    public DbSet<Script> Script { get; set; }
+    public DbSet<Repository> Repository { get; set; }
 
     public override int SaveChanges()
     {
@@ -52,8 +53,4 @@ public class AppDbContext : DbContext
 
         return await base.SaveChangesAsync(cancellationToken);
     }
-
-    public DbSet<Site> Site { get; set; }
-    public DbSet<Script> Script { get; set; }
-    public DbSet<Repository> Repository { get; set; }
 }

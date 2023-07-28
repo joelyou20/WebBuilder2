@@ -7,5 +7,6 @@ public interface IScriptService
     Task<List<ScriptModel>> GetScriptsAsync(IEnumerable<long>? exclude = null);
     Task<ScriptModel?> GetSingleScriptAsync(long id);
     Task<ScriptModel?> AddScriptAsync(ScriptModel script);
+    Task<ScriptModel?> UpdateScriptAsync(ScriptModel script);
     Task<ScriptModel?> SoftDeleteScriptAsync(ScriptModel script);
 }

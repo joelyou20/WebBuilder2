@@ -11,4 +11,5 @@ public interface IScriptClient
     Task<ValidationResponse<ScriptModel>> GetScriptsAsync(IEnumerable<long>? exclude = null);
     Task<ValidationResponse<ScriptModel>> SoftDeleteScriptAsync(ScriptModel site);
     Task<ValidationResponse<ScriptModel>> SoftDeleteRangeScriptAsync(IEnumerable<ScriptModel> sites);
+    Task<ValidationResponse<ScriptModel>> UpdateScriptAsync(ScriptModel script);
 }

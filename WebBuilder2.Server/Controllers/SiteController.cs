@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services.Contracts;
@@ -20,7 +21,7 @@ public class SiteController : ControllerBase
     }
 
     [HttpGet("/site/{id?}")]
-    public ActionResult<ValidationResponse<SiteModel>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
+    public IActionResult Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
         try
         {
@@ -33,16 +34,16 @@ public class SiteController : ControllerBase
 
             var listResult = result.ToList();
 
-            return Ok(ValidationResponse<SiteModel>.Success(listResult));
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(listResult)));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<SiteModel>.BuildFailedResponse(ex));
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(ex)));
         }
     }
 
     [HttpPut("/site")]
-    public ActionResult<ValidationResponse<SiteModel>> Put([FromBody] IEnumerable<SiteModel> sites)
+    public IActionResult Put([FromBody] IEnumerable<SiteModel> sites)
     {
         try
         {
@@ -51,21 +52,21 @@ public class SiteController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex));
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
         }
     }
 
     [HttpPost("/site/delete")]
-    public ActionResult<ValidationResponse<SiteModel>> SoftDelete([FromBody] IEnumerable<SiteModel> sites)
+    public IActionResult SoftDelete([FromBody] IEnumerable<SiteModel> sites)
     {
         try
         {
             var result = _siteRepository.SoftDeleteRange(sites);
-            return Ok(ValidationResponse<SiteModel>.Success(result));
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(result)));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex));
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
         }
     }
 }

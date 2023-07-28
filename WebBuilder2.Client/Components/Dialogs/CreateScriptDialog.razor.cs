@@ -21,32 +21,20 @@ public partial class CreateScriptDialog
     private ScriptModel _script = new();
 
     private List<ApiError> _errors = new();
-    public Editor<ScriptEditorFile>? _editor;
 
-    protected async override Task OnAfterRenderAsync(bool firstRender)
+    public void OnFileChanged(ScriptEditorFile file)
     {
-        if(firstRender)
-        {
-            if (_editor == null) throw new ArgumentNullException("Editor reference value is null.");
-
-            var file = new ScriptEditorFile("test", "This is some content");
-            EditorOptions editorOptions = new()
-            {
-                Syntax = Syntax.Yaml,
-                Theme = Theme.Eclipse
-            };
-            await _editor.Open(file, editorOptions);
-            StateHasChanged();
-        }
+        _script.Data = file.Content;
     }
 
-    public async void OnCreateBtnClick()
+    public async Task OnValidSubmit()
     {
+
         var script = await ScriptService.AddScriptAsync(_script);
 
         if (script == null)
         {
-            _errors.Add(new ApiError("Failed to create site"));
+            _errors.Add(new ApiError("Failed to create script"));
             StateHasChanged();
             return;
         }

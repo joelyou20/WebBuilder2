@@ -43,4 +43,6 @@ public partial class Scripts
 
         await UpdateScriptsAsync();
     }
+
+    public async Task OnScriptsChanged() => await UpdateScriptsAsync();
 }

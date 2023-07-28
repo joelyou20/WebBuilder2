@@ -1,7 +1,8 @@
 ﻿@page "/scripts"
 
 <MudText>Scripts</MudText>
+<MudText>WebBuilder2 does not store any secrets or private variables</MudText>
 <div class="s-btn-row">
     <MudButton Variant="Variant.Filled" OnClick="@OnCreateScriptBtnClick">Create Script</MudButton>
 </div>
-<ScriptList Scripts="@_scripts" />
+<ScriptList Scripts="@_scripts" ScriptsChanged="@OnScriptsChanged" />

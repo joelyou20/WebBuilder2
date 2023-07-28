@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Utils;
@@ -19,7 +20,7 @@ public class ScriptController : ControllerBase
     }
 
     [HttpGet("/script/{id?}")]
-    public ActionResult<ValidationResponse<ScriptModel>> Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
+    public IActionResult Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
         try
         {
@@ -33,53 +34,53 @@ public class ScriptController : ControllerBase
 
             List<ScriptModel> resultList = result.ToList();
 
-            return Ok(ValidationResponse<ScriptModel>.Success(resultList));
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(resultList)));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(ex));
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(ex)));
         }
     }
 
     [HttpPut("/script")]
-    public ActionResult<ValidationResponse<ScriptModel>> Put([FromBody] IEnumerable<ScriptModel> repos)
+    public IActionResult Put([FromBody] IEnumerable<ScriptModel> scripts)
     {
         try
         {
-            var result = _scriptRepository.UpsertRange(repos);
-            return Ok(ValidationResponse<ScriptModel>.Success(result));
+            var result = _scriptRepository.UpsertRange(scripts);
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(result)));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(repos, ex));
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(scripts, ex)));
         }
     }
 
     [HttpPost("/script/delete")]
-    public ActionResult<ValidationResponse<ScriptModel>> SoftDelete([FromBody] IEnumerable<ScriptModel> repos)
+    public IActionResult SoftDelete([FromBody] IEnumerable<ScriptModel> scripts)
     {
         try
         {
-            var result = _scriptRepository.SoftDeleteRange(repos);
-            return Ok(ValidationResponse<ScriptModel>.Success(result));
+            var result = _scriptRepository.SoftDeleteRange(scripts);
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(result)));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(repos, ex));
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(scripts, ex)));
         }
     }
 
     [HttpPost("/script/update")]
-    public ActionResult<ValidationResponse<ScriptModel>> Update([FromBody] IEnumerable<ScriptModel> repos)
+    public IActionResult Update([FromBody] IEnumerable<ScriptModel> scripts)
     {
         try
         {
-            var result = _scriptRepository.UpdateRange(repos);
-            return Ok(ValidationResponse<ScriptModel>.Success(result));
+            var result = _scriptRepository.UpdateRange(scripts);
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(result)));
         }
         catch (Exception ex)
         {
-            return BadRequest(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(repos, ex));
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(scripts, ex)));
         }
     }
 }

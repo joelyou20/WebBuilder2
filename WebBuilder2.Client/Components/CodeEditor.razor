@@ -1,1 +1,4 @@
-﻿<div id='example' style="height: 100%"></div>
+﻿@using Blace.Components
+@using WebBuilder2.Client.Models;
+
+<Editor @ref="@_editor" T="ScriptEditorFile" ShowSettings="false" FileChanged="@OnFileChanged" />

@@ -11,4 +11,5 @@ public interface IGithubService
     Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
     Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
     Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository);
+    Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync();
 }

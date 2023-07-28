@@ -11,5 +11,6 @@ namespace WebBuilder2.Server.Services.Contracts
         Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repository);
         Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
         Task<ValidationResponse<GithubProjectLicense>> GetLicenseTemplatesAsync();
+        Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync();
     }
 }

@@ -84,5 +84,18 @@ namespace WebBuilder2.Client.Clients
             var result = JsonConvert.DeserializeObject<ValidationResponse<GithubProjectLicense>>(message);
             return result;
         }
+
+        public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync()
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/secrets");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+            }
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse<GithubSecretResponse>>(message);
+            return result;
+        }
     }
 }

@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Octokit;
+using System.IO;
 using System.Net;
+using System.Net.Http.Headers;
 using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
@@ -19,9 +22,9 @@ public class GithubService : IGithubService
         _client = client;
     }
 
-    public async Task<ValidationResponse<Shared.Models.RepositoryModel>> GetRepositoriesAsync()
+    public async Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync()
     {
-        List<Shared.Models.RepositoryModel> repos = new();
+        List<RepositoryModel> repos = new();
 
         var repositories = await _client.Repository.GetAllForCurrent();
 
@@ -30,7 +33,7 @@ public class GithubService : IGithubService
             repos.Add(ParseRepository(repo));
         }
 
-        return ValidationResponse<Shared.Models.RepositoryModel>.Success(repos);
+        return ValidationResponse<RepositoryModel>.Success(repos);
     }
 
     public async Task<ValidationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request)
@@ -55,7 +58,7 @@ public class GithubService : IGithubService
         }
     }
 
-    public async Task<ValidationResponse<Shared.Models.RepositoryModel>> CreateRepoAsync(Shared.Models.RepositoryModel repository)
+    public async Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repository)
     {
         try
         {
@@ -101,11 +104,11 @@ public class GithubService : IGithubService
             response.UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault;
             response.Visibility = repository.Visibility;
 
-            return ValidationResponse<Shared.Models.RepositoryModel>.Success(response);
+            return ValidationResponse<RepositoryModel>.Success(response);
         }
         catch (ApiException ex)
         {
-            var response = new ValidationResponse<Shared.Models.RepositoryModel>
+            var response = new ValidationResponse<RepositoryModel>
             {
                 Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError
                 {
@@ -129,7 +132,7 @@ public class GithubService : IGithubService
 
     public async Task<ValidationResponse<GithubProjectLicense>> GetLicenseTemplatesAsync()
     {
-        var licenses = await _client.Licenses.GetAllLicenses();
+        IReadOnlyList<LicenseMetadata> licenses = await _client.Licenses.GetAllLicenses();
 
         return ValidationResponse<GithubProjectLicense>.Success(licenses.Select(license => new GithubProjectLicense
         {
@@ -140,7 +143,29 @@ public class GithubService : IGithubService
         }));
     }
 
-    public Shared.Models.RepositoryModel ParseRepository(Octokit.Repository repo) => new Shared.Models.RepositoryModel
+    public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync()
+    {
+        var client = new HttpClient();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/joelyou20/Portfolio/actions/secrets");
+        request.Headers.Add("Accept", "application/vnd.github+json");
+        request.Headers.Add("Authorization", "Bearer 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");
+        request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+        request.Headers.Add("User-Agent", "request");
+        request.Headers.Add("Cookie", "_octo=GH1.1.1578474083.1689685007; logged_in=no");
+
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var message = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<GithubSecretResponse>(message);
+
+        if(result == null) return ValidationResponse<GithubSecretResponse>.Failure();
+
+        return ValidationResponse<GithubSecretResponse>.Success(result);
+    }
+
+    public RepositoryModel ParseRepository(Octokit.Repository repo) => new RepositoryModel
     {
         AllowAutoMerge = repo.AllowAutoMerge != null,
         AllowMergeCommit = repo.AllowMergeCommit != null,
@@ -164,7 +189,7 @@ public class GithubService : IGithubService
         HtmlUrl = repo.HtmlUrl,
     };
 
-    public Data.Models.Repository ToDto(Shared.Models.RepositoryModel repo) => new()
+    public Data.Models.Repository ToDto(RepositoryModel repo) => new()
     {
         Id = repo.Id,
         Name = repo.Name,

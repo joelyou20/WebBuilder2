@@ -2,6 +2,7 @@
 
 namespace WebBuilder2.Shared.Validation;
 
+[Serializable]
 public class ValidationResponse<T> where T : class
 {
     public bool IsSuccessful { get; set; } = false;

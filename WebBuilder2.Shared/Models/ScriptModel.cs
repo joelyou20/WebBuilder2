@@ -14,6 +14,7 @@ public class ScriptModel : AuditableEntity
     [JsonPropertyName("id")]
     public long Id { get; set; }
     [JsonPropertyName("name")]
+    [Required]
     public string Name { get; set; } = string.Empty;
     [JsonPropertyName("data")]
     public string Data { get; set; } = string.Empty;

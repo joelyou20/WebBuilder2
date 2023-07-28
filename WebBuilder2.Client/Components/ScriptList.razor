@@ -1,10 +1,26 @@
-﻿<MudList>
-    @foreach(ScriptModel script in Scripts)
-    {
-        <MudListItem>
-            <MudCard>
-                @script.Data
-            </MudCard>
-        </MudListItem>
-    }
-</MudList>
+﻿@using Blace.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using WebBuilder2.Client.Models;
+
+<div>
+    <MudList>
+        @foreach (ScriptModel script in Scripts)
+        {
+            int index = Scripts.IndexOf(script);
+
+            <MudListItem>
+                <MudCard class="expanded" id="@($"script-{index}")">
+                    <div class="sl-top-row">
+                        <MudText>@script.Name</MudText>
+                        <MudButton class="sl-expand-btn" StartIcon="@Icons.Material.Filled.Expand" OnClick="@(() => OnExpandBtnClick(index))"></MudButton>
+                    </div>
+                    <CodeEditor Value="@script.Data" FileChanged="@((file) => OnFileChanged(file, script))" />
+                        <div class="sl-btn-row">
+                            <MudButton Variant="Variant.Filled" OnClick="@(() => OnSaveFileClick(script))">Save</MudButton>
+                            <MudButton Variant="Variant.Filled" OnClick="@(() => OnDeleteFileClick(script))">Delete</MudButton>
+                        </div>
+                </MudCard>
+            </MudListItem>
+        }
+    </MudList>
+</div>

@@ -14,4 +14,5 @@ public class ScriptClient : ClientBase<ScriptModel>, IScriptClient
     public async Task<ValidationResponse<ScriptModel>> GetScriptsAsync(IEnumerable<long>? exclude = null) => await GetAsync(exclude);
     public async Task<ValidationResponse<ScriptModel>> SoftDeleteScriptAsync(ScriptModel script) => await SoftDeleteAsync(script);
     public async Task<ValidationResponse<ScriptModel>> SoftDeleteRangeScriptAsync(IEnumerable<ScriptModel> scripts) => await SoftDeleteRangeAsync(scripts);
+    public async Task<ValidationResponse<ScriptModel>> UpdateScriptAsync(ScriptModel script) => await UpdateAsync(script);
 }

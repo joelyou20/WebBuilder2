@@ -31,6 +31,7 @@ public class ClientBase<T> where T : AuditableEntity
         HttpResponseMessage response = await _httpClient.GetAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}");
+        response.EnsureSuccessStatusCode();
 
         return await ParseResponseAsync(response);
     }
@@ -40,6 +41,7 @@ public class ClientBase<T> where T : AuditableEntity
         HttpResponseMessage response = await _httpClient.PostAsync(path == null ? 
             $"{_httpClient.BaseAddress}{_endpoint}" : 
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+        response.EnsureSuccessStatusCode();
 
         return await ParseResponseAsync(response);
     }
@@ -49,17 +51,13 @@ public class ClientBase<T> where T : AuditableEntity
         HttpResponseMessage response = await _httpClient.PutAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+        response.EnsureSuccessStatusCode();
 
         return await ParseResponseAsync(response);
     }
 
     private async Task<ValidationResponse<T>> ParseResponseAsync(HttpResponseMessage response)
     {
-        if (!response.IsSuccessStatusCode)
-        {
-            // Handle error
-        }
-
         var message = await response.Content.ReadAsStringAsync();
         var result = JsonConvert.DeserializeObject<ValidationResponse<T>>(message);
         return result;

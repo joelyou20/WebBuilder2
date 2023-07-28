@@ -11,4 +11,5 @@ public interface IGithubClient
     Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository);
     Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
     Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
+    Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync();
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace WebBuilder2.Shared.Models;
@@ -7,9 +8,9 @@ namespace WebBuilder2.Shared.Models;
 public class SiteModel : AuditableEntity
 {
     [Key]
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public long Id { get; set; }
-    [JsonPropertyName("name")]
+    [JsonProperty("name")]
     public string Name { get; set; } = "";
     public RepositoryModel? Repository { get; set; }
 
