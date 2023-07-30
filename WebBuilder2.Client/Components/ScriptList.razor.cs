@@ -2,6 +2,8 @@
 using Blace.Editing;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using MudBlazor;
+using WebBuilder2.Client.Components.Dialogs;
 using WebBuilder2.Client.Models;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
@@ -13,6 +15,7 @@ public partial class ScriptList
 {
     [Inject] public IScriptService ScriptService { get; set; } = default!;
     [Inject] public IJSRuntime JSRuntime { get; set; } = default!;
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
     [Parameter] public List<ScriptModel> Scripts { get; set; } = new();
     [Parameter] public EventCallback ScriptsChanged { get; set; } = default!;
@@ -49,6 +52,32 @@ public partial class ScriptList
         if (result == null) _errors.Add(new ApiError("Failed to delete script"));
 
         await ScriptsChanged.InvokeAsync();
+        StateHasChanged();
+    }
+
+    public async Task OnFullscreenBtnClick(ScriptModel script)
+    {
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center,
+            FullScreen = true
+        };
+
+        DialogParameters dialogParameters = new()
+        {
+            { "Script", script }
+        };
+
+        var dialog = await DialogService.ShowAsync<EditScriptDialog>(
+            title: script.Name,
+            options: options,
+            parameters: dialogParameters
+        );
+
+        await dialog.Result;
+
         StateHasChanged();
     }
 }

@@ -50,6 +50,12 @@ namespace WebBuilder2.Client.Services
             return await _client.CreateSecretAsync(secret, userName, repoName);
         }
 
+        public async Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string repoName)
+        {
+            var userName = await GetLoginAsync();
+            return await _client.CreateCommitAsync(request, userName, repoName);
+        }
+
         public async Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
         {
             return await _client.PostAuthenticateAsync(request);

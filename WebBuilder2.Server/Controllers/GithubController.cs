@@ -125,12 +125,37 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
-        [HttpPut("/github/secrets/{userName}/{repoName}")]
-        public async Task<IActionResult> CreateSecret([FromRoute] string userName, [FromRoute] string repoName, [FromBody] GithubSecret secret)
+        [HttpPut("/github/secrets/{owner}/{repoName}")]
+        public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] GithubSecret secret)
         {
             try
             {
-                return Created($"github/secrets/{userName}/{repoName}", JsonConvert.SerializeObject(await _githubService.CreateSecretAsync(secret, userName, repoName)));
+                return Created($"github/secrets/{owner}/{repoName}", JsonConvert.SerializeObject(await _githubService.CreateSecretAsync(secret, owner, repoName)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
+        [HttpPut("/github/commit/{owner}/{repoName}")]
+        public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] GithubCreateCommitRequest commit)
+        {
+            try
+            {
+                return Created($"github/commit/{owner}/{repoName}", JsonConvert.SerializeObject(await _githubService.CreateCommitAsync(owner, repoName, commit)));
             }
             catch (HttpRequestException ex)
             {

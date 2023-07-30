@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Sockets;
 using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
@@ -98,6 +99,17 @@ namespace WebBuilder2.Client.Clients
 
             var message = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<ValidationResponse<string>>(message);
+            return result;
+        }
+
+        public async Task<ValidationResponse?> CreateCommitAsync(GithubCreateCommitRequest request, string userName, string repoName)
+        {
+            JsonContent content = JsonContent.Create(request);
+            HttpResponseMessage response = await _httpClient.PutAsync($"{_httpClient.BaseAddress}github/commit/{userName}/{repoName}", content);
+            response.EnsureSuccessStatusCode();
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
             return result;
         }
     }

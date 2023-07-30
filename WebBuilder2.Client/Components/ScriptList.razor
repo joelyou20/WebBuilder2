@@ -12,6 +12,7 @@
                 <MudCard class="expanded" id="@($"script-{index}")">
                     <div class="sl-top-row">
                         <MudText>@script.Name</MudText>
+                        <MudButton class="sl-expand-btn" StartIcon="@Icons.Material.Filled.Fullscreen" OnClick="@(() => OnFullscreenBtnClick(script))"></MudButton>
                         <MudButton class="sl-expand-btn" StartIcon="@Icons.Material.Filled.Expand" OnClick="@(() => OnExpandBtnClick(index))"></MudButton>
                     </div>
                     <CodeEditor Value="@script.Data" FileChanged="@((file) => OnFileChanged(file, script))" />

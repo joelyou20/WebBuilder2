@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Octokit;
@@ -191,6 +192,15 @@ public class GithubService : IGithubService
     {
         var user = await _client.User.Current();
         return ValidationResponse<string>.Success(user.Login);
+    }
+
+    public async Task<ValidationResponse> CreateCommitAsync(string owner, string repoName, GithubCreateCommitRequest request)
+    {
+        CreateFileRequest createFileRequest = new(request.Message, request.Content);
+
+        await _client.Repository.Content.CreateFile(owner, repoName, request.Path, createFileRequest);
+
+        return ValidationResponse.Success();
     }
 
 

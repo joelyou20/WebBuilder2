@@ -14,5 +14,6 @@ namespace WebBuilder2.Server.Services.Contracts
         Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName);
         Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string userName, string repoName);
         Task<ValidationResponse<string>> GetUserAsync();
+        Task<ValidationResponse> CreateCommitAsync(string owner, string repoName, GithubCreateCommitRequest request);
     }
 }

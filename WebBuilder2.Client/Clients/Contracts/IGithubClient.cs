@@ -14,4 +14,5 @@ public interface IGithubClient
     Task<ValidationResponse<GithubProjectLicense>?> GetGithubProjectLicensesAsync();
     Task<ValidationResponse<GithubSecretResponse>?> GetSecretsAsync(string userName, string repoName);
     Task<ValidationResponse<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string userName, string repoName);
+    Task<ValidationResponse?> CreateCommitAsync(GithubCreateCommitRequest request, string userName, string repoName);
 }

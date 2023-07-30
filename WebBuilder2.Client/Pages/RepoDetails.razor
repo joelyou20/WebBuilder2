@@ -1,0 +1,10 @@
+﻿@page "/connections/github/{Id:long}"
+
+@if(_repo != null)
+{
+    <MudText>@_repo.Name</MudText>
+}
+else
+{
+    <MudText>Loading...</MudText>
+}
