@@ -18,26 +18,43 @@ namespace WebBuilder2.Client.Services
             _navigationManager = navigationManager;
         }
 
+        public async Task<ValidationResponse<string>> GetGithubUser()
+        {
+            return await _client.GetUserAsync();
+        }
+
         public async Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync()
         {
             return await _client.GetRepositoriesAsync();
         }
+
         public async Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync()
         {
             return await _client.GetGitIgnoreTemplatesAsync();
         }
+
         public async Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync()
         {
             return await _client.GetGithubProjectLicensesAsync();
         }
-        public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync()
+
+        public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string repoName)
         {
-            return await _client.GetSecretsAsync();
+            var userName = await GetLoginAsync();
+            return await _client.GetSecretsAsync(userName, repoName);
         }
+
+        public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string repoName)
+        {
+            var userName = await GetLoginAsync();
+            return await _client.CreateSecretAsync(secret, userName, repoName);
+        }
+
         public async Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
         {
             return await _client.PostAuthenticateAsync(request);
         }
+
         public async Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository)
         {
             ValidationResponse authenticateResponse = await PostAuthenticateAsync(new GithubAuthenticationRequest(""));
@@ -51,6 +68,15 @@ namespace WebBuilder2.Client.Services
                 _navigationManager.NavigateTo($"/github/auth/{Uri.EscapeDataString(_navigationManager.Uri)}");
                 return ValidationResponse<RepositoryModel>.NotAuthenticated();
             }
+        }
+
+        private async Task<string> GetLoginAsync()
+        {
+            ValidationResponse<string>? userResponse = await _client.GetUserAsync();
+
+            if (userResponse == null || !userResponse.IsSuccessful || userResponse.Values == null || !userResponse.Values.Any()) 
+                throw new Exception("Failed to get Github user.");
+            return userResponse.Values.First();
         }
     }
 }

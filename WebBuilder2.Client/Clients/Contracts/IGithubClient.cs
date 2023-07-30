@@ -6,10 +6,12 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface IGithubClient
 {
-    Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync();
-    Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
-    Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository);
-    Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
-    Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
-    Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync();
+    Task<ValidationResponse<string>?> GetUserAsync();
+    Task<ValidationResponse<RepositoryModel>?> GetRepositoriesAsync();
+    Task<ValidationResponse?> PostAuthenticateAsync(GithubAuthenticationRequest request);
+    Task<ValidationResponse<RepositoryModel>?> PostCreateRepoAsync(RepositoryModel repository);
+    Task<ValidationResponse<GitIgnoreTemplateResponse>?> GetGitIgnoreTemplatesAsync();
+    Task<ValidationResponse<GithubProjectLicense>?> GetGithubProjectLicensesAsync();
+    Task<ValidationResponse<GithubSecretResponse>?> GetSecretsAsync(string userName, string repoName);
+    Task<ValidationResponse<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string userName, string repoName);
 }

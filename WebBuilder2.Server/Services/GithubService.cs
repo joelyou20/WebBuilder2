@@ -2,9 +2,11 @@
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Octokit;
+using Sodium;
 using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
 using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
@@ -16,10 +18,12 @@ namespace WebBuilder2.Server.Services;
 public class GithubService : IGithubService
 {
     private IGitHubClient _client;
+    private IAwsSecretsManagerService _awsSecretsManagerService;
 
-    public GithubService(IGitHubClient client)
+    public GithubService(IGitHubClient client, IAwsSecretsManagerService awsSecretsManagerService)
     {
         _client = client;
+        _awsSecretsManagerService = awsSecretsManagerService;
     }
 
     public async Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync()
@@ -143,29 +147,96 @@ public class GithubService : IGithubService
         }));
     }
 
-    public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync()
+    public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName)
     {
-        var client = new HttpClient();
+        using var client = new HttpClient();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/joelyou20/Portfolio/actions/secrets");
-        request.Headers.Add("Accept", "application/vnd.github+json");
-        request.Headers.Add("Authorization", "Bearer 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");
-        request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-        request.Headers.Add("User-Agent", "request");
-        request.Headers.Add("Cookie", "_octo=GH1.1.1578474083.1689685007; logged_in=no");
+        HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Get, "actions/secrets", userName, repoName);
 
-        var response = await client.SendAsync(request);
+        HttpResponseMessage response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
-        var message = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<GithubSecretResponse>(message);
+        string message = await response.Content.ReadAsStringAsync();
+        GithubSecretResponse? result = JsonConvert.DeserializeObject<GithubSecretResponse>(message);
 
         if(result == null) return ValidationResponse<GithubSecretResponse>.Failure();
 
         return ValidationResponse<GithubSecretResponse>.Success(result);
     }
 
-    public RepositoryModel ParseRepository(Octokit.Repository repo) => new RepositoryModel
+    public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string userName, string repoName)
+    {
+        using var client = new HttpClient();
+
+        GithubPublicKey? publicKey = await GetPublicKeyAsync(userName, repoName) ?? throw new NotFoundException("Github public key not found", HttpStatusCode.NotFound);
+
+        if (secret.Value == null) throw new ArgumentNullException("Github Secret has no value."); 
+
+        string encodedSecret = EncodeSecret(secret.Value, publicKey.Key);
+
+        GithubCreateSecretRequest githubCreateSecretRequest = new(encodedSecret, publicKey.Id);
+        JsonContent content = JsonContent.Create(githubCreateSecretRequest);
+        var value = content.Value.ToString();
+        HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Put, $"actions/secrets/{secret.Name}", userName, repoName, content);
+
+        HttpResponseMessage response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        string message = await response.Content.ReadAsStringAsync();
+
+        return ValidationResponse<GithubSecret>.Success(secret, message);
+    }
+
+    public async Task<ValidationResponse<string>> GetUserAsync()
+    {
+        var user = await _client.User.Current();
+        return ValidationResponse<string>.Success(user.Login);
+    }
+
+
+    #region Private Methods
+
+    private async Task<GithubPublicKey?> GetPublicKeyAsync(string userName, string repoName)
+    {
+        using var client = new HttpClient();
+
+        HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Get, "actions/secrets/public-key", userName, repoName);
+
+        HttpResponseMessage response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        string message = await response.Content.ReadAsStringAsync();
+        GithubPublicKey? result = JsonConvert.DeserializeObject<GithubPublicKey>(message);
+
+        return result;
+    }
+
+    private async Task<HttpRequestMessage> BuildRequestAsync(HttpMethod method, string endpoint, string userName, string repoName, JsonContent? content = null)
+    {
+        string pat = await _awsSecretsManagerService.GetSecretAsync("github-pat");
+
+        HttpRequestMessage request = new(method, $"https://api.github.com/repos/{userName}/{repoName}/{endpoint}");
+        request.Headers.Add("Accept", "application/vnd.github+json");
+        request.Headers.Add("Authorization", $"Bearer {pat}");
+        request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+        request.Headers.Add("User-Agent", "request");
+        request.Headers.Add("Cookie", "_octo=GH1.1.1578474083.1689685007; logged_in=no");
+        if(content != null) request.Content = content;
+
+        return request;
+    }
+
+    private string EncodeSecret(string secret, string publicKey)
+    {
+        var encodedSecret = Encoding.UTF8.GetBytes(secret);
+        var encodedPublicKey = Convert.FromBase64String(publicKey);
+
+        var sealedPublicKeyBox = SealedPublicKeyBox.Create(encodedSecret, encodedPublicKey);
+
+        return Convert.ToBase64String(sealedPublicKeyBox);
+    }
+
+    private RepositoryModel ParseRepository(Octokit.Repository repo) => new()
     {
         AllowAutoMerge = repo.AllowAutoMerge != null,
         AllowMergeCommit = repo.AllowMergeCommit != null,
@@ -189,32 +260,5 @@ public class GithubService : IGithubService
         HtmlUrl = repo.HtmlUrl,
     };
 
-    public Data.Models.Repository ToDto(RepositoryModel repo) => new()
-    {
-        Id = repo.Id,
-        Name = repo.Name,
-        AllowAutoMerge = repo.AllowAutoMerge,
-        AllowMergeCommit = repo.AllowMergeCommit,
-        AllowRebaseMerge = repo.AllowRebaseMerge,
-        AllowSquashMerge = repo.AllowSquashMerge,
-        AutoInit = repo.AutoInit,
-        CreatedDateTime = repo.CreatedDateTime,
-        DeleteBranchOnMerge = repo.DeleteBranchOnMerge,
-        DeletedDateTime = repo.DeletedDateTime,
-        Description = repo.Description,
-        GitIgnoreTemplate = repo.GitIgnoreTemplate,
-        HasDownloads = repo.HasDownloads,
-        HasIssues = repo.HasIssues,
-        HasProjects = repo.HasProjects,
-        HasWiki = repo.HasWiki,
-        Homepage = repo.Homepage,
-        IsPrivate = repo.IsPrivate,
-        IsTemplate = repo.IsTemplate,
-        LicenseTemplate = repo.LicenseTemplate,
-        ModifiedDateTime = repo.ModifiedDateTime,
-        RepoName = repo.RepoName,
-        TeamId = repo.TeamId,
-        UseSquashPrTitleAsDefault = repo.UseSquashPrTitleAsDefault,
-        Visibility = repo.Visibility
-    };
+    #endregion
 }

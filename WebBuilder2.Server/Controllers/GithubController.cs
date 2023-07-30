@@ -62,6 +62,19 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
+        [HttpGet("/github/user")]
+        public async Task<IActionResult> GetUserAsync()
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _githubService.GetUserAsync()));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<string>.BuildFailedResponse(ex)));
+            }
+        }
+
         [HttpPost("/github/repos/create")]
         public async Task<IActionResult> Create([FromBody] RepositoryModel repository)
         {
@@ -88,12 +101,12 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
-        [HttpGet("/github/secrets")]
-        public async Task<IActionResult> GetSecrets()
+        [HttpGet("/github/secrets/{userName}/{repoName}")]
+        public async Task<IActionResult> GetSecrets([FromRoute] string userName, [FromRoute] string repoName)
         {
             try
             {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetSecretsAsync()));
+                return Ok(JsonConvert.SerializeObject(await _githubService.GetSecretsAsync(userName, repoName)));
             }
             catch(HttpRequestException ex)
             {
@@ -109,6 +122,31 @@ namespace WebBuilder2.Server.Controllers
             catch (Exception ex)
             {
                 return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<GithubSecretResponse>.BuildFailedResponse(ex)));
+            }
+        }
+
+        [HttpPut("/github/secrets/{userName}/{repoName}")]
+        public async Task<IActionResult> CreateSecret([FromRoute] string userName, [FromRoute] string repoName, [FromBody] GithubSecret secret)
+        {
+            try
+            {
+                return Created($"github/secrets/{userName}/{repoName}", JsonConvert.SerializeObject(await _githubService.CreateSecretAsync(secret, userName, repoName)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
             }
         }
     }

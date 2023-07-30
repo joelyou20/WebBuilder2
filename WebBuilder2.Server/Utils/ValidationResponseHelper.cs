@@ -62,3 +62,24 @@ public static class ValidationResponseHelper<T> where T : class
         return response;
     }
 }
+
+public static class ValidationResponseHelper
+{
+    public static ValidationResponse BuildFailedResponse(Exception ex)
+    {
+        var response = new ValidationResponse
+        {
+            IsSuccessful = false,
+            Message = ex.Message,
+            Errors = new List<ApiError>
+                {
+                    new ApiError
+                    {
+                        Exception = ex,
+                        Message = ex.Message
+                    }
+                }
+        };
+        return response;
+    }
+}
