@@ -1,0 +1,5 @@
+﻿.scripts-widget-container {
+    min-width: 40rem;
+    height: 20rem;
+    overflow: scroll;
+}

@@ -25,7 +25,6 @@ public partial class CodeEditor
                 Syntax = Syntax.Yaml,
                 Theme = Theme.Eclipse,
             };
-
             if (_file == null) return;
             await _editor.Open(_file, editorOptions);
             StateHasChanged();

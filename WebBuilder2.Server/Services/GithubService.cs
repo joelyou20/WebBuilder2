@@ -176,7 +176,7 @@ public class GithubService : IGithubService
 
         GithubCreateSecretRequest githubCreateSecretRequest = new(encodedSecret, publicKey.Id);
         JsonContent content = JsonContent.Create(githubCreateSecretRequest);
-        var value = content.Value.ToString();
+
         HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Put, $"actions/secrets/{secret.Name}", userName, repoName, content);
 
         HttpResponseMessage response = await client.SendAsync(request);
