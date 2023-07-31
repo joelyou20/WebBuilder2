@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using Amazon.Runtime;
+using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -203,8 +204,113 @@ public class GithubService : IGithubService
         return ValidationResponse.Success();
     }
 
+    public async Task<ValidationResponse<RepoContent>> GetRepositoryContentAsync(string owner, string repoName)
+    {
+        IReadOnlyList<RepositoryContent> repoContent = await _client.Repository.Content.GetAllContents(owner, repoName);
+
+        FileType ConvertFileType(Octokit.ContentType contentType) => (contentType) switch
+        {
+            Octokit.ContentType.File => FileType.File,
+            Octokit.ContentType.Dir => FileType.Directory,
+            Octokit.ContentType.Symlink => FileType.Symlink,
+            Octokit.ContentType.Submodule => FileType.Submodule,
+            _ => throw new Exception($"Unknown file type discovered in Repository: {repoName}"),
+        };
+
+        return ValidationResponse<RepoContent>.Success(repoContent.Select(x => new RepoContent(x.Name, x.Path, x.Content, ConvertFileType(x.Type.Value))));
+    }
+
+    public async Task<ValidationResponse<GitTreeItem>> GetGitTreeAsync(string owner, string repoName)
+    {
+        var reference = "refs/heads/master";
+        TreeResponse treeResponse = await _client.Git.Tree.GetRecursive(owner, repoName, reference);
+
+        IEnumerable<GitTreeItem> gitTree = BuildGitTreeRecursive(treeResponse.Tree.ToArray());
+
+        return ValidationResponse<GitTreeItem>.Success(gitTree);
+    }
+
+
+    public IEnumerable<GitTreeItem> BuildGitTreeRecursive(TreeItem[] tree, TreeItem? previousItem = null)
+    {
+        var gitTree = new HashSet<GitTreeItem>();
+
+        GitTreeType ConvertTreeType(TreeType treeType) => (treeType) switch
+        {
+            TreeType.Blob => GitTreeType.Blob,
+            TreeType.Tree => GitTreeType.Tree,
+            TreeType.Commit => GitTreeType.Commit,
+            _ => throw new Exception($"Unknown tree type discovered in Repository"),
+        };
+
+        string GetBasePath(string? path)
+        {
+            if (path == null) return string.Empty;
+
+            int index = path.LastIndexOf('/');
+            return index == -1 ? path : path[..index];
+        }
+
+        for (int i = 0; i < tree.Length; i++)
+        {
+            TreeItem item = tree[i];
+            Console.WriteLine(item.Path);
+            string itemPrefix = GetBasePath(item.Path);
+            if (previousItem != null && !itemPrefix.Equals(previousItem.Path)) break;
+
+            if (item.Type == TreeType.Tree)
+            {
+                var items = BuildGitTreeRecursive(tree[(i+1)..tree.Length], item);
+                var leaf = new GitTreeItem(item.Path.Split('/').Last(), item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value), items);
+                gitTree.Add(leaf);
+                var leafCount = GetLeafs(leaf).Count();
+                i += leafCount;
+            }
+            else if (item.Type == TreeType.Blob)
+            {
+                gitTree.Add(new GitTreeItem(item.Path.Split('/').Last(), item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value)));
+            }
+        }
+
+        return gitTree;
+    }
+
 
     #region Private Methods
+
+    private FileExtension GetFileExtensionFromPath(string path)
+    {
+        var extension = Path.GetExtension(path);
+        return extension switch
+        {
+            ".pdf" => FileExtension.PDF,
+            ".png" => FileExtension.PNG,
+            ".jpg" => FileExtension.JPG,
+            ".jpeg" => FileExtension.JPEG,
+            ".cs" => FileExtension.CSharp,
+            ".mp3" => FileExtension.MP3,
+            _ => FileExtension.Text
+        };
+    }
+
+    private IEnumerable<GitTreeItem> GetLeafs(GitTreeItem source)
+    {
+        if(source.Items == null) return Enumerable.Empty<GitTreeItem>();
+
+        var list = new List<GitTreeItem>();
+
+        foreach (var item in source.Items)
+        {
+            list.Add(item);
+
+            foreach (var subchild in GetLeafs(item))
+            {
+                list.Add(subchild);
+            }
+        }
+
+        return list;
+    }
 
     private async Task<GithubPublicKey?> GetPublicKeyAsync(string userName, string repoName)
     {

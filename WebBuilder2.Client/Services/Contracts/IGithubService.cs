@@ -8,6 +8,8 @@ public interface IGithubService
 {
     Task<ValidationResponse<string>> GetGithubUser();
     Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync();
+    Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string repoName);
+    Task<ValidationResponse<GitTreeItem>?> GetGitTreeAsync(string repoName);
     Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
     Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
     Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);

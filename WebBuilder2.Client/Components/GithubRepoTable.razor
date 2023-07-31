@@ -33,7 +33,7 @@
         }
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Id"><MudLink Href="@($"/connections/github/{context.Id}")">@context.ExternalId</MudLink></MudTd>
+        <MudTd DataLabel="Id"><MudLink Href="@($"/repository/{context.Id}")">@context.ExternalId</MudLink></MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         @if(context.Site != null)
         {

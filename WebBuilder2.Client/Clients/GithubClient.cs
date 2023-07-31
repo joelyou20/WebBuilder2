@@ -19,6 +19,8 @@ namespace WebBuilder2.Client.Clients
             _httpClient = httpClient;
         }
 
+        #region Repos
+
         public async Task<ValidationResponse<RepositoryModel>?> GetRepositoriesAsync()
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/repos");
@@ -26,17 +28,6 @@ namespace WebBuilder2.Client.Clients
 
             var message = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<ValidationResponse<RepositoryModel>>(message);
-            return result;
-        }
-
-        public async Task<ValidationResponse?> PostAuthenticateAsync(GithubAuthenticationRequest request)
-        {
-            var content = JsonContent.Create(request);
-            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/auth", content);
-            response.EnsureSuccessStatusCode();
-
-            var message = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
             return result;
         }
 
@@ -51,6 +42,49 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
+        public async Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string userName, string repoName)
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/repos/{userName}/{repoName}");
+            response.EnsureSuccessStatusCode();
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse<RepoContent>>(message);
+            return result;
+        }
+
+        #endregion
+
+        #region Git
+
+        public async Task<ValidationResponse<GitTreeItem>?> GetGitTreeAsync(string userName, string repoName)
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/git/tree/{userName}/{repoName}");
+            response.EnsureSuccessStatusCode();
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse<GitTreeItem>>(message);
+            return result;
+        }
+
+        #endregion
+
+        #region Auth
+
+        public async Task<ValidationResponse?> PostAuthenticateAsync(GithubAuthenticationRequest request)
+        {
+            var content = JsonContent.Create(request);
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/auth", content);
+            response.EnsureSuccessStatusCode();
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
+            return result;
+        }
+
+        #endregion
+
+        #region GitIgnore
+
         public async Task<ValidationResponse<GitIgnoreTemplateResponse>?> GetGitIgnoreTemplatesAsync()
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/gitignore");
@@ -61,6 +95,10 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
+        #endregion
+
+        #region License
+
         public async Task<ValidationResponse<GithubProjectLicense>?> GetGithubProjectLicensesAsync()
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/license");
@@ -70,6 +108,10 @@ namespace WebBuilder2.Client.Clients
             var result = JsonConvert.DeserializeObject<ValidationResponse<GithubProjectLicense>>(message);
             return result;
         }
+
+        #endregion
+
+        #region Secrets
 
         public async Task<ValidationResponse<GithubSecretResponse>?> GetSecretsAsync(string userName, string repoName)
         {
@@ -92,6 +134,10 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
+        #endregion
+
+        #region User
+
         public async Task<ValidationResponse<string>?> GetUserAsync()
         {
             HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/user");
@@ -101,6 +147,10 @@ namespace WebBuilder2.Client.Clients
             var result = JsonConvert.DeserializeObject<ValidationResponse<string>>(message);
             return result;
         }
+
+        #endregion
+
+        #region Commit
 
         public async Task<ValidationResponse?> CreateCommitAsync(GithubCreateCommitRequest request, string userName, string repoName)
         {
@@ -112,5 +162,7 @@ namespace WebBuilder2.Client.Clients
             var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
             return result;
         }
+
+        #endregion
     }
 }

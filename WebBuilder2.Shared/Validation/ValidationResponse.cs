@@ -9,6 +9,7 @@ public class ValidationResponse<T> where T : class
     public string? Message { get; set; }
     public IEnumerable<T>? Values { get; set; } = default!;
     public IEnumerable<ApiError> Errors { get; set; } = Enumerable.Empty<ApiError>();
+    public bool HasValues => IsSuccessful && Values != null && Values.Any();
 
     public static ValidationResponse<T> Default() => new();
 

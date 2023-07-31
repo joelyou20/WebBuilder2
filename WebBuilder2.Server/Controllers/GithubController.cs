@@ -23,18 +23,7 @@ namespace WebBuilder2.Server.Controllers
             _githubService = githubService;
         }
 
-        [HttpGet("/github/repos")]
-        public async Task<IActionResult> Get()
-        {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetRepositoriesAsync()));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(ex)));
-            }
-        }
+        #region GitIgnore
 
         [HttpGet("/github/gitignore")]
         public async Task<IActionResult> GetGitIgnoreTemplates()
@@ -49,6 +38,10 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
+        #endregion
+
+        #region License
+
         [HttpGet("/github/license")]
         public async Task<IActionResult> GetLicenseTemplates()
         {
@@ -62,6 +55,10 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
+        #endregion
+
+        #region User
+
         [HttpGet("/github/user")]
         public async Task<IActionResult> GetUserAsync()
         {
@@ -72,6 +69,23 @@ namespace WebBuilder2.Server.Controllers
             catch (Exception ex)
             {
                 return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<string>.BuildFailedResponse(ex)));
+            }
+        }
+
+        #endregion
+
+        #region Repos
+
+        [HttpGet("/github/repos")]
+        public async Task<IActionResult> Get()
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _githubService.GetRepositoriesAsync()));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(ex)));
             }
         }
 
@@ -88,6 +102,64 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
+        [HttpGet("/github/repos/{owner}/{repoName}")]
+        public async Task<IActionResult> GetRepositoryContent([FromRoute] string owner, [FromRoute] string repoName)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _githubService.GetRepositoryContentAsync(owner, repoName)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
+        #endregion
+
+        #region Git
+
+        [HttpGet("/github/git/tree/{owner}/{repoName}")]
+        public async Task<IActionResult> GetGitTree([FromRoute] string owner, [FromRoute] string repoName)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _githubService.GetGitTreeAsync(owner, repoName)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
+        #endregion
+
+        #region Auth
+
         [HttpPost("/github/auth")]
         public async Task<IActionResult> Authenticate([FromBody] GithubAuthenticationRequest request)
         {
@@ -100,6 +172,10 @@ namespace WebBuilder2.Server.Controllers
                 return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<GithubAuthenticationRequest>.BuildFailedResponse(request, ex)));
             }
         }
+
+        #endregion
+
+        #region Secrets
 
         [HttpGet("/github/secrets/{userName}/{repoName}")]
         public async Task<IActionResult> GetSecrets([FromRoute] string userName, [FromRoute] string repoName)
@@ -150,6 +226,10 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
+        #endregion
+
+        #region Commit
+
         [HttpPut("/github/commit/{owner}/{repoName}")]
         public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] GithubCreateCommitRequest commit)
         {
@@ -174,5 +254,7 @@ namespace WebBuilder2.Server.Controllers
                 return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
             }
         }
+
+        #endregion
     }
 }
