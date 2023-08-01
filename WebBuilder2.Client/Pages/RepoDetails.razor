@@ -16,8 +16,8 @@
             </MudButton>
         </ButtonTemplate>
     </MudFileUpload>
-    <div>
-        <MudTreeView Items="@_content" @bind-SelectedValue="@_selectedFile" Hover="true">
+    <div class="rd-content">
+        <MudTreeView Items="@_repoTree" T="GitTreeItem" SelectedValueChanged="@OnSelectedFileChanged" Hover="true">
             <ItemTemplate>
                 @if(context.Type == GitTreeType.Tree)
                 {
@@ -25,14 +25,15 @@
                              Items="@context.Items?.ToHashSet()"
                              Value="@context"
                              Icon="@GetIcon(context)"
-                             Text="@context.Path" />
+                             Text="@context.Path.Split('/').Last()" />
                 }
                 else
                 {
-                    <MudTreeViewItem Value="@context" Icon="@GetIcon(context)" Text="@context.Path" />
+                    <MudTreeViewItem Value="@context" Icon="@GetIcon(context)" Text="@context.Path.Split('/').Last()" />
                 }
             </ItemTemplate>
         </MudTreeView>
+        <CodeEditor @ref="@_codeEditor" />
     </div>
 }
 else

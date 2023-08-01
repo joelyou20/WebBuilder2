@@ -28,10 +28,10 @@ namespace WebBuilder2.Client.Services
             return await _client.GetRepositoriesAsync();
         }
 
-        public async Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string repoName)
+        public async Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string repoName, string? reference = null)
         {
             var userName = await GetLoginAsync();
-            return await _client.GetRepositoryContentAsync(userName, repoName);
+            return await _client.PostRepositoryContentAsync(userName, repoName, reference);
         }
 
         public async Task<ValidationResponse<GitTreeItem>?> GetGitTreeAsync(string repoName)

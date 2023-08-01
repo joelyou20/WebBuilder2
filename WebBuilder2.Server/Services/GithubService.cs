@@ -14,6 +14,7 @@ using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebBuilder2.Server.Services;
 
@@ -204,9 +205,36 @@ public class GithubService : IGithubService
         return ValidationResponse.Success();
     }
 
-    public async Task<ValidationResponse<RepoContent>> GetRepositoryContentAsync(string owner, string repoName)
+    public async Task<ValidationResponse<RepoContent>> GetRepositoryContentAsync(string owner, string repoName, string? path = null)
     {
-        IReadOnlyList<RepositoryContent> repoContent = await _client.Repository.Content.GetAllContents(owner, repoName);
+        List<RepositoryContent>? repoContent = null;
+
+        if (path == null)
+        {
+            repoContent = (await _client.Repository.Content.GetAllContents(owner, repoName)).ToList();
+        }
+        else
+        {
+            var contentBytes = await _client.Repository.Content.GetRawContent(owner, repoName, path);
+            var bytesAsString = Convert.ToBase64String(contentBytes);
+            repoContent = new List<RepositoryContent> { new RepositoryContent(
+                name: path.Split('\\').Last(), 
+                path: path, 
+                sha: "", 
+                size: 0, 
+                type: Octokit.ContentType.File, 
+                downloadUrl: "", 
+                url: "", 
+                gitUrl: "", 
+                htmlUrl: "", 
+                encoding: "", 
+                encodedContent: bytesAsString, 
+                target: "", 
+                submoduleGitUrl: ""
+            )};
+        }
+
+        if (repoContent == null) return ValidationResponse<RepoContent>.Failure(message: "Failed to get repository content");
 
         FileType ConvertFileType(Octokit.ContentType contentType) => (contentType) switch
         {
@@ -217,7 +245,14 @@ public class GithubService : IGithubService
             _ => throw new Exception($"Unknown file type discovered in Repository: {repoName}"),
         };
 
-        return ValidationResponse<RepoContent>.Success(repoContent.Select(x => new RepoContent(x.Name, x.Path, x.Content, ConvertFileType(x.Type.Value))));
+        string DecodeContent(string content)
+        {
+            byte[] data = Convert.FromBase64String(content);
+            string decodedContent = Encoding.UTF8.GetString(data);
+            return decodedContent;
+        }
+
+        return ValidationResponse<RepoContent>.Success(repoContent.Select(x => new RepoContent(x.Name, x.Path, DecodeContent(x.EncodedContent), ConvertFileType(x.Type.Value))));
     }
 
     public async Task<ValidationResponse<GitTreeItem>> GetGitTreeAsync(string owner, string repoName)
@@ -261,14 +296,14 @@ public class GithubService : IGithubService
             if (item.Type == TreeType.Tree)
             {
                 var items = BuildGitTreeRecursive(tree[(i+1)..tree.Length], item);
-                var leaf = new GitTreeItem(item.Path.Split('/').Last(), item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value), items);
+                var leaf = new GitTreeItem(item.Path, item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value), items);
                 gitTree.Add(leaf);
                 var leafCount = GetLeafs(leaf).Count();
                 i += leafCount;
             }
             else if (item.Type == TreeType.Blob)
             {
-                gitTree.Add(new GitTreeItem(item.Path.Split('/').Last(), item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value)));
+                gitTree.Add(new GitTreeItem(item.Path, item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value)));
             }
         }
 

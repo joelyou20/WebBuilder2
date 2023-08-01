@@ -7,6 +7,8 @@ using WebBuilder2.Client.Utils;
 using System.IO;
 using WebBuilder2.Shared.Validation;
 using MudBlazor;
+using WebBuilder2.Client.Components;
+using System.Text;
 
 namespace WebBuilder2.Client.Pages;
 
@@ -19,8 +21,9 @@ public partial class RepoDetails
 
     private RepositoryModel? _repo;
     private List<ApiError> _errors = new();
-    private GitTreeItem? _selectedFile;
-    private HashSet<GitTreeItem> _content = new();
+    private HashSet<GitTreeItem> _repoTree = new();
+    private string _fileContent = string.Empty;
+    private CodeEditor? _codeEditor;
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,7 +50,7 @@ public partial class RepoDetails
         }
         else
         {
-            _content = gitTreeResponse!.GetValues().ToHashSet();
+            _repoTree = gitTreeResponse!.GetValues().ToHashSet();
         }
 
         StateHasChanged();
@@ -68,6 +71,29 @@ public partial class RepoDetails
         await InitializeDataAsync();
         StateHasChanged();
     }
+
+    public async Task OnSelectedFileChanged(GitTreeItem item)
+    {
+        if(_repo == null) return;
+
+        ValidationResponse<RepoContent>? repoContentResponse = await GithubService.GetRepositoryContentAsync(_repo.Name, item.Path);
+
+        if (repoContentResponse == null) throw new ArgumentNullException(nameof(repoContentResponse));
+
+        if(repoContentResponse != null && !repoContentResponse.HasValues)
+        {
+            _errors.AddRange(repoContentResponse.Errors);
+            return;
+        }
+
+        _fileContent = repoContentResponse!.GetValues().First().Content;
+
+        if(_codeEditor != null) await _codeEditor.Refresh(_fileContent, GetNumberOfLines(_fileContent));
+
+        StateHasChanged();
+    }
+
+    private int GetNumberOfLines(string content) => content.Split('\n').Length;
 
     private string GetIcon(GitTreeItem item) => item.Type switch
     {

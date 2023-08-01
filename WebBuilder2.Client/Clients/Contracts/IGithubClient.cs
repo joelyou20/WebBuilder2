@@ -9,7 +9,7 @@ public interface IGithubClient
     Task<ValidationResponse<string>?> GetUserAsync();
     Task<ValidationResponse<RepositoryModel>?> GetRepositoriesAsync();
     Task<ValidationResponse<RepositoryModel>?> PostCreateRepoAsync(RepositoryModel repository);
-    Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string userName, string repoName);
+    Task<ValidationResponse<RepoContent>?> PostRepositoryContentAsync(string userName, string repoName, string? path = null);
     Task<ValidationResponse<GitTreeItem>?> GetGitTreeAsync(string userName, string repoName);
     Task<ValidationResponse?> PostAuthenticateAsync(GithubAuthenticationRequest request);
     Task<ValidationResponse<GitIgnoreTemplateResponse>?> GetGitIgnoreTemplatesAsync();

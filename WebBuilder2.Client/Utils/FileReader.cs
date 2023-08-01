@@ -6,11 +6,8 @@ public static class FileReader
 {
     public static async Task<string> ReadFileAsync(IBrowserFile file)
     {
-        var stream = file.OpenReadStream(file.Size);
-        var bytes = new byte[file.Size]; 
-        
-        await stream.ReadAsync(bytes);
+        var reader = await new StreamReader(file.OpenReadStream()).ReadToEndAsync();
 
-        return Convert.ToBase64String(bytes);
+        return reader;
     }
 }

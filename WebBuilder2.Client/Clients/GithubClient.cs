@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Sockets;
+using System.Text;
 using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
@@ -42,9 +43,10 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
-        public async Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string userName, string repoName)
+        public async Task<ValidationResponse<RepoContent>?> PostRepositoryContentAsync(string userName, string repoName, string? path = null)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}github/repos/{userName}/{repoName}");
+            var content = JsonContent.Create(path);
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/repos/{userName}/{repoName}", content);
             response.EnsureSuccessStatusCode();
 
             var message = await response.Content.ReadAsStringAsync();

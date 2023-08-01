@@ -102,12 +102,12 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
-        [HttpGet("/github/repos/{owner}/{repoName}")]
-        public async Task<IActionResult> GetRepositoryContent([FromRoute] string owner, [FromRoute] string repoName)
+        [HttpPost("/github/repos/{owner}/{repoName}")]
+        public async Task<IActionResult> PostRepositoryContent([FromRoute] string owner, [FromRoute] string repoName, [FromBody] string? path = null)
         {
             try
             {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetRepositoryContentAsync(owner, repoName)));
+                return Ok(JsonConvert.SerializeObject(await _githubService.GetRepositoryContentAsync(owner, repoName, path)));
             }
             catch (HttpRequestException ex)
             {
