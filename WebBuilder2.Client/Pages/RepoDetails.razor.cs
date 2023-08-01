@@ -88,12 +88,12 @@ public partial class RepoDetails
 
         _fileContent = repoContentResponse!.GetValues().First().Content;
 
-        if(_codeEditor != null) await _codeEditor.Refresh(_fileContent, GetNumberOfLines(_fileContent));
+        if(_codeEditor != null) await _codeEditor.Refresh(_fileContent, FileExtensionHelper.GetSyntax(item.Path));
 
         StateHasChanged();
     }
 
-    private int GetNumberOfLines(string content) => content.Split('\n').Length;
+    //private int GetNumberOfLines(string content) => content.Split('\n').Length;
 
     private string GetIcon(GitTreeItem item) => item.Type switch
     {

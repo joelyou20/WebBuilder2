@@ -14,6 +14,7 @@ public partial class CodeEditor
     private Editor<ScriptEditorFile>? _editor;
     private ScriptEditorFile? _file;
 
+    private const int MIN_LINES = 60;
     private const int MAX_LINES = 80;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -21,17 +22,17 @@ public partial class CodeEditor
         if (firstRender) await OpenFileAsync();
     }
 
-    public async Task OpenFileAsync(string? content = null, int numLines = 20)
+    public async Task OpenFileAsync(string? content = null, Syntax syntax = Syntax.Text, int? numLines = null)
     {
         if (_editor == null) throw new ArgumentNullException("Editor reference value is null.");
 
         _file = new ScriptEditorFile("", content ?? Value);
         EditorOptions editorOptions = new()
         {
-            Syntax = Syntax.Yaml,
+            Syntax = syntax,
             Theme = Theme.Eclipse,
-            MinLines = MAX_LINES,
-            MaxLines = MAX_LINES
+            MinLines = numLines ?? MIN_LINES,
+            MaxLines = numLines ?? MAX_LINES
         };
         if (_file == null) return;
         await _editor.Open(_file, editorOptions);
@@ -39,7 +40,7 @@ public partial class CodeEditor
         StateHasChanged();
     }
 
-    public async Task Refresh(string content, int numLines) => await OpenFileAsync(content, numLines);
+    public async Task Refresh(string content, Syntax syntax, int? numLines = null) => await OpenFileAsync(content, syntax, numLines);
 
     public void OnFileChanged() => InvokeAsync(async () => await FileChanged.InvokeAsync(_file));
 }
