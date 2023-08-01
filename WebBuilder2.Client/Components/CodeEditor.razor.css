@@ -1,3 +1,7 @@
-﻿div {
-    height: 100vh;
+﻿.ce-container {
+    height: auto;
 }
+
+    .ce-container > ::deep .editor_container {
+        height: auto;
+    }

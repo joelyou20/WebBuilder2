@@ -3,3 +3,7 @@
     height: 20rem;
     overflow: scroll;
 }
+
+    .scripts-widget-container > ::deep .sl-card-content {
+        height: 10rem;
+    }

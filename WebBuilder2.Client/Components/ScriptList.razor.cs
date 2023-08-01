@@ -19,6 +19,8 @@ public partial class ScriptList
 
     [Parameter] public List<ScriptModel> Scripts { get; set; } = new();
     [Parameter] public EventCallback ScriptsChanged { get; set; } = default!;
+    [Parameter] public int? MinLines { get; set; }
+    [Parameter] public int? MaxLines { get; set; }
 
     private List<ApiError> _errors = new();
 

@@ -93,8 +93,6 @@ public partial class RepoDetails
         StateHasChanged();
     }
 
-    //private int GetNumberOfLines(string content) => content.Split('\n').Length;
-
     private string GetIcon(GitTreeItem item) => item.Type switch
     {
         GitTreeType.Blob => item.Extension switch
