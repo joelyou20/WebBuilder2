@@ -18,6 +18,8 @@ public class ScriptModel : AuditableEntity
     public string Name { get; set; } = string.Empty;
     [JsonPropertyName("data")]
     public string Data { get; set; } = string.Empty;
+    [JsonPropertyName("syntax")]
+    public string Syntax { get; set; } = string.Empty;
 
     public ScriptModel() { }
 }

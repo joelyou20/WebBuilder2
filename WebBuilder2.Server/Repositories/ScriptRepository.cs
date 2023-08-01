@@ -29,6 +29,7 @@ public class ScriptRepository : IScriptRepository
             Id = s.Id,
             Data = s.Data,
             Name = s.Name,
+            Syntax = s.Syntax,
             CreatedDateTime = s.CreatedDateTime,
             ModifiedDateTime = s.ModifiedDateTime,
             DeletedDateTime = s.DeletedDateTime
@@ -97,6 +98,7 @@ public class ScriptRepository : IScriptRepository
         Id = script.Id,
         Data = script.Data,
         Name = script.Name,
+        Syntax = script.Syntax,
         ModifiedDateTime = script.ModifiedDateTime,
         CreatedDateTime = script.CreatedDateTime,
         DeletedDateTime = script.DeletedDateTime,

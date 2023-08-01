@@ -12,12 +12,14 @@ public class Script : AuditableEntity, IEntity<ScriptModel>
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Data { get; set; } = string.Empty;
+    public string Syntax { get; set; } = string.Empty;
 
     public ScriptModel FromDto() => new()
     {
         Id = Id,
         Name = Name,
         Data = Data,
+        Syntax = Syntax,
         CreatedDateTime = CreatedDateTime,
         DeletedDateTime = DeletedDateTime,
         ModifiedDateTime = ModifiedDateTime

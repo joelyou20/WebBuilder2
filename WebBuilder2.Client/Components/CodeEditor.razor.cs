@@ -8,6 +8,7 @@ namespace WebBuilder2.Client.Components;
 public partial class CodeEditor
 {
     [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public Syntax Syntax { get; set; }
     [Parameter] public EventCallback<string> ValueChanged { get; set; }
     [Parameter] public EventCallback<ScriptEditorFile> FileChanged { get; set; }
 
@@ -22,14 +23,14 @@ public partial class CodeEditor
         if (firstRender) await OpenFileAsync();
     }
 
-    public async Task OpenFileAsync(string? content = null, Syntax syntax = Syntax.Text, int? numLines = null)
+    public async Task OpenFileAsync(string? content = null, Syntax? syntax = null, int? numLines = null)
     {
         if (_editor == null) throw new ArgumentNullException("Editor reference value is null.");
 
         _file = new ScriptEditorFile("", content ?? Value);
         EditorOptions editorOptions = new()
         {
-            Syntax = syntax,
+            Syntax = syntax ?? Syntax,
             Theme = Theme.Eclipse,
             MinLines = numLines ?? MIN_LINES,
             MaxLines = numLines ?? MAX_LINES

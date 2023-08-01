@@ -80,4 +80,11 @@ public partial class ScriptList
 
         StateHasChanged();
     }
+
+    private Syntax? ConvertSyntax(string syntax)
+    {
+        Array enums = Enum.GetValues(typeof(Syntax));
+        IEnumerable<Syntax> enumsAsSyntax = enums.Cast<Syntax>();
+        return enumsAsSyntax.Where(x => x.ToString().Equals(syntax)).SingleOrDefault();
+    }
 }

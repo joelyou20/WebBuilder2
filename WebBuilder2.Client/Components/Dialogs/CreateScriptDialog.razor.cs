@@ -19,17 +19,30 @@ public partial class CreateScriptDialog
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private ScriptModel _script = new();
-
+    private readonly Func<Syntax, string> _syntaxSelectConverter = x => x.ToString();
     private List<ApiError> _errors = new();
+    private CodeEditor? _codeEditor;
 
     public void OnFileChanged(ScriptEditorFile file)
     {
         _script.Data = file.Content;
     }
 
+    public async Task OnSyntaxSelectionChanged(Syntax syntax)
+    {
+        _script.Syntax = syntax.ToString();
+
+        if (_codeEditor == null) return;
+
+        await _codeEditor.OpenFileAsync(
+            content: _script.Data,
+            syntax: syntax
+        );
+        StateHasChanged();
+    }
+
     public async Task OnValidSubmit()
     {
-
         var script = await ScriptService.AddScriptAsync(_script);
 
         if (script == null)
@@ -40,5 +53,12 @@ public partial class CreateScriptDialog
         }
 
         MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private List<Syntax> GetSyntaxList()
+    {
+        Array enums = Enum.GetValues(typeof(Syntax));
+        IEnumerable<Syntax> enumsAsSyntax = enums.Cast<Syntax>();
+        return enumsAsSyntax.ToList();
     }
 }
