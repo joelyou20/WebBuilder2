@@ -21,6 +21,7 @@ public partial class ScriptList
     [Parameter] public EventCallback ScriptsChanged { get; set; } = default!;
     [Parameter] public int? MinLines { get; set; }
     [Parameter] public int? MaxLines { get; set; }
+    [Parameter] public bool ShowEditor { get; set; } = true;
 
     private List<ApiError> _errors = new();
 

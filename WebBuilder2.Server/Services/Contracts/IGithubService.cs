@@ -12,7 +12,7 @@ namespace WebBuilder2.Server.Services.Contracts
         Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
         Task<ValidationResponse<GithubProjectLicense>> GetLicenseTemplatesAsync();
         Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName);
-        Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string userName, string repoName);
+        Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName);
         Task<ValidationResponse<string>> GetUserAsync();
         Task<ValidationResponse> CreateCommitAsync(string owner, string repoName, GithubCreateCommitRequest request);
         Task<ValidationResponse<RepoContent>> GetRepositoryContentAsync(string owner, string repoName, string? path = null);

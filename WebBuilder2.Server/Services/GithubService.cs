@@ -167,27 +167,28 @@ public class GithubService : IGithubService
         return ValidationResponse<GithubSecretResponse>.Success(result);
     }
 
-    public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string userName, string repoName)
+    public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName)
     {
         using var client = new HttpClient();
 
         GithubPublicKey? publicKey = await GetPublicKeyAsync(userName, repoName) ?? throw new NotFoundException("Github public key not found", HttpStatusCode.NotFound);
 
-        if (secret.Value == null) throw new ArgumentNullException("Github Secret has no value."); 
+        foreach(GithubSecret secret in secrets)
+        {
+            if (secret.Value == null) throw new ArgumentNullException($"Github Secret: {secret.Name} has no value.");
 
-        string encodedSecret = EncodeSecret(secret.Value, publicKey.Key);
+            string encodedSecret = EncodeSecret(secret.Value, publicKey.Key);
 
-        GithubCreateSecretRequest githubCreateSecretRequest = new(encodedSecret, publicKey.Id);
-        JsonContent content = JsonContent.Create(githubCreateSecretRequest);
+            GithubCreateSecretRequest githubCreateSecretRequest = new(encodedSecret, publicKey.Id);
+            JsonContent content = JsonContent.Create(githubCreateSecretRequest);
 
-        HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Put, $"actions/secrets/{secret.Name}", userName, repoName, content);
+            HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Put, $"actions/secrets/{secret.Name}", userName, repoName, content);
 
-        HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+            HttpResponseMessage response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
 
-        string message = await response.Content.ReadAsStringAsync();
-
-        return ValidationResponse<GithubSecret>.Success(secret, message);
+        return ValidationResponse<GithubSecret>.Success(secrets);
     }
 
     public async Task<ValidationResponse<string>> GetUserAsync()

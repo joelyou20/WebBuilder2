@@ -56,10 +56,13 @@ namespace WebBuilder2.Client.Services
             return await _client.GetSecretsAsync(userName, repoName);
         }
 
-        public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string repoName)
+        public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string repoName) =>
+            await CreateSecretAsync(new GithubSecret[] { secret }, repoName);
+
+        public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName)
         {
             var userName = await GetLoginAsync();
-            return await _client.CreateSecretAsync(secret, userName, repoName);
+            return await _client.CreateSecretAsync(secrets, userName, repoName);
         }
 
         public async Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string repoName)

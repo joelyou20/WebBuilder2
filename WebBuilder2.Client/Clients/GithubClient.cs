@@ -125,9 +125,12 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
-        public async Task<ValidationResponse<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string userName, string repoName)
+        public async Task<ValidationResponse<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string userName, string repoName) =>
+            await CreateSecretAsync(new GithubSecret[] { secret }, userName, repoName);
+
+        public async Task<ValidationResponse<GithubSecret>?> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName)
         {
-            JsonContent content = JsonContent.Create(secret);
+            JsonContent content = JsonContent.Create(secrets);
             HttpResponseMessage response = await _httpClient.PutAsync($"{_httpClient.BaseAddress}github/secrets/{userName}/{repoName}", content);
             response.EnsureSuccessStatusCode();
 

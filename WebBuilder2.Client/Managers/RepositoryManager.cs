@@ -3,6 +3,7 @@ using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Managers;
@@ -30,11 +31,33 @@ public class RepositoryManager : IRepositoryManager
             createdRepo.Site = site;
             createdRepo.SiteId = site.Id;
 
-            var addRepoResponse = await _repositoryService.AddRepositoriesAsync(new List<RepositoryModel> { createdRepo });
+            var newRepo = await _repositoryService.AddRepositoriesAsync(new List<RepositoryModel> { createdRepo });
 
-            return addRepoResponse != null ? 
-                ValidationResponse<RepositoryModel>.Success(addRepoResponse) :
-                ValidationResponse<RepositoryModel>.Failure();
+            if(newRepo == null) return ValidationResponse<RepositoryModel>.Failure(message: "Failed to add repo");
+
+            // Add secrets to repo
+
+            // Get S3 Bucket
+            string s3BucketName = "";
+
+            // Get AWS Access Key Id
+            string awsAccessKeyId = "";
+
+            // Get AWS Secret Access Key
+            string awsSecretAccessKey = "";
+
+            // Get AWS Region
+            string awsRegion = "";
+
+            var createSecretsResponse = await _githubService.CreateSecretAsync(new GithubSecret[]
+            {
+                new GithubSecret { Name = "AWS_S3_BUCKET", Value = s3BucketName },
+                new GithubSecret { Name = "AWS_ACCESS_KEY_ID", Value = awsAccessKeyId },
+                new GithubSecret { Name = "AWS_SECRET_ACCESS_KEY", Value = awsSecretAccessKey },
+                new GithubSecret { Name = "AWS_REGION", Value = awsRegion }
+            }, createdRepo.Name);
+
+            if (createSecretsResponse == null || !createSecretsResponse.HasValues) return ValidationResponse<RepositoryModel>.Failure(message: "Failed to add repo");
         }
         
         return createRepoResponse;

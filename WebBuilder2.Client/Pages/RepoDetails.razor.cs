@@ -65,7 +65,7 @@ public partial class RepoDetails
         {
             Content = fileAsString,
             Message = $"Add file {file.Name}",
-            Path = $"resources/test/{file.Name.Replace(' ', '_')}"
+            Path = $"resources/{file.Name.Replace(' ', '_')}"
         };
         await GithubService.CreateCommitAsync(request, _repo.Name);
         await InitializeDataAsync();

@@ -202,7 +202,7 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpPut("/github/secrets/{owner}/{repoName}")]
-        public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] GithubSecret secret)
+        public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] IEnumerable<GithubSecret> secret)
         {
             try
             {

@@ -16,5 +16,6 @@ public interface IGithubService
     Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository);
     Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string repoName);
     Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string repoName);
+    Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName);
     Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string repoName);
 }
