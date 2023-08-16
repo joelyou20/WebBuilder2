@@ -1,6 +1,7 @@
 ﻿@using Blace.Editing;
 @using Microsoft.AspNetCore.Components.Forms
 @using WebBuilder2.Client.Models;
+@using WebBuilder2.Client.Utils;
 
 <MudDialog>
     <DialogContent>
@@ -9,7 +10,7 @@
             <DataAnnotationsValidator />
             <MudTextField Label="Script Name" T="string" @bind-Value="@_script.Name" Required="true" For="@(() => _script.Name)"></MudTextField>
             <MudSelect T="Syntax" Label="Syntax" Clearable="false" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_syntaxSelectConverter" Required="false" ValueChanged="OnSyntaxSelectionChanged">
-                @foreach (Syntax syntax in GetSyntaxList())
+                @foreach (Syntax syntax in EnumHelper.All<Syntax>())
                 {
                     <MudSelectItem Value="@syntax" />
                 }

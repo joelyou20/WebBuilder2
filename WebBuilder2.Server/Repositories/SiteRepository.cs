@@ -30,6 +30,7 @@ namespace WebBuilder2.Server.Repositories
             {
                 Id = s.Id,
                 Name = s.Name,
+                Description = s.Description,
                 Repository = s.Repository == null ? null : s.Repository.FromDto(),
                 CreatedDateTime = s.CreatedDateTime,
                 ModifiedDateTime = s.ModifiedDateTime,
@@ -96,6 +97,7 @@ namespace WebBuilder2.Server.Repositories
         {
             Id = site.Id,
             Name = site.Name,
+            Description = site.Description,
             CreatedDateTime = site.CreatedDateTime,
             ModifiedDateTime = site.ModifiedDateTime,
             DeletedDateTime = site.DeletedDateTime

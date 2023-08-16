@@ -2,6 +2,8 @@
 using Amazon.S3.Model;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
@@ -28,18 +30,37 @@ public class AwsS3Service : IAwsS3Service
 
     public async Task<IEnumerable<Bucket>> GetBucketsAsync()
     {
-        var buckets = new List<Bucket>();
-
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync();
-        foreach(S3Bucket bucket in bucketResponse.Buckets)
+        IEnumerable<Bucket> buckets = bucketResponse.Buckets.Select(x => new Bucket
         {
-            buckets.Add(new Bucket
-            {
-                Name = bucket.BucketName
-            });
-        }
+            Name = x.BucketName
+        });
 
         return buckets;
     }
 
+    public async Task<ValidationResponse> CreateBucketAsync(AwsCreateBucketRequest request)
+    {
+        foreach(var bucket in request.Buckets)
+        {
+            var putBucketRequest = new PutBucketRequest
+            {
+                BucketName = bucket.Name,
+                BucketRegion = bucket.Region switch
+                {
+                    Region.USEast1 => "us-east-1",
+                    Region.USEast2 => "us-east-2",
+                    Region.USWest1 => "us-west-1",
+                    Region.USWest2 => "us-west-2",
+                    _ => throw new InvalidOperationException($"Region {bucket.Region} not recognized.")
+                }
+            };
+
+            var response = await _client.PutBucketAsync(putBucketRequest);
+
+            if (response == null) return ValidationResponse.Failure($"Failed to create bucket {bucket.Name}.");
+        }
+
+        return ValidationResponse.Success();
+    }
 }

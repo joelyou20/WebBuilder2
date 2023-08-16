@@ -6,14 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebBuilder2.Shared.Models;
 
-public enum FileExtension
+public class Domain
 {
-    Text,
-    PDF,
-    PNG,
-    JPG,
-    JPEG,
-    CSharp,
-    MP3,
-    Json
+    public string Name { get; set; } = string.Empty;
 }

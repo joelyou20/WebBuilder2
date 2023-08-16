@@ -1,5 +1,6 @@
 ﻿using Amazon.Route53;
 using Amazon.Route53.Model;
+using Amazon.Route53Domains;
 using Amazon.S3;
 using System.Net;
 using WebBuilder2.Server.Services.Contracts;

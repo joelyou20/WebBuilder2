@@ -1,6 +1,8 @@
 ﻿using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services;
 
@@ -18,6 +20,11 @@ public class AwsService : IAwsService
         return await _client.GetBucketsAsync();
     }
 
+    public async Task<ValidationResponse?> CreateBucketsAsync(AwsCreateBucketRequest request)
+    {
+        return await _client.CreateBucketsAsync(request);
+    }
+
     public async Task<IEnumerable<HostedZone>> GetHostedZonesAsync()
     {
         return await _client.GetHostedZonesAsync();
@@ -29,5 +36,25 @@ public class AwsService : IAwsService
         decimal.TryParse(response, out decimal result);
 
         return result;
+    }
+
+    public async Task<ValidationResponse> CreateAmplifyAppAsync(RepositoryModel repo)
+    {
+        return await _client.PostAppAsync(repo);
+    }
+
+    public async Task<ValidationResponse<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain)
+    {
+        return await _client.GetSuggestedDomainNamesAsync(domain);
+    }
+
+    public async Task<ValidationResponse<Domain>> GetRegisteredDomainsAsync()
+    {
+        return await _client.GetRegisteredDomainsAsync();
+    }
+
+    public async Task<ValidationResponse> PostRegisterDomainAsync(string domainName)
+    {
+        return await _client.PostRegisterDomainAsync(domainName);
     }
 }

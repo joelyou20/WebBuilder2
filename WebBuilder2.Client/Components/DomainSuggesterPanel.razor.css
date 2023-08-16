@@ -1,0 +1,9 @@
+﻿.gdns-list {
+    overflow-y: scroll;
+    max-height: 40rem;
+}
+
+::deep .mud-radio-group {
+    display: flex;
+    flex-direction: column;
+}

@@ -1,5 +1,7 @@
-﻿using Amazon.CostExplorer;
+﻿using Amazon.Amplify;
+using Amazon.CostExplorer;
 using Amazon.Route53;
+using Amazon.Route53Domains;
 using Amazon.S3;
 using Amazon.SecretsManager;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,9 +17,9 @@ namespace WebBuilder2.Server.Utils.Extensions
         {
             var awsSecretsManagerService = serviceProvider.Invoke(services.BuildServiceProvider());
             
-            var pat = awsSecretsManagerService.GetSecretAsync("github-pat").Result;
+            var pat = awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat).Result;
 
-            var githubSettings = configuration.GetSection("GithubSettings").Get<GithubSettings>()!;
+            var githubSettings = configuration.GetSection(nameof(GithubSettings)).Get<GithubSettings>()!;
             services.AddSingleton<IGitHubClient, GitHubClient>(sp =>
             {
                 var client = new GitHubClient(new ProductHeaderValue(githubSettings.OrganizationName))
@@ -56,6 +58,19 @@ namespace WebBuilder2.Server.Utils.Extensions
             return services.AddSingleton(sp => new AmazonRoute53Client(credentials, awsConfig));
         }
 
+        public static IServiceCollection AddAwsRoute53DomainsClient(this IServiceCollection services)
+        {
+            AmazonRoute53DomainsConfig awsConfig = new()
+            {
+                UseAlternateUserAgentHeader = AwsConfig.UseAlternateUserAgentHeader,
+                RegionEndpoint = AwsConfig.RegionEndpoint
+            };
+
+            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
+
+            return services.AddSingleton(sp => new AmazonRoute53DomainsClient(credentials, awsConfig));
+        }
+
         public static IServiceCollection AddAwsCostExplorerClient(this IServiceCollection services)
         {
             AmazonCostExplorerConfig awsConfig = new()
@@ -80,6 +95,20 @@ namespace WebBuilder2.Server.Utils.Extensions
             var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
 
             return services.AddScoped(sp => new AmazonSecretsManagerClient(credentials, awsConfig));
+        }
+
+        public static IServiceCollection AddAwsAmplifyClient(this IServiceCollection services)
+        {
+            AmazonAmplifyConfig awsConfig = new()
+            {
+                UseAlternateUserAgentHeader = AwsConfig.UseAlternateUserAgentHeader,
+                RegionEndpoint = AwsConfig.RegionEndpoint
+            };
+
+            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
+
+
+            return services.AddScoped(sp => new AmazonAmplifyClient(credentials, awsConfig));
         }
 
     }

@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace WebBuilder2.Shared.Models;
 
-public enum FileExtension
+public class PriceWithCurrency
 {
-    Text,
-    PDF,
-    PNG,
-    JPG,
-    JPEG,
-    CSharp,
-    MP3,
-    Json
+    public decimal Price { get; set; }
+    public string Currency { get; set; } = string.Empty;
 }

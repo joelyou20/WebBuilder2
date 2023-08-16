@@ -69,7 +69,7 @@ public partial class CreateGithubRepoDialog
     {
         if (_selectedSite == null) throw new InvalidOperationException("No site selected.");
 
-        ValidationResponse<RepositoryModel> response = await RepositoryManager.CreateRepoAsync(_model, _selectedSite);
+        ValidationResponse<RepositoryModel> response = await RepositoryManager.CreateRepositoryAsync(_model, _selectedSite);
 
         if (response.IsSuccessful)
         {

@@ -17,7 +17,7 @@
         </ButtonTemplate>
     </MudFileUpload>
     <div class="rd-content">
-        <MudTreeView Items="@_repoTree" T="GitTreeItem" SelectedValueChanged="@OnSelectedFileChanged" Hover="true">
+        <MudTreeView Items="@_repoTree" T="GitTreeItem" SelectedValueChanged="@OnSelectedFileChanged" Hover="true" ExpandOnClick="true">
             <ItemTemplate>
                 @if(context.Type == GitTreeType.Tree)
                 {

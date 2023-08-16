@@ -66,18 +66,27 @@ public class ValidationResponse
     public string? Message { get; set; }
     public IEnumerable<ApiError> Errors { get; set; } = Enumerable.Empty<ApiError>();
 
+    public ValidationResponse() { }
+
+    public ValidationResponse(bool isSuccessful, string? message, IEnumerable<ApiError>? errors = null)
+    {
+        IsSuccessful = isSuccessful;
+        Message = message;
+        Errors = errors ?? Enumerable.Empty<ApiError>();
+    }
+
     public static ValidationResponse Default() => new();
 
-    public static ValidationResponse Success() => new()
+    public static ValidationResponse Success(string? message = null) => new()
     {
         IsSuccessful = true,
-        Message = "Success"
+        Message = message ?? "Success"
     };
 
-    public static ValidationResponse Failure() => new()
+    public static ValidationResponse Failure(string? message = null) => new()
     {
         IsSuccessful = false,
-        Message = "Failure",
+        Message = message ?? "Failure",
     };
 
     public static ValidationResponse CouldNotLocateEntity() => new()

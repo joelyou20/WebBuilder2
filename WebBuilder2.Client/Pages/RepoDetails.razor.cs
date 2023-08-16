@@ -74,7 +74,7 @@ public partial class RepoDetails
 
     public async Task OnSelectedFileChanged(GitTreeItem item)
     {
-        if(_repo == null) return;
+        if(_repo == null || item == null || item.Type == GitTreeType.Tree) return;
 
         ValidationResponse<RepoContent>? repoContentResponse = await GithubService.GetRepositoryContentAsync(_repo.Name, item.Path);
 

@@ -19,10 +19,13 @@ public class RepositoryManager : IRepositoryManager
         _repositoryService = repositoryService;
     }
 
-    public async Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repo, SiteModel site)
+    public async Task<ValidationResponse<RepositoryModel>> CreateRepositoryAsync(RepositoryModel repo, SiteModel site)
     {
-        var createRepoResponse = await _githubService.PostCreateRepoAsync(repo);
+        repo.RepoName = $"{site.Name}-repo";
+        repo.Description = $"{site.Name}-repo description";
+        repo.Homepage = $"{site.Name}-repo Homepage";
 
+        var createRepoResponse = await _githubService.PostCreateRepoAsync(repo);
 
         if (!createRepoResponse.Errors.Any() && createRepoResponse.Values != null && createRepoResponse.Values.Any())
         {
@@ -33,33 +36,39 @@ public class RepositoryManager : IRepositoryManager
 
             var newRepo = await _repositoryService.AddRepositoriesAsync(new List<RepositoryModel> { createdRepo });
 
-            if(newRepo == null) return ValidationResponse<RepositoryModel>.Failure(message: "Failed to add repo");
+            if (newRepo == null) return ValidationResponse<RepositoryModel>.Failure(message: "Failed to add repo");
 
-            // Add secrets to repo
+        }
 
-            // Get S3 Bucket
-            string s3BucketName = "";
+        return createRepoResponse;
+    }
 
-            // Get AWS Access Key Id
-            string awsAccessKeyId = "";
+    public async Task<ValidationResponse<GithubSecret>> AddSecretsAsync(RepositoryModel repo)
+    {
+        // Add secrets to repo
 
-            // Get AWS Secret Access Key
-            string awsSecretAccessKey = "";
+        // Get S3 Bucket
+        string s3BucketName = "";
 
-            // Get AWS Region
-            string awsRegion = "";
+        // Get AWS Access Key Id
+        string awsAccessKeyId = "";
 
-            var createSecretsResponse = await _githubService.CreateSecretAsync(new GithubSecret[]
-            {
+        // Get AWS Secret Access Key
+        string awsSecretAccessKey = "";
+
+        // Get AWS Region
+        string awsRegion = "";
+
+        var createSecretsResponse = await _githubService.CreateSecretAsync(new GithubSecret[]
+        {
                 new GithubSecret { Name = "AWS_S3_BUCKET", Value = s3BucketName },
                 new GithubSecret { Name = "AWS_ACCESS_KEY_ID", Value = awsAccessKeyId },
                 new GithubSecret { Name = "AWS_SECRET_ACCESS_KEY", Value = awsSecretAccessKey },
                 new GithubSecret { Name = "AWS_REGION", Value = awsRegion }
-            }, createdRepo.Name);
+        }, repo.Name);
 
-            if (createSecretsResponse == null || !createSecretsResponse.HasValues) return ValidationResponse<RepositoryModel>.Failure(message: "Failed to add repo");
-        }
-        
-        return createRepoResponse;
+        if (createSecretsResponse == null) return ValidationResponse<GithubSecret>.Failure(message: "Failed to add repo");
+
+        return createSecretsResponse;
     }
 }

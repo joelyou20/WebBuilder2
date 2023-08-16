@@ -9,6 +9,7 @@ namespace WebBuilder2.Client.Components;
 public partial class SiteTable
 {
     [Inject] public ISiteService SiteService { get; set; } = default!; // Eventually all calls will go through manager
+    [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter] public List<SiteModel> Sites { get; set; } = new();
@@ -17,6 +18,8 @@ public partial class SiteTable
     public void OnDeleteSiteBtnClicked(SiteModel site) => InvokeAsync(async () =>
     {
         Sites.Remove(site);
+        // TODO: For the time being I will be soft deleting connected repos when sites are deleted
+        if(site.Repository != null) await RepositoryService.SoftDeleteRepositoryAsync(site.Repository);
         await SiteService.SoftDeleteSiteAsync(site);
         await ValuedChanged.InvokeAsync();
     });

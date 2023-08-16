@@ -6,14 +6,10 @@ using System.Threading.Tasks;
 
 namespace WebBuilder2.Shared.Models;
 
-public enum FileExtension
+public enum Region
 {
-    Text,
-    PDF,
-    PNG,
-    JPG,
-    JPEG,
-    CSharp,
-    MP3,
-    Json
+    USEast1,
+    USEast2,
+    USWest1,
+    USWest2
 }

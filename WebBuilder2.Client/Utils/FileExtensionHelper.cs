@@ -15,6 +15,7 @@ public static class FileExtensionHelper
             ".js" => Syntax.Javascript,
             ".ps1" => Syntax.Powershell,
             ".md" => Syntax.Markdown,
+            ".json" => Syntax.Json,
             _ => Syntax.Text,
         };
     }

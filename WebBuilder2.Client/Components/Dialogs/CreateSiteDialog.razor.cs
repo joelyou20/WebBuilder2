@@ -12,16 +12,17 @@ namespace WebBuilder2.Client.Components.Dialogs;
 public partial class CreateSiteDialog
 {
     [Inject] public ISiteManager SiteManager { get; set; } = default!;
-    [Inject] public IRepositoryManager RepositoryManager { get; set; } = default!;
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
 
-    [Parameter] public List<RepositoryModel> TemplateRepositories { get; set; } = new();
+    [Parameter] public List<Domain> RegisteredDomains { get; set; } = new();
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private CreateSiteRequest _createSiteRequest = new();
-    private readonly Func<RepositoryModel, string> _templateSelectConverter = r => r.Name;
+    private readonly Func<RepositoryModel, string> _templateSelectConverter = t => t.Name;
+    private readonly Func<Domain, string> _domainSelectConverter = d => d.Name;
     private RepositoryModel? _repoModel;
     private List<RepositoryModel> _templateRepositories = new();
+    private bool _useNewDomain = false;
 
     private List<ApiError> _errors = new();
 
@@ -60,25 +61,18 @@ public partial class CreateSiteDialog
 
     public void OnCreateBtnClick() => InvokeAsync(async () =>
     {
-        var site = await SiteManager.CreateSiteAsync(_createSiteRequest);
+        var createSiteResponse = await SiteManager.CreateSiteAsync(_createSiteRequest);
 
-        if (site == null)
+        if (createSiteResponse == null)
         {
             _errors.Add(new ApiError("Failed to create site"));
             StateHasChanged();
             return;
         }
 
-        var repo = _createSiteRequest.TemplateRepository;
-        repo.RepoName = $"{_createSiteRequest.SiteName}-repo";
-        repo.Description = $"{_createSiteRequest.SiteName}-repo description";
-        repo.Homepage = $"{_createSiteRequest.SiteName}-repo Homepage";
-
-        var createRepoResponse = await RepositoryManager.CreateRepoAsync(repo, site);
-
-        if (createRepoResponse.IsSuccessful)
+        if (createSiteResponse.IsSuccessful)
         {
-            if (createRepoResponse.Values == null || !createRepoResponse.Values.Any())
+            if (createSiteResponse.Values == null || !createSiteResponse.Values.Any())
             {
                 throw new Exception("ERROR: Repo response reports successful, but no values were returned.");
             }
@@ -86,7 +80,7 @@ public partial class CreateSiteDialog
         }
         else
         {
-            _errors.AddRange(createRepoResponse.Errors);
+            _errors.AddRange(createSiteResponse.Errors);
             StateHasChanged();
         }
     });

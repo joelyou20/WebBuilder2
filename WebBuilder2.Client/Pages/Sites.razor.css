@@ -20,3 +20,8 @@
     padding: 1rem;
     width: 100%;
 }
+
+.sites-domain-container {
+    display: flex;
+    flex-direction: column;
+}

@@ -54,11 +54,4 @@ public partial class CreateScriptDialog
 
         MudDialog.Close(DialogResult.Ok(true));
     }
-
-    private List<Syntax> GetSyntaxList()
-    {
-        Array enums = Enum.GetValues(typeof(Syntax));
-        IEnumerable<Syntax> enumsAsSyntax = enums.Cast<Syntax>();
-        return enumsAsSyntax.ToList();
-    }
 }

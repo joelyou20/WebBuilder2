@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
@@ -325,6 +326,7 @@ public class GithubService : IGithubService
             ".jpeg" => FileExtension.JPEG,
             ".cs" => FileExtension.CSharp,
             ".mp3" => FileExtension.MP3,
+            ".json" => FileExtension.Json,
             _ => FileExtension.Text
         };
     }
@@ -365,7 +367,7 @@ public class GithubService : IGithubService
 
     private async Task<HttpRequestMessage> BuildRequestAsync(HttpMethod method, string endpoint, string userName, string repoName, JsonContent? content = null)
     {
-        string pat = await _awsSecretsManagerService.GetSecretAsync("github-pat");
+        string pat = await _awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat);
 
         HttpRequestMessage request = new(method, $"https://api.github.com/repos/{userName}/{repoName}/{endpoint}");
         request.Headers.Add("Accept", "application/vnd.github+json");
