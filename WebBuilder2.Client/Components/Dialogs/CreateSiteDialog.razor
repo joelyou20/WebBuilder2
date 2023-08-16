@@ -51,7 +51,7 @@
                     <MudCard>
                         <MudText Style="font-weight:bold">New Buckets</MudText>
                         <MudList>
-                            @foreach(Bucket bucket in _createSiteRequest.Buckets)
+                            @foreach(Bucket bucket in _createSiteRequest.Buckets.Values)
                             {
                                 <MudListItem>@bucket.Name</MudListItem>
                             }

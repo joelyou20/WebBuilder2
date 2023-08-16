@@ -6,5 +6,5 @@ namespace WebBuilder2.Client.Managers.Contracts;
 
 public interface ISiteManager
 {
-    Task<ValidationResponse<SiteModel>> CreateSiteAsync(CreateSiteRequest createSiteRequest);
+    Task<ValidationResponse> CreateSiteAsync(CreateSiteRequest createSiteRequest);
 }

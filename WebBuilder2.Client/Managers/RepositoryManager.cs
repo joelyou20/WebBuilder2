@@ -65,7 +65,7 @@ public class RepositoryManager : IRepositoryManager
                 new GithubSecret { Name = "AWS_ACCESS_KEY_ID", Value = awsAccessKeyId },
                 new GithubSecret { Name = "AWS_SECRET_ACCESS_KEY", Value = awsSecretAccessKey },
                 new GithubSecret { Name = "AWS_REGION", Value = awsRegion }
-        }, repo.Name);
+        }, repo.RepoName);
 
         if (createSecretsResponse == null) return ValidationResponse<GithubSecret>.Failure(message: "Failed to add repo");
 

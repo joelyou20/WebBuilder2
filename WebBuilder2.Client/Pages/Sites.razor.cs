@@ -42,7 +42,7 @@ public partial class Sites
 
     private async Task UpdateSitesAsync()
     {
-        var sites = await SiteService.GetSitesAsync(_siteList.Select(x => x.Id));
+        var sites = await SiteService.GetSitesAsync(new Dictionary<string, string> { { nameof(SiteModel.Id).ToLower(), string.Join(",", _siteList.Select(x => x.Id)) } });
 
         if (sites == null) return;
 

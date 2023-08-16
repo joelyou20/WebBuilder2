@@ -43,6 +43,48 @@ public class AwsClient : IAwsClient
         return result;
     }
 
+    public async Task<ValidationResponse?> PostConfigureLoggingAsync(AwsConfigureLoggingRequest request)
+    {
+        var content = JsonContent.Create(request);
+        HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}aws/buckets/logging", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle error
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
+        return result;
+    }
+
+    public async Task<ValidationResponse?> PostBucketPolicyAsync(AwsAddBucketPolicyRequest request)
+    {
+        var content = JsonContent.Create(request);
+        HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}aws/buckets/policy", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle error
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
+        return result;
+    }
+
+    public async Task<ValidationResponse?> PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request)
+    {
+        var content = JsonContent.Create(request);
+        HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}aws/buckets/access", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle error
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
+        return result;
+    }
+
     public async Task<string?> GetForecastedCostAsync()
     {
         HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}aws/cost");

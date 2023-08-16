@@ -58,6 +58,13 @@ public class ValidationResponse<T> where T : class
     public static ValidationResponse<T> NotAuthenticated(T value, string? message = null) => NotAuthenticated(new List<T>() { value }, message);
 
     public List<T> GetValues() => Values?.ToList() ?? new List<T>();
+
+    public ValidationResponse GetResponse() => new()
+    {
+        IsSuccessful = IsSuccessful,
+        Errors = Errors,
+        Message = Message
+    };
 }
 
 public class ValidationResponse

@@ -15,7 +15,7 @@ namespace WebBuilder2.Client.Clients
         public async Task<ValidationResponse<SiteModel>> AddSiteAsync(SiteModel site) => await AddAsync(site);
         public async Task<ValidationResponse<SiteModel>> AddRangeSiteAsync(IEnumerable<SiteModel> sites) => await AddRangeAsync(sites);
         public async Task<ValidationResponse<SiteModel>> GetSingleSiteAsync(long id) => await GetSingleAsync(id);
-        public async Task<ValidationResponse<SiteModel>> GetSitesAsync(IEnumerable<long>? exclude = null) => await GetAsync(exclude);
+        public async Task<ValidationResponse<SiteModel>> GetSitesAsync(Dictionary<string, string>? filter = null) => await GetAsync(filter: filter);
         public async Task<ValidationResponse<SiteModel>> SoftDeleteSiteAsync(SiteModel site) => await SoftDeleteAsync(site);
         public async Task<ValidationResponse<SiteModel>> SoftDeleteRangeSiteAsync(IEnumerable<SiteModel> sites) => await SoftDeleteRangeAsync(sites);
     }

@@ -20,9 +20,24 @@ public class AwsService : IAwsService
         return await _client.GetBucketsAsync();
     }
 
-    public async Task<ValidationResponse?> CreateBucketsAsync(AwsCreateBucketRequest request)
+    public async Task<ValidationResponse> CreateBucketsAsync(AwsCreateBucketRequest request)
     {
         return await _client.CreateBucketsAsync(request);
+    }
+
+    public async Task<ValidationResponse> PostConfigureLoggingAsync(AwsConfigureLoggingRequest request)
+    {
+        return await _client.PostConfigureLoggingAsync(request);
+    }
+
+    public async Task<ValidationResponse> PostBucketPolicyAsync(AwsAddBucketPolicyRequest request)
+    {
+        return await _client.PostBucketPolicyAsync(request);
+    }
+
+    public async Task<ValidationResponse> PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request)
+    {
+        return await _client.PostConfigurePublicAccessBlockAsync(request);
     }
 
     public async Task<IEnumerable<HostedZone>> GetHostedZonesAsync()

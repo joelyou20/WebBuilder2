@@ -32,27 +32,178 @@ namespace WebBuilder2.Server.Controllers
         }
 
         [HttpGet("/aws/buckets")]
-        public async Task<IEnumerable<Bucket>> GetBucketsAsync()
+        public async Task<IActionResult> GetBucketsAsync()
         {
-            return await _awsS3Service.GetBucketsAsync();
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsS3Service.GetBucketsAsync()));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
         }
 
         [HttpPut("/aws/buckets")]
-        public async Task<ValidationResponse> CreateBucketsAsync([FromBody] AwsCreateBucketRequest request)
+        public async Task<IActionResult> CreateBucketsAsync([FromBody] AwsCreateBucketRequest request)
         {
-            return await _awsS3Service.CreateBucketAsync(request);
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsS3Service.CreateBucketAsync(request)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
+        [HttpPost("/aws/buckets/logging")]
+        public async Task<IActionResult> PostLoggingConfigAsync([FromBody] AwsConfigureLoggingRequest request)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsS3Service.ConfigureLoggingAsync(request)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
+        [HttpPost("/aws/buckets/policy")]
+        public async Task<IActionResult> PostBucketPolicyAsync([FromBody] AwsAddBucketPolicyRequest request)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsS3Service.AddBucketPolicyAsync(request)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
+        [HttpPost("/aws/buckets/access")]
+        public async Task<IActionResult> PostConfigurePublicAccessBlockAsync([FromBody] AwsPublicAccessBlockRequest request)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsS3Service.ConfigurePublicAccessBlockAsync(request)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
         }
 
         [HttpGet("/aws/hostedzones")]
-        public async Task<IEnumerable<HostedZone>> GetHostedZonesAsync()
+        public async Task<IActionResult> GetHostedZonesAsync()
         {
-            return await _awsRoute53Service.GetHostedZonesAsync();
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsRoute53Service.GetHostedZonesAsync()));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
         }
 
         [HttpGet("/aws/cost")]
-        public async Task<string> GetForecastedCostAsync()
+        public async Task<IActionResult> GetForecastedCostAsync()
         {
-            return await _awsCostExplorerService.GetForecastedCostAsync();
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsCostExplorerService.GetForecastedCostAsync()));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
         }
 
         [HttpPost("/aws/app")]

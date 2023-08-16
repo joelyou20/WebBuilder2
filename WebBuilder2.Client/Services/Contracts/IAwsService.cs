@@ -7,7 +7,10 @@ namespace WebBuilder2.Client.Services.Contracts;
 public interface IAwsService
 {
     Task<IEnumerable<Bucket>> GetBucketsAsync();
-    Task<ValidationResponse?> CreateBucketsAsync(AwsCreateBucketRequest request);
+    Task<ValidationResponse> CreateBucketsAsync(AwsCreateBucketRequest request);
+    Task<ValidationResponse> PostConfigureLoggingAsync(AwsConfigureLoggingRequest request);
+    Task<ValidationResponse> PostBucketPolicyAsync(AwsAddBucketPolicyRequest request);
+    Task<ValidationResponse> PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
     Task<IEnumerable<HostedZone>> GetHostedZonesAsync();
     Task<decimal> GetForecastedCostAsync();
     Task<ValidationResponse> CreateAmplifyAppAsync(RepositoryModel repo);

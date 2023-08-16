@@ -16,10 +16,29 @@ public class CreateSiteRequest
     public Domain Domain { get; set; } = new();
     public Region Region { get; set; } = new();
     public RepositoryModel TemplateRepository { get; set; } = new();
-    public IEnumerable<Bucket> Buckets => new Bucket[]
+    public Dictionary<BucketType, Bucket> Buckets => new()
     {
-        new Bucket(Domain.Name, Region),
-        new Bucket($"www.{Domain.Name}", Region),
-        new Bucket($"logs.{Domain.Name}", Region)
+        { 
+            BucketType.Domain, 
+            new Bucket(
+                name: Domain.Name,
+                region: Region,
+                configureForWebSiteHosting: true) 
+        },
+        {
+            BucketType.Subdomain,
+            new Bucket(
+                name: $"www.{Domain.Name}",
+                region: Region,
+                configureForWebSiteHosting: true,
+                redirectTarget: Domain.Name)
+        },
+        {
+            BucketType.Logging,
+            new Bucket(
+                name: $"logs.{Domain.Name}",
+                region: Region,
+                configureForLogging: true)
+        }
     };
 }

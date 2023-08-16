@@ -64,25 +64,13 @@ public partial class CreateSiteDialog
     {
         var createSiteResponse = await SiteManager.CreateSiteAsync(_createSiteRequest);
 
-        if (createSiteResponse == null)
+        if (!createSiteResponse.IsSuccessful)
         {
-            _errors.Add(new ApiError("Failed to create site"));
+            _errors.AddRange(createSiteResponse.Errors);
             StateHasChanged();
             return;
         }
 
-        if (createSiteResponse.IsSuccessful)
-        {
-            if (createSiteResponse.Values == null || !createSiteResponse.Values.Any())
-            {
-                throw new Exception("ERROR: Repo response reports successful, but no values were returned.");
-            }
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            _errors.AddRange(createSiteResponse.Errors);
-            StateHasChanged();
-        }
+        MudDialog.Close(DialogResult.Ok(true));
     });
 }
