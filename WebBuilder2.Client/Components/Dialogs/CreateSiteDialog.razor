@@ -1,34 +1,65 @@
-﻿@using WebBuilder2.Client.Components.Forms
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using WebBuilder2.Client.Components.Forms
 @using WebBuilder2.Client.Utils;
 
 <MudDialog>
     <DialogContent>
         <ErrorContainer Errors="@_errors" />
-        <MudTextField Label="Name" T="string" @bind-Value="@_createSiteRequest.Name" Required="true" />
-        <MudTextField Label="Description" Lines="5" T="string" @bind-Value="@_createSiteRequest.Description" Required="true" />
-        <MudSelect T="Region" Label="Region" Clearable="false" AnchorOrigin="Origin.BottomCenter" Required="false" @bind-Value="@_createSiteRequest.Region">
-            @foreach (Region region in EnumHelper.All<Region>())
+        <EditForm OnValidSubmit="@OnValidSubmit" Model="@_createSiteRequest">
+            <DataAnnotationsValidator />
+            <MudTextField Label="Name" T="string" @bind-Value="@_createSiteRequest.Name" Required="true" For="@(() => _createSiteRequest.Name)" />
+            <MudTextField Label="Description" Lines="5" T="string" @bind-Value="@_createSiteRequest.Description" Required="true" For="@(() => _createSiteRequest.Description)" />
+            <MudSelect T="Region" Label="Region" Clearable="false" AnchorOrigin="Origin.BottomCenter" Required="false" @bind-Value="@_createSiteRequest.Region">
+                @foreach (Region region in EnumHelper.All<Region>())
+                {
+                    <MudSelectItem Value="@region" />
+                }
+            </MudSelect>
+            <MudSelect T="RepositoryModel" 
+                Label="Template" 
+                Clearable="true" 
+                AnchorOrigin="Origin.BottomCenter" 
+                ToStringFunc="@_templateSelectConverter" 
+                Required="false" 
+                ValueChanged="OnTemplateSelected" 
+                For="@(() => _createSiteRequest.TemplateRepository)">
+                @foreach (RepositoryModel templateRepository in _templateRepositories)
+                {
+                    <MudSelectItem Value="@templateRepository" />
+                }
+            </MudSelect>
+            <MudSelect T="Domain" 
+                Disabled="@_useNewDomain" 
+                Label="Domain" 
+                Clearable="true" 
+                AnchorOrigin="Origin.BottomCenter" 
+                ToStringFunc="@_domainSelectConverter" 
+                Required="false"
+                @bind-Value="@_createSiteRequest.Domain"
+                For="@(() => _createSiteRequest.Domain)">
+                @foreach (Domain domain in RegisteredDomains)
+                {
+                    <MudSelectItem Value="@domain" />
+                }
+            </MudSelect>
+            <MudExpansionPanel Text="Register New Domain" IsExpandedChanged="@(() => _useNewDomain = !_useNewDomain)">
+                <DomainSuggesterPanel @bind-Value="@_createSiteRequest.Domain" />
+            </MudExpansionPanel>
+            @if(!_createSiteRequest.Domain.Name.Equals(string.Empty))
             {
-                <MudSelectItem Value="@region" />
+                <div class="csd-bucket-card">
+                    <MudCard>
+                        <MudText Style="font-weight:bold">New Buckets</MudText>
+                        <MudList>
+                            @foreach(Bucket bucket in _createSiteRequest.Buckets)
+                            {
+                                <MudListItem>@bucket.Name</MudListItem>
+                            }
+                        </MudList>
+                        </MudCard>
+                </div>
             }
-        </MudSelect>
-        <MudSelect T="RepositoryModel" Label="Template" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_templateSelectConverter" Required="false" ValueChanged="OnTemplateSelected">
-            @foreach (RepositoryModel templateRepository in _templateRepositories)
-            {
-                <MudSelectItem Value="@templateRepository" />
-            }
-        </MudSelect>
-        <MudSelect Disabled="@_useNewDomain" T="Domain" Label="Domain" Clearable="true" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_domainSelectConverter" Required="false" @bind-Value="@_createSiteRequest.Domain">
-            @foreach (Domain domain in RegisteredDomains)
-            {
-                <MudSelectItem Value="@domain" />
-            }
-        </MudSelect>
-        <MudExpansionPanel Text="Register New Domain" IsExpandedChanged="@(() => _useNewDomain = !_useNewDomain)">
-            <DomainSuggesterPanel @bind-Value="@_createSiteRequest.Domain" />
-        </MudExpansionPanel>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Create</MudButton>
+        </EditForm>
     </DialogContent>
-    <DialogActions>
-        <MudButton Variant="Variant.Filled" OnClick="@(() => OnCreateBtnClick())">Create</MudButton>
-    </DialogActions>
 </MudDialog>

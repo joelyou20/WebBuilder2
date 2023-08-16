@@ -34,14 +34,7 @@ public class SiteManager : ISiteManager
 
         // Create AWS Buckets
 
-        var createBucketResponse = await _awsService.CreateBucketsAsync(new AwsCreateBucketRequest
-        {
-            Buckets = new Bucket[]
-            {
-                new Bucket(createSiteRequest.Domain.Name, createSiteRequest.Region),
-                new Bucket($"www.{createSiteRequest.Domain.Name}", createSiteRequest.Region)
-            }
-        });
+        var createBucketResponse = await _awsService.CreateBucketsAsync(new AwsCreateBucketRequest { Buckets = createSiteRequest.Buckets });
 
         if (createBucketResponse == null) throw new Exception("Failed to create Buckets");
 

@@ -1,2 +1,6 @@
-﻿body {
+﻿.csd-bucket-card > ::deep .mud-card {
+    background-color: var(--accent-color);
+    margin: 1rem;
+    padding: 0.5rem;
+    width: auto;
 }

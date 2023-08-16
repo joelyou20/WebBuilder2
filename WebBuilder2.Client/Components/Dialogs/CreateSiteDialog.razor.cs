@@ -18,6 +18,7 @@ public partial class CreateSiteDialog
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private CreateSiteRequest _createSiteRequest = new();
+
     private readonly Func<RepositoryModel, string> _templateSelectConverter = t => t.Name;
     private readonly Func<Domain, string> _domainSelectConverter = d => d.Name;
     private RepositoryModel? _repoModel;
@@ -59,7 +60,7 @@ public partial class CreateSiteDialog
         StateHasChanged();
     }
 
-    public void OnCreateBtnClick() => InvokeAsync(async () =>
+    public void OnValidSubmit() => InvokeAsync(async () =>
     {
         var createSiteResponse = await SiteManager.CreateSiteAsync(_createSiteRequest);
 
