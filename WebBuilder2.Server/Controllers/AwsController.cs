@@ -31,6 +31,31 @@ namespace WebBuilder2.Server.Controllers
             _awsAmplifyService = awsAmplifyService;
         }
 
+        [HttpGet("/aws/bucket/{name}")]
+        public async Task<IActionResult> GetSingleBucketAsync([FromRoute] string name)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsS3Service.GetSingleBucketAsync(name)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
         [HttpGet("/aws/buckets")]
         public async Task<IActionResult> GetBucketsAsync()
         {

@@ -16,6 +16,7 @@ public class CreateSiteRequest
     public Domain Domain { get; set; } = new();
     public Region Region { get; set; } = new();
     public RepositoryModel TemplateRepository { get; set; } = new();
+    public ProjectTemplateType ProjectTemplateType { get; set; }
     public Dictionary<BucketType, Bucket> Buckets => new()
     {
         { 

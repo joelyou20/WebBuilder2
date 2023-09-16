@@ -20,6 +20,7 @@ public partial class CreateSiteDialog
     private CreateSiteRequest _createSiteRequest = new();
 
     private readonly Func<RepositoryModel, string> _templateSelectConverter = t => t.Name;
+    private readonly Func<ProjectTemplateType, string> _projectTemplateSelectConverter = p => p.ToString();
     private readonly Func<Domain, string> _domainSelectConverter = d => d.Name;
     private RepositoryModel? _repoModel;
     private List<RepositoryModel> _templateRepositories = new();

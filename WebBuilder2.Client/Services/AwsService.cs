@@ -15,6 +15,11 @@ public class AwsService : IAwsService
         _client = client;
     }
 
+    public async Task<Bucket?> GetSingleBucketAsync(string name)
+    {
+        return await _client.GetSingleBucketAsync(name);
+    }
+
     public async Task<IEnumerable<Bucket>> GetBucketsAsync()
     {
         return await _client.GetBucketsAsync();

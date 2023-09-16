@@ -29,7 +29,7 @@ public class AwsS3Service : IAwsS3Service
 
         return new Bucket
         {
-            Name = bucket.BucketName
+            Name = bucket.BucketName,
         };
     }
 

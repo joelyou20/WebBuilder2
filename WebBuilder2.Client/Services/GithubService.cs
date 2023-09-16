@@ -34,6 +34,11 @@ namespace WebBuilder2.Client.Services
             return await _client.PostRepositoryContentAsync(userName, repoName, reference);
         }
 
+        public async Task<ValidationResponse?> PostCopyRepoAsync(GithubCopyRepoRequest request)
+        {
+            return await _client.PostCopyRepoAsync(request);
+        }
+
         public async Task<ValidationResponse<GitTreeItem>?> GetGitTreeAsync(string repoName)
         {
             var userName = await GetLoginAsync();

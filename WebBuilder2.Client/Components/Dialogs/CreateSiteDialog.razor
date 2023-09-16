@@ -15,28 +15,41 @@
                     <MudSelectItem Value="@region" />
                 }
             </MudSelect>
-            <MudSelect T="RepositoryModel" 
-                Label="Template" 
-                Clearable="true" 
-                AnchorOrigin="Origin.BottomCenter" 
-                ToStringFunc="@_templateSelectConverter" 
-                Required="false" 
-                ValueChanged="OnTemplateSelected" 
-                For="@(() => _createSiteRequest.TemplateRepository)">
+            <MudSelect T="RepositoryModel"
+                       Label="Repository Template"
+                       Clearable="true"
+                       AnchorOrigin="Origin.BottomCenter"
+                       ToStringFunc="@_templateSelectConverter"
+                       Required="false"
+                       ValueChanged="OnTemplateSelected"
+                       For="@(() => _createSiteRequest.TemplateRepository)">
                 @foreach (RepositoryModel templateRepository in _templateRepositories)
                 {
                     <MudSelectItem Value="@templateRepository" />
                 }
             </MudSelect>
-            <MudSelect T="Domain" 
-                Disabled="@_useNewDomain" 
-                Label="Domain" 
-                Clearable="true" 
-                AnchorOrigin="Origin.BottomCenter" 
-                ToStringFunc="@_domainSelectConverter" 
-                Required="false"
-                @bind-Value="@_createSiteRequest.Domain"
-                For="@(() => _createSiteRequest.Domain)">
+            <MudSelect T="ProjectTemplateType"
+                       Label="Project Type"
+                       Clearable="false"
+                       AnchorOrigin="Origin.BottomCenter"
+                       ToStringFunc="@_projectTemplateSelectConverter"
+                       Required="false"
+                       @bind-Value="@_createSiteRequest.ProjectTemplateType"
+                       For="@(() => _createSiteRequest.ProjectTemplateType)">
+                @foreach (ProjectTemplateType projectTemplateType in EnumHelper.All<ProjectTemplateType>())
+                {
+                    <MudSelectItem Value="@projectTemplateType" />
+                }
+            </MudSelect>
+            <MudSelect T="Domain"
+                       Disabled="@_useNewDomain"
+                       Label="Domain"
+                       Clearable="true"
+                       AnchorOrigin="Origin.BottomCenter"
+                       ToStringFunc="@_domainSelectConverter"
+                       Required="false"
+                       @bind-Value="@_createSiteRequest.Domain"
+                       For="@(() => _createSiteRequest.Domain)">
                 @foreach (Domain domain in RegisteredDomains)
                 {
                     <MudSelectItem Value="@domain" />

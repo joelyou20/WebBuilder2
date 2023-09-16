@@ -54,6 +54,17 @@ namespace WebBuilder2.Client.Clients
             return result;
         }
 
+        public async Task<ValidationResponse?> PostCopyRepoAsync(GithubCopyRepoRequest request)
+        {
+            var content = JsonContent.Create(request);
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_httpClient.BaseAddress}github/repos/copy", content);
+            response.EnsureSuccessStatusCode();
+
+            var message = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ValidationResponse>(message);
+            return result;
+        }
+
         #endregion
 
         #region Git

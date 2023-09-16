@@ -17,5 +17,6 @@ namespace WebBuilder2.Server.Services.Contracts
         Task<ValidationResponse> CreateCommitAsync(string owner, string repoName, GithubCreateCommitRequest request);
         Task<ValidationResponse<RepoContent>> GetRepositoryContentAsync(string owner, string repoName, string? path = null);
         Task<ValidationResponse<GitTreeItem>> GetGitTreeAsync(string owner, string repoName);
+        Task<ValidationResponse> CopyRepoAsync(string clonedRepoName, string newRepoName, string path = ".");
     }
 }

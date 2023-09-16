@@ -1,6 +1,7 @@
 ﻿using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
+using WebBuilder2.Client.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
@@ -26,83 +27,117 @@ public class SiteManager : ISiteManager
 
     public async Task<ValidationResponse> CreateSiteAsync(CreateSiteRequest createSiteRequest)
     {
-        _logger.LogInformation("Running site creation");
-        var domainBucket = createSiteRequest.Buckets[BucketType.Domain];
-        var subDomainBucket = createSiteRequest.Buckets[BucketType.Subdomain];
-        var loggingBucket = createSiteRequest.Buckets[BucketType.Logging];
-
-        // Add Site
-        _logger.LogInformation("Creating Site...");
-        SiteModel? site = await _siteService.AddSiteAsync(new()
+        try
         {
-            Name = createSiteRequest.Name,
-            Description = createSiteRequest.Description,
-        });
-        _logger.LogInformation("Site Created!");
 
-        if (site == null) return ValidationResponse.Failure($"Failed to create site. Site value = {site}");
+            _logger.LogInformation("Running site creation");
+            var domainBucket = createSiteRequest.Buckets[BucketType.Domain];
+            var subDomainBucket = createSiteRequest.Buckets[BucketType.Subdomain];
+            var loggingBucket = createSiteRequest.Buckets[BucketType.Logging];
 
-        var repo = createSiteRequest.TemplateRepository;
+            // Add Site
+            _logger.LogInformation("Creating Site...");
+            SiteModel? site = await _siteService.AddSiteAsync(new()
+            {
+                Name = createSiteRequest.Name,
+                Description = createSiteRequest.Description,
+            });
+            _logger.LogInformation("Site Created!");
 
-        // Register domain
-        //_ = await _awsService.PostRegisterDomainAsync(createSiteRequest.Domain.Name) ?? 
-        //    throw new Exception($"Failed to register domain {createSiteRequest.Domain.Name}");
+            if (site == null) return ValidationResponse.Failure($"Failed to create site. Site value = {site}");
 
-        // Create AWS Buckets
-        _logger.LogInformation("Creating Buckets...");
-        _logger.LogInformation("Domain Bucket: {0}", domainBucket.Name);
-        _logger.LogInformation("Subdomain Bucket: {0}", subDomainBucket.Name);
-        _logger.LogInformation("Logging Bucket: {0}", loggingBucket.Name);
+            var repo = createSiteRequest.TemplateRepository;
 
-        var createBucketsResponse = await _awsService.CreateBucketsAsync(new AwsCreateBucketRequest { Buckets = createSiteRequest.Buckets.Values });
-        if (!createBucketsResponse.IsSuccessful) return createBucketsResponse;
+            // Register domain
+            //_ = await _awsService.PostRegisterDomainAsync(createSiteRequest.Domain.Name) ?? 
+            //    throw new Exception($"Failed to register domain {createSiteRequest.Domain.Name}");
 
-        _logger.LogInformation("Buckets Created!");
+            // Create AWS Buckets
+            _logger.LogInformation("Creating Buckets...");
+            _logger.LogInformation("Domain Bucket: {0}", domainBucket.Name);
+            _logger.LogInformation("Subdomain Bucket: {0}", subDomainBucket.Name);
+            _logger.LogInformation("Logging Bucket: {0}", loggingBucket.Name);
 
-        // Configure AWS logging
-        _logger.LogInformation("Configuring Logging for buckets...");
-        var configureLoggingResponse = await _awsService.PostConfigureLoggingAsync(new AwsConfigureLoggingRequest
+            //var createBucketsResponse = await _awsService.CreateBucketsAsync(new AwsCreateBucketRequest { Buckets = createSiteRequest.Buckets.Values });
+            //if (!createBucketsResponse.IsSuccessful) return createBucketsResponse;
+
+            _logger.LogInformation("Buckets Created!");
+
+            // Configure AWS logging
+            //_logger.LogInformation("Configuring Logging for buckets...");
+            //var configureLoggingResponse = await _awsService.PostConfigureLoggingAsync(new AwsConfigureLoggingRequest
+            //{
+            //    Bucket = domainBucket,
+            //    LogBucket = loggingBucket,
+            //    LogObjectKeyPrefix = ""
+            //});
+            //if (!configureLoggingResponse.IsSuccessful) return configureLoggingResponse;
+
+            //_logger.LogInformation("Logging Configured!");
+
+            // Create repo
+            _logger.LogInformation("Creating Repository...");
+            _logger.LogInformation("Repository: {0}", $"{site.Name}-repo");
+            ValidationResponse<RepositoryModel> createRepoResponse = await _repositoryManager.CreateRepositoryAsync(repo, site);
+            if (!createRepoResponse.HasValues || createRepoResponse.Values?.Single().Site == null) return createRepoResponse.GetResponse();
+
+            _logger.LogInformation("Repository Created!");
+
+            // Add secret variables to repo
+            _logger.LogInformation("Adding secrets to repository...");
+            var addSecretsResponse = await _repositoryManager.AddSecretsAsync(repo);
+            if (!addSecretsResponse.IsSuccessful) return addSecretsResponse.GetResponse();
+
+            _logger.LogInformation("Secrets Added!");
+
+            // Add default index.html
+            var addTemplateProjectResponse = await AddTemplateProjectToRepoAsync(createSiteRequest.ProjectTemplateType, createRepoResponse.Values);
+
+            if (!addTemplateProjectResponse.IsSuccessful) return addTemplateProjectResponse;
+
+            // Allow public access to site
+            //var configurePublicAccessBlockResponse = await _awsService.PostConfigurePublicAccessBlockAsync(new AwsPublicAccessBlockRequest { Bucket = domainBucket, BlockPublicAcls = false });
+            //if (!configurePublicAccessBlockResponse.IsSuccessful) return configurePublicAccessBlockResponse;
+
+            // Add Bucket Policy
+            //_logger.LogInformation("Add Bucket Policy...");
+            //ScriptModel? bucketPolicyScript = await _scriptService.GetScriptByNameAsync("policy");
+            //if (bucketPolicyScript == null) return ValidationResponse.Failure("Failed to locate bucket policy script");
+
+            //bucketPolicyScript.Data = bucketPolicyScript.Data.Replace("Bucket-Name", domainBucket.Name);
+            //_logger.LogInformation("Policy found...");
+
+            //var addBucketPolicyResponse = await _awsService.PostBucketPolicyAsync(new AwsAddBucketPolicyRequest { Bucket = domainBucket, Policy = bucketPolicyScript.Data });
+            //if (!addBucketPolicyResponse.IsSuccessful) return addBucketPolicyResponse!;
+
+            //_logger.LogInformation("Policy Added!");
+
+            return ValidationResponse.Success();
+        }
+        catch (Exception ex)
         {
-            Bucket = domainBucket,
-            LogBucket = loggingBucket,
-            LogObjectKeyPrefix = ""
-        });
-        if (!configureLoggingResponse.IsSuccessful) return configureLoggingResponse;
+            return ValidationResponse.Failure(ex);
+        }
+    }
 
-        _logger.LogInformation("Logging Configured!");
+    private async Task<ValidationResponse> AddTemplateProjectToRepoAsync(ProjectTemplateType projectTemplateType, IEnumerable<RepositoryModel>? repos = null)
+    {
+        if (repos == null || !repos.Any()) return ValidationResponse.Failure("Invalid repo response for AddTemplateProjectToRepoAsync");
 
-        // Create repo
-        _logger.LogInformation("Creating Repository...");
-        _logger.LogInformation("Repository: {0}", $"{site.Name}-repo");
-        var createRepoResponse = await _repositoryManager.CreateRepositoryAsync(repo, site);
-        if (!createRepoResponse.HasValues || createRepoResponse.Values?.Single().Site == null) return createRepoResponse.GetResponse();
+        switch (projectTemplateType)
+        {
+            case ProjectTemplateType.Default:
+                _logger.LogInformation("Adding default index.html to repo...");
+                ScriptModel? defaultIndexScript = await _scriptService.GetScriptByNameAsync("default-index");
+                if (defaultIndexScript == null) return ValidationResponse.Failure("Failed to locate default index.html script");
+                return await _repositoryManager.CreateCommitAsync(defaultIndexScript.Data, "index.html", repos.First());
+            case ProjectTemplateType.BlazorWebAssembly:
+                _logger.LogInformation("Adding Blazor WebAssembly project template to repo...");
+                return await _repositoryManager.CreateTemplateRepoAsync(ProjectTemplateType.BlazorWebAssembly, repos.First());
+            default:
+                break;
+        }
 
-        _logger.LogInformation("Repository Created!");
-
-        // Add secret variables to repo
-        _logger.LogInformation("Add secrets to repository...");
-        var addSecretsResponse = await _repositoryManager.AddSecretsAsync(repo);
-        if (!addSecretsResponse.IsSuccessful) return addSecretsResponse.GetResponse();
-
-        _logger.LogInformation("Secrets Added!");
-
-        // Allow public access to site
-        var configurePublicAccessBlockResponse = await _awsService.PostConfigurePublicAccessBlockAsync(new AwsPublicAccessBlockRequest { Bucket = domainBucket, BlockPublicAcls = false });
-        if (!configurePublicAccessBlockResponse.IsSuccessful) return configurePublicAccessBlockResponse;
-
-        // Add Bucket Policy
-        _logger.LogInformation("Add Bucket Policy...");
-        ScriptModel? script = await _scriptService.GetScriptByNameAsync("policy");
-        if (script == null) return ValidationResponse.Failure("Failed to locate bucket policy script");
-
-        script.Data = script.Data.Replace("Bucket-Name", domainBucket.Name);
-        _logger.LogInformation("Policy found...");
-
-        var addBucketPolicyResponse = await _awsService.PostBucketPolicyAsync(new AwsAddBucketPolicyRequest { Bucket = domainBucket, Policy = script.Data });
-        if (!addBucketPolicyResponse.IsSuccessful) return addBucketPolicyResponse;
-
-        _logger.LogInformation("Policy Added!");
-
-        return ValidationResponse.Success();
+        return ValidationResponse.Failure("Failed to add project template to repo.");
     }
 }

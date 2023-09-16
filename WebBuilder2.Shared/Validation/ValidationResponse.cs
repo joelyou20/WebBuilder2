@@ -30,6 +30,13 @@ public class ValidationResponse<T> where T : class
     };
     public static ValidationResponse<T> Failure(T value, string? message = null) => Failure(new List<T>() { value }, message);
 
+    public static ValidationResponse<T> Failure(Exception e) => new()
+    {
+        IsSuccessful = false,
+        Message = e.Message ?? "Failure",
+        Errors = new List<ApiError>() { new ApiError(e.Message ?? "Failure", ApiErrorSeverity.Error) }
+    };
+
     public static ValidationResponse<T> CouldNotLocateEntity(IEnumerable<T>? values = null, string? message = null) => new()
     {
         IsSuccessful = false,
@@ -94,6 +101,13 @@ public class ValidationResponse
     {
         IsSuccessful = false,
         Message = message ?? "Failure",
+    };
+
+    public static ValidationResponse Failure(Exception e) => new()
+    {
+        IsSuccessful = false,
+        Message = e.Message ?? "Failure",
+        Errors = new List<ApiError>() { new ApiError(e.Message ?? "Failure", ApiErrorSeverity.Error) }
     };
 
     public static ValidationResponse CouldNotLocateEntity() => new()

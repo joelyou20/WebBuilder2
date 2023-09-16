@@ -1,20 +1,26 @@
-﻿using MudBlazor;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using MudBlazor;
+using System.IO;
 using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
+using WebBuilder2.Client.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Utils;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Managers;
 
 public class RepositoryManager : IRepositoryManager
 {
+    private IAwsService _awsService;
     private IGithubService _githubService;
     private IRepositoryService _repositoryService;
 
-    public RepositoryManager(IGithubService githubService, IRepositoryService repositoryService)
+    public RepositoryManager(IGithubService githubService, IRepositoryService repositoryService, IAwsService awsService)
     {
+        _awsService = awsService;
         _githubService = githubService;
         _repositoryService = repositoryService;
     }
@@ -70,5 +76,42 @@ public class RepositoryManager : IRepositoryManager
         if (createSecretsResponse == null) return ValidationResponse<GithubSecret>.Failure(message: "Failed to add repo");
 
         return createSecretsResponse;
+    }
+
+    public async Task<ValidationResponse> CreateCommitAsync(IBrowserFile file, RepositoryModel repo)
+    {
+        string fileAsString = await FileHelper.ReadFileAsync(file);
+        return await CreateCommitAsync(fileAsString, file.Name, repo);
+    }
+
+    public async Task<ValidationResponse> CreateCommitAsync(string content, string fileName, RepositoryModel repo)
+    {
+        GithubCreateCommitRequest request = new()
+        {
+            Message = $"Add file {fileName}",
+            Files = new List<NewFile>
+            {
+                new NewFile
+                {
+                    Content = content,
+                    Path = $"{fileName.Replace(' ', '_')}",
+                    FileType = FileType.File
+                }
+            }
+        };
+
+        return await _githubService.CreateCommitAsync(request, repo.Name);
+    }
+
+    public async Task<ValidationResponse?> CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel)
+    {
+        var response = await _githubService.PostCopyRepoAsync(new GithubCopyRepoRequest
+        {
+            ClonedRepoName = projectTemplateType.ToString(),
+            NewRepoName = repositoryModel.Name,
+            Path = null
+        });
+
+        return response;
     }
 }

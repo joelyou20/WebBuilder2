@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,5 +27,22 @@ public class GitTreeItem
         Extension = extension;
         Type = type;
         Items = items;
+    }
+
+    public FileExtension GetFileExtensionFromPath(string path)
+    {
+        var extension = System.IO.Path.GetExtension(path);
+        return extension switch
+        {
+            ".pdf" => FileExtension.PDF,
+            ".png" => FileExtension.PNG,
+            ".jpg" => FileExtension.JPG,
+            ".jpeg" => FileExtension.JPEG,
+            ".cs" => FileExtension.CSharp,
+            ".mp3" => FileExtension.MP3,
+            ".json" => FileExtension.Json,
+            ".html" => FileExtension.Html,
+            _ => FileExtension.Text
+        };
     }
 }

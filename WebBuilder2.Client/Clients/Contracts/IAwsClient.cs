@@ -6,6 +6,7 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface IAwsClient
 {
+    Task<Bucket?> GetSingleBucketAsync(string name);
     Task<IEnumerable<Bucket>?> GetBucketsAsync();
     Task<ValidationResponse?> CreateBucketsAsync(AwsCreateBucketRequest request);
     Task<ValidationResponse?> PostConfigureLoggingAsync(AwsConfigureLoggingRequest request);

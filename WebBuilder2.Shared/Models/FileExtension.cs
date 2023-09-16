@@ -15,5 +15,6 @@ public enum FileExtension
     JPEG,
     CSharp,
     MP3,
-    Json
+    Json,
+    Html
 }

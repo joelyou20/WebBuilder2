@@ -127,6 +127,31 @@ namespace WebBuilder2.Server.Controllers
             }
         }
 
+        [HttpPost("/github/repos/copy")]
+        public async Task<IActionResult> PostCopyRepoAsync([FromBody] GithubCopyRepoRequest githubCopyRepoRequest)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _githubService.CopyRepoAsync(githubCopyRepoRequest.ClonedRepoName, githubCopyRepoRequest.NewRepoName, githubCopyRepoRequest.Path)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
         #endregion
 
         #region Git
@@ -231,7 +256,7 @@ namespace WebBuilder2.Server.Controllers
         #region Commit
 
         [HttpPut("/github/commit/{owner}/{repoName}")]
-        public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] GithubCreateCommitRequest commit)
+        public async Task<IActionResult> CreateCommit([FromRoute] string owner, [FromRoute] string repoName, [FromBody] GithubCreateCommitRequest commit)
         {
             try
             {

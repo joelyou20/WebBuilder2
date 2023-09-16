@@ -9,6 +9,8 @@ using WebBuilder2.Shared.Validation;
 using MudBlazor;
 using WebBuilder2.Client.Components;
 using System.Text;
+using WebBuilder2.Client.Managers.Contracts;
+using Blace.Editing;
 
 namespace WebBuilder2.Client.Pages;
 
@@ -16,6 +18,7 @@ public partial class RepoDetails
 {
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
     [Inject] public IGithubService GithubService { get; set; } = default!;
+    [Inject] public IRepositoryManager RepositoryManager { get; set; } = default!;
 
     [Parameter] public long Id { get; set; }
 
@@ -59,15 +62,7 @@ public partial class RepoDetails
     public async Task OnUploadFileBtnClicked(IBrowserFile file)
     {
         if(_repo == null) return;
-
-        string fileAsString = await FileReader.ReadFileAsync(file);
-        GithubCreateCommitRequest request = new()
-        {
-            Content = fileAsString,
-            Message = $"Add file {file.Name}",
-            Path = $"resources/{file.Name.Replace(' ', '_')}"
-        };
-        await GithubService.CreateCommitAsync(request, _repo.Name);
+        await RepositoryManager.CreateCommitAsync(file, _repo);
         await InitializeDataAsync();
         StateHasChanged();
     }
@@ -88,9 +83,26 @@ public partial class RepoDetails
 
         _fileContent = repoContentResponse!.GetValues().First().Content;
 
-        if(_codeEditor != null) await _codeEditor.Refresh(_fileContent, FileExtensionHelper.GetSyntax(item.Path));
+        if(_codeEditor != null) await _codeEditor.Refresh(_fileContent, GetSyntax(item.Path));
 
         StateHasChanged();
+    }
+
+    private Syntax GetSyntax(string fileName)
+    {
+        var extension = Path.GetExtension(fileName);
+        return extension switch
+        {
+            ".cs" => Syntax.Csharp,
+            ".yaml" => Syntax.Yaml,
+            ".css" => Syntax.Css,
+            ".js" => Syntax.Javascript,
+            ".ps1" => Syntax.Powershell,
+            ".md" => Syntax.Markdown,
+            ".json" => Syntax.Json,
+            ".html" => Syntax.Html,
+            _ => Syntax.Text,
+        };
     }
 
     private string GetIcon(GitTreeItem item) => item.Type switch

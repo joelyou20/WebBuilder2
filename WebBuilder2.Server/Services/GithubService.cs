@@ -1,21 +1,17 @@
-﻿using Amazon.Runtime;
-using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Octokit;
 using Sodium;
-using System.IO;
+using System.Collections.ObjectModel;
+using System.Management.Automation;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Text;
-using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
+using WebBuilder2.Shared.Utils;
 using WebBuilder2.Shared.Validation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebBuilder2.Server.Services;
 
@@ -200,9 +196,33 @@ public class GithubService : IGithubService
 
     public async Task<ValidationResponse> CreateCommitAsync(string owner, string repoName, GithubCreateCommitRequest request)
     {
-        CreateFileRequest createFileRequest = new(request.Message, request.Content);
+        var headMasterRef = "heads/master";
 
-        await _client.Repository.Content.CreateFile(owner, repoName, request.Path, createFileRequest);
+        // Get reference of master branch
+        var masterReference = await _client.Git.Reference.Get(owner, repoName, headMasterRef);
+
+        // Get the laster commit of this branch
+        var latestCommit = await _client.Git.Commit.Get(owner, repoName, masterReference.Object.Sha);
+
+        var nt = new NewTree { BaseTree = latestCommit.Tree.Sha };
+
+        foreach (var file in request.Files)
+        {
+            // Create blob
+            var blob = new NewBlob { Encoding = file.IsImage ? EncodingType.Base64 : EncodingType.Utf8, Content = (file.Content) };
+            var blobRef = await _client.Git.Blob.Create(owner, repoName, blob);
+
+            nt.Tree.Add(new NewTreeItem { Path = file.Path, Mode = file.Mode, Type = file.FileType == FileType.File ? TreeType.Blob : TreeType.Tree, Sha = blobRef.Sha });
+        }
+
+        var newTree = await _client.Git.Tree.Create(owner, repoName, nt);
+
+        // Create Commit
+        NewCommit newCommit = new(request.Message, newTree.Sha, masterReference.Object.Sha);
+        var commit = await _client.Git.Commit.Create(owner, repoName, newCommit);
+
+        // Update HEAD with the commit
+        await _client.Git.Reference.Update(owner, repoName, headMasterRef, new ReferenceUpdate(commit.Sha));
 
         return ValidationResponse.Success();
     }
@@ -298,38 +318,49 @@ public class GithubService : IGithubService
             if (item.Type == TreeType.Tree)
             {
                 var items = BuildGitTreeRecursive(tree[(i+1)..tree.Length], item);
-                var leaf = new GitTreeItem(item.Path, item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value), items);
+                var leaf = new GitTreeItem(item.Path, item.Sha, item.Mode, FileExtensionHelpers.GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value), items);
                 gitTree.Add(leaf);
                 var leafCount = GetLeafs(leaf).Count();
                 i += leafCount;
             }
             else if (item.Type == TreeType.Blob)
             {
-                gitTree.Add(new GitTreeItem(item.Path, item.Sha, item.Mode, GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value)));
+                gitTree.Add(new GitTreeItem(item.Path, item.Sha, item.Mode, FileExtensionHelpers.GetFileExtensionFromPath(item.Path), ConvertTreeType(item.Type.Value)));
             }
         }
 
         return gitTree;
     }
 
+    public async Task<ValidationResponse> CopyRepoAsync(string clonedRepoName, string newRepoName, string path = ".")
+    {
+        try
+        {
+            using PowerShell powershell = PowerShell.Create();
+            User user = await _client.User.Current();
+
+            string templateRepoUrl = $"https://github.com/{user.Login}/{clonedRepoName}-template.git";
+            string newRepoUrl = $"https://github.com/{user.Login}/{newRepoName}.git";
+
+            powershell.AddScript($"cd .");
+            powershell.AddScript(@$"git clone --bare {templateRepoUrl}");
+            powershell.AddScript($"cd {clonedRepoName}");
+            powershell.AddScript(@$"git push --mirror {newRepoUrl}");
+            powershell.AddScript($"cd ..");
+            powershell.AddScript($"rm -rf {clonedRepoName}");
+
+            PSDataCollection<PSObject> results = await powershell.InvokeAsync();
+
+            return ValidationResponse.Success();
+        }
+        catch (Exception ex)
+        {
+            return ValidationResponse.Failure(ex);
+        }
+    }
+
 
     #region Private Methods
-
-    private FileExtension GetFileExtensionFromPath(string path)
-    {
-        var extension = Path.GetExtension(path);
-        return extension switch
-        {
-            ".pdf" => FileExtension.PDF,
-            ".png" => FileExtension.PNG,
-            ".jpg" => FileExtension.JPG,
-            ".jpeg" => FileExtension.JPEG,
-            ".cs" => FileExtension.CSharp,
-            ".mp3" => FileExtension.MP3,
-            ".json" => FileExtension.Json,
-            _ => FileExtension.Text
-        };
-    }
 
     private IEnumerable<GitTreeItem> GetLeafs(GitTreeItem source)
     {

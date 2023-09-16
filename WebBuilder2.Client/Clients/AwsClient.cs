@@ -16,6 +16,19 @@ public class AwsClient : IAwsClient
         _httpClient = httpClient;
     }
 
+    public async Task<Bucket?> GetSingleBucketAsync(string name)
+    {
+        HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}aws/bucket/{name}");
+        if (!response.IsSuccessStatusCode)
+        {
+            // Handle error
+        }
+
+        var message = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<Bucket>(message);
+        return result;
+    }
+
     public async Task<IEnumerable<Bucket>?> GetBucketsAsync()
     {
         HttpResponseMessage response = await _httpClient.GetAsync($"{_httpClient.BaseAddress}aws/buckets");
