@@ -1,0 +1,42 @@
+﻿@page "/repository/{Id:long}"
+@using Microsoft.AspNetCore.Components.Forms;
+
+@if(_repo != null)
+{
+    <ErrorContainer Errors="@_errors" />
+    <MudText>@_repo.Name</MudText>
+    <MudFileUpload T="IBrowserFile" FilesChanged="OnUploadFileBtnClicked">
+        <ButtonTemplate>
+            <MudButton HtmlTag="label"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                       for="@context">
+                Upload Files
+            </MudButton>
+        </ButtonTemplate>
+    </MudFileUpload>
+    <div class="rd-content">
+        <MudTreeView Items="@_repoTree" T="GitTreeItem" SelectedValueChanged="@OnSelectedFileChanged" Hover="true" ExpandOnClick="true">
+            <ItemTemplate>
+                @if(context.Type == GitTreeType.Tree)
+                {
+                    <MudTreeViewItem @bind-Expanded="@context.IsExpanded"
+                             Items="@context.Items?.ToHashSet()"
+                             Value="@context"
+                             Icon="@GetIcon(context)"
+                             Text="@context.Path.Split('/').Last()" />
+                }
+                else
+                {
+                    <MudTreeViewItem Value="@context" Icon="@GetIcon(context)" Text="@context.Path.Split('/').Last()" />
+                }
+            </ItemTemplate>
+        </MudTreeView>
+        <CodeEditor @ref="@_codeEditor" />
+    </div>
+}
+else
+{
+    <MudText>Loading...</MudText>
+}

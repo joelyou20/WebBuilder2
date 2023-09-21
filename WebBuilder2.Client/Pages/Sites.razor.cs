@@ -10,6 +10,7 @@ namespace WebBuilder2.Client.Pages;
 
 public partial class Sites
 {
+    [Inject] public IAwsService AwsService { get; set; } = default!;
     [Inject] public ISiteService SiteService { get; set; } = default!; // Eventually all calls will go through manager
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
     [Inject] public ISiteManager SiteManager { get; set; } = default!;
@@ -17,35 +18,31 @@ public partial class Sites
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
     private List<SiteModel> _siteList = new();
+    private List<Domain> _registeredDomains = new();
+    private List<ApiError> _errors = new();
 
     protected override async Task OnInitializedAsync()
     {
+        await UpdateDomainsAsync();
         await UpdateSitesAsync();
     }
 
-    public void OnCreateSiteBtnClicked() => InvokeAsync(async () =>
+    private async Task UpdateDomainsAsync()
     {
-        DialogOptions options = new()
+        var response = await AwsService.GetRegisteredDomainsAsync();
+
+        if(!response.IsSuccessful)
         {
-            CloseOnEscapeKey = true,
-            CloseButton = true,
-            Position = DialogPosition.Center,
-            
-        };
+            _errors.AddRange(response.Errors);
+            StateHasChanged();
+        }
 
-        var dialog = await DialogService.ShowAsync<CreateSiteDialog>(
-            title: "Create New Site",
-            options: options
-        );
-
-        await dialog.Result;
-
-        await UpdateSitesAsync();
-    });
+        _registeredDomains = response.GetValues();
+    }
 
     private async Task UpdateSitesAsync()
     {
-        var sites = await SiteService.GetSitesAsync(_siteList.Select(x => x.Id));
+        var sites = await SiteService.GetSitesAsync(new Dictionary<string, string> { { nameof(SiteModel.Id).ToLower(), string.Join(",", _siteList.Select(x => x.Id)) } });
 
         if (sites == null) return;
 
@@ -61,6 +58,32 @@ public partial class Sites
         StateHasChanged();
     }
 
+    public void OnCreateSiteBtnClicked() => InvokeAsync(async () =>
+    {
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center,
+            FullWidth = true,
+        };
+
+        DialogParameters dialogParameters = new()
+        {
+            { "RegisteredDomains", _registeredDomains }
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateSiteDialog>(
+            title: "Create New Site",
+            options: options,
+            parameters: dialogParameters
+        );
+
+        await dialog.Result;
+
+        await UpdateSitesAsync();
+    });
+
     public void OnAddExistingSiteBtnClicked() => InvokeAsync(async () =>
     {
         DialogOptions options = new()
@@ -75,6 +98,21 @@ public partial class Sites
             options: options
         );
     });
+
+    public async Task OnGetSuggestedDomainNamesClicked()
+    {
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center
+        };
+
+        await DialogService.ShowAsync<GetDomainNameSuggestionsDialog>(
+            title: "Get Domain Name Suggestion",
+            options: options
+        );
+    }
 
     public void OnSiteTableValueChanged() => InvokeAsync(UpdateSitesAsync);
 }

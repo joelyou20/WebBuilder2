@@ -20,13 +20,13 @@ public class ScriptController : ControllerBase
     }
 
     [HttpGet("/script/{id?}")]
-    public IActionResult Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
+    public IActionResult Get([FromQuery] long? id, [FromQuery] string? name, [FromQuery] IEnumerable<long>? exclude = null)
     {
         try
         {
-            var result = _scriptRepository.Get(exclude);
+            IQueryable<ScriptModel>? result = _scriptRepository.Get(exclude);
             if (id != null) result = result?.Where(x => x.Id == id);
-
+            if (name != null) result = result?.Where(x => x.Name.Equals(name));
 
             if (result == null) throw new Exception(id == null ?
                 "Failed to get script data from database." :

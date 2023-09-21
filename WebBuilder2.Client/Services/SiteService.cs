@@ -19,9 +19,9 @@ namespace WebBuilder2.Client.Services
             _siteClient = siteClient;
         }
 
-        public async Task<List<SiteModel>> GetSitesAsync(IEnumerable<long>? exclude = null)
+        public async Task<List<SiteModel>> GetSitesAsync(Dictionary<string, string>? filter = null)
         {
-            ValidationResponse<SiteModel> response = await _siteClient.GetSitesAsync(exclude);
+            ValidationResponse<SiteModel> response = await _siteClient.GetSitesAsync(filter);
 
             if (response == null || !response.IsSuccessful)
             {

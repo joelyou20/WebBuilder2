@@ -12,6 +12,8 @@ public class SiteModel : AuditableEntity
     public long Id { get; set; }
     [JsonProperty("name")]
     public string Name { get; set; } = "";
+    [JsonProperty("description")]
+    public string Description { get; set; } = "";
     public RepositoryModel? Repository { get; set; }
 
     public SiteModel() { }

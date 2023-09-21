@@ -15,13 +15,15 @@ namespace Webbuilder2.Server.Tests.Services;
 public class GithubServiceTest
 {
     private Mock<IGitHubClient> _githubClientMock;
+    private Mock<IAwsSecretsManagerService> _awsSecretsManagerServiceMock;
     private GithubService _githubService;
 
     [SetUp]
     public void Setup()
     {
         _githubClientMock = new Mock<IGitHubClient>();
-        _githubService = new GithubService(_githubClientMock.Object);
+        _awsSecretsManagerServiceMock = new Mock<IAwsSecretsManagerService>();
+        _githubService = new GithubService(_githubClientMock.Object, _awsSecretsManagerServiceMock.Object);
     }
 
     [TearDown] 

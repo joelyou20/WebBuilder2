@@ -3,6 +3,7 @@
 <MudCard>
     <MudButton Variant="@Variant.Filled" OnClick="@(() => _gitHubWidgetEnabled = !_gitHubWidgetEnabled)"><MudIcon Size="@Size.Large" Icon="@Icons.Custom.Brands.GitHub" /></MudButton>
     <MudButton Variant="@Variant.Filled" OnClick="@(() => _sitesWidgetEnabled = !_sitesWidgetEnabled)"><MudIcon Size="@Size.Large" Icon="@Icons.Custom.Brands.Chrome" /></MudButton>
+    <MudButton Variant="@Variant.Filled" OnClick="@(() => _scriptsWidgetEnabled = !_scriptsWidgetEnabled)"><MudIcon Size="@Size.Large" Icon="@Icons.Material.Filled.Code" /></MudButton>
 </MudCard>
 
 <div class="index-widget-container">
@@ -13,5 +14,9 @@
     @if (_sitesWidgetEnabled)
     {
         <SitesWidget />
+    }
+    @if (_scriptsWidgetEnabled)
+    {
+        <ScriptsWidget />
     }
 </div>

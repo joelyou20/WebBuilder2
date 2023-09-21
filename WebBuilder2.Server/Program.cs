@@ -25,8 +25,10 @@ builder.Services.AddScoped<AppDbContextFactory>();
 builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContextFactory>().CreateDbContext(Array.Empty<string>()));
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
+builder.Services.AddScoped<IAwsRoute53DomainsService, AwsRoute53DomainsService>();
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>();
+builder.Services.AddScoped<IAwsAmplifyService, AwsAmplifyService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 
 builder.Services.AddScoped<ISiteRepository, SiteRepository>();
@@ -36,7 +38,9 @@ builder.Services.AddScoped<IScriptRepository, ScriptRepository>();
 builder.Services.AddAwsSecretsManagerClient();
 builder.Services.AddAwsS3Client();
 builder.Services.AddAwsRoute53Client();
+builder.Services.AddAwsRoute53DomainsClient();
 builder.Services.AddAwsCostExplorerClient();
+builder.Services.AddAwsAmplifyClient();
 builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 
 var app = builder.Build();

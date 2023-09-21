@@ -7,4 +7,5 @@ public partial class Index
 {
     private bool _gitHubWidgetEnabled = true;
     private bool _sitesWidgetEnabled = true;
+    private bool _scriptsWidgetEnabled = true;
 }

@@ -33,7 +33,7 @@
         }
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Id">@context.ExternalId</MudTd>
+        <MudTd DataLabel="Id"><MudLink Href="@($"/repository/{context.Id}")">@context.ExternalId</MudLink></MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         @if(context.Site != null)
         {
@@ -45,7 +45,7 @@
         }
         <MudTd DataLabel="RepoName">@context.RepoName</MudTd>
         <MudTd DataLabel="Description">@context.Description</MudTd>
-        <MudTd DataLabel="HtmlUrl"><MudLink Href="@context.HtmlUrl">@context.HtmlUrl</MudLink></MudTd>
+        <MudTd DataLabel="HtmlUrl"><MudLink Href="@context.HtmlUrl" Target="_blank">@context.HtmlUrl</MudLink></MudTd>
         <MudTd DataLabel="GitUrl">@context.GitUrl</MudTd>
         <MudTd DataLabel="IsPrivate"><BooleanIcon Value="@context.IsPrivate" /></MudTd>
         <MudTd DataLabel="Visibility">@context.Visibility</MudTd>

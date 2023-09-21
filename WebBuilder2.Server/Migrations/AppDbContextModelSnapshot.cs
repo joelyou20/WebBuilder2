@@ -155,6 +155,10 @@ namespace WebBuilder2.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Syntax")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Script");
@@ -173,6 +177,10 @@ namespace WebBuilder2.Server.Migrations
 
                     b.Property<DateTime?>("DeletedDateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDateTime")
                         .HasColumnType("datetime2");

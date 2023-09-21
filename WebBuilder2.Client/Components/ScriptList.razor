@@ -1,4 +1,5 @@
 ﻿@using Blace.Components
+@using Blace.Editing;
 @using Microsoft.AspNetCore.Components.Forms
 @using WebBuilder2.Client.Models;
 
@@ -10,15 +11,22 @@
 
             <MudListItem>
                 <MudCard class="expanded" id="@($"script-{index}")">
-                    <div class="sl-top-row">
-                        <MudText>@script.Name</MudText>
-                        <MudButton class="sl-expand-btn" StartIcon="@Icons.Material.Filled.Expand" OnClick="@(() => OnExpandBtnClick(index))"></MudButton>
-                    </div>
-                    <CodeEditor Value="@script.Data" FileChanged="@((file) => OnFileChanged(file, script))" />
-                        <div class="sl-btn-row">
-                            <MudButton Variant="Variant.Filled" OnClick="@(() => OnSaveFileClick(script))">Save</MudButton>
-                            <MudButton Variant="Variant.Filled" OnClick="@(() => OnDeleteFileClick(script))">Delete</MudButton>
+                    <div class="sl-card-content">
+                        <div class="sl-top-row">
+                            <MudText>@script.Name</MudText>
+                            <MudText>@(script.Syntax.ToString())</MudText>
+                            <MudButton class="sl-expand-btn" StartIcon="@Icons.Material.Filled.Fullscreen" OnClick="@(() => OnFullscreenBtnClick(script))"></MudButton>
+                            @*<MudButton class="sl-expand-btn" StartIcon="@Icons.Material.Filled.Expand" OnClick="@(() => OnExpandBtnClick(index))"></MudButton>*@
                         </div>
+                        @if(ShowEditor)
+                        {
+                            <CodeEditor MinLines="@MinLines" MaxLines="@MaxLines" Syntax="@(ConvertSyntax(script.Syntax) ?? Syntax.Text)" Value="@script.Data" FileChanged="@((file) => OnFileChanged(file, script))" />
+                            <div class="sl-btn-row">
+                                <MudButton Variant="Variant.Filled" OnClick="@(() => OnSaveFileClick(script))">Save</MudButton>
+                                <MudButton Variant="Variant.Filled" OnClick="@(() => OnDeleteFileClick(script))">Delete</MudButton>
+                            </div>
+                        }
+                    </div>
                 </MudCard>
             </MudListItem>
         }

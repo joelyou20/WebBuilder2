@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+
+<MudDialog>
+    <DialogContent>
+        <ErrorContainer Errors="@_errors" />
+        <EditForm Model="@_secret" OnValidSubmit="@OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudSelect T="string" Label="Repository" Value="@_selectedRepo" Clearable="false" AnchorOrigin="Origin.BottomCenter" Required="true" ValueChanged="OnRepoSelected">
+                @foreach (string repoName in RepositoryNames)
+                {
+                    <MudSelectItem Value="@repoName" />
+                }
+            </MudSelect>
+            <MudTextField Label="Secret Name" T="string" @bind-Value="@_secret.Name" Required="true" For="@(() => _secret.Name)"></MudTextField>
+            <MudTextField Label="Secret Value" T="string" @bind-Value="@_secret.Value" Lines="5" Required="true" For="@(() => _secret.Value)"></MudTextField>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Create</MudButton>
+        </EditForm>
+    </DialogContent>
+</MudDialog>

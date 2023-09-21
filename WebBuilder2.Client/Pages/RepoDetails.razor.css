@@ -1,0 +1,14 @@
+﻿div {
+    height: 100%;
+}
+
+.rd-content {
+    display: grid;
+    grid-template-columns: 20% auto;
+}
+
+::deep .mud-treeview-item-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

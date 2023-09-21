@@ -14,11 +14,17 @@ public class ApiError
     public string Resource { get; set; } = string.Empty;
     public string Field { get; set; } = string.Empty; 
     public Exception? Exception { get; set; }
+    public ApiErrorSeverity? Severity { get; set; }
 
     public ApiError() { }
 
     public ApiError(string message)
     {
         Message = message;
+    }
+    public ApiError(string message, ApiErrorSeverity severity)
+    {
+        Message = message;
+        Severity = severity;
     }
 }

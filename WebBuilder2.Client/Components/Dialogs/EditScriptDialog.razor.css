@@ -1,0 +1,7 @@
+﻿div {
+    max-height: 90vh;
+}
+
+::deep  .editor_container {
+    height: 90vh;
+}

@@ -1,0 +1,18 @@
+﻿<ErrorContainer Errors="@_errors" />
+<MudTextField Placeholder="Domain Name (example.com)" @bind-Value="@_text">Enter text</MudTextField>
+@if (_loading)
+{
+    <MudProgressLinear Indeterminate="true" />
+}
+else
+{
+    <div class="gdns-list">
+        <MudRadioGroup T="DomainInquiry" SelectedOptionChanged="@OnSelectedOptionChanged">
+            @foreach (DomainInquiry domain in _domains)
+            {
+                <MudRadio Option="@domain">@($"{domain.Name}, {domain.Price.Currency}{domain.Price.Price}")</MudRadio>
+            }
+        </MudRadioGroup>
+    </div>
+}
+<MudButton Disabled="@(_text.Equals(string.Empty))" Variant="Variant.Filled" OnClick="@OnGetSuggestionsButtonClick">Get Suggestions</MudButton>

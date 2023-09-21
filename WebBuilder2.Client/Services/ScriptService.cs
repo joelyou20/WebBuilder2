@@ -14,9 +14,9 @@ public class ScriptService : IScriptService
         _scriptClient = scriptClient;
     }
 
-    public async Task<List<ScriptModel>> GetScriptsAsync(IEnumerable<long>? exclude = null)
+    public async Task<List<ScriptModel>> GetScriptsAsync(Dictionary<string, string>? filter = null)
     {
-        ValidationResponse<ScriptModel> response = await _scriptClient.GetScriptsAsync(exclude);
+        ValidationResponse<ScriptModel> response = await _scriptClient.GetScriptsAsync(filter);
 
         if (response == null || !response.IsSuccessful)
         {
@@ -26,9 +26,23 @@ public class ScriptService : IScriptService
         return response.GetValues();
     }
 
-    public async Task<ScriptModel?> GetSingleScriptAsync(long id)
+    public async Task<ScriptModel?> GetScriptByIdAsync(long id)
     {
-        ValidationResponse<ScriptModel>? response = await _scriptClient.GetSingleScriptAsync(id);
+        ValidationResponse<ScriptModel>? response = await _scriptClient.GetScriptByIdAsync(id);
+
+        if (response == null) return null;
+
+        if (!response.IsSuccessful)
+        {
+            throw new Exception(response?.Message ?? "Failed to get script Data");
+        }
+
+        return response.GetValues().SingleOrDefault();
+    }
+
+    public async Task<ScriptModel?> GetScriptByNameAsync(string name)
+    {
+        ValidationResponse<ScriptModel>? response = await _scriptClient.GetScriptsAsync(new Dictionary<string, string> { { nameof(name), name } });
 
         if (response == null) return null;
 

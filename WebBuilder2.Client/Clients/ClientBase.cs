@@ -24,13 +24,14 @@ public class ClientBase<T> where T : AuditableEntity
     public async Task<ValidationResponse<T>> UpdateAsync(T value) => await UpdateRangeAsync(new T[] { value });
     public async Task<ValidationResponse<T>> UpdateRangeAsync(IEnumerable<T> values) => await PostAsync("update", JsonContent.Create(values));
 
-    public async Task<ValidationResponse<T>> GetAsync(IEnumerable<long>? exclude = null, string? path = null)
+    public async Task<ValidationResponse<T>> GetAsync(string? path = null, Dictionary<string, string>? filter = null)
     {
-        if (exclude != null && exclude.Any()) path = $"{path}?{exclude?.ToString()}";
+        var url = $"{_httpClient.BaseAddress}{_endpoint}";
+        if (path != null) url = $"{url}/{path}";
+        if (filter != null) url = $"{url}?{string.Join('&', filter.Select(kv => $"{kv.Key}={kv.Value}"))}";
 
-        HttpResponseMessage response = await _httpClient.GetAsync(path == null ?
-            $"{_httpClient.BaseAddress}{_endpoint}" :
-            $"{_httpClient.BaseAddress}{_endpoint}/{path}");
+        HttpResponseMessage response = await _httpClient.GetAsync(url);
+
         response.EnsureSuccessStatusCode();
 
         return await ParseResponseAsync(response);
