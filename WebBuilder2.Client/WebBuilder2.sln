@@ -11,14 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBuilder2.Shared", "..\We
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webbuilder2.Server.Tests", "..\Webbuilder2.Server.Tests\Webbuilder2.Server.Tests.csproj", "{4E06CD05-5771-462D-ABC5-7D013273E05F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{E3B8C64B-4EE8-4749-8C6F-E922E009E10C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBuilder2.Templates.BlazorWebAssembly.Client", "..\WebBuilder2.Templates.BlazorWebAssembly.Client\WebBuilder2.Templates.BlazorWebAssembly.Client.csproj", "{1B8E6B2F-4737-4B93-8AC3-6F1A3F95FC22}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebBuilder.Templates.BlazorWebAssembly", "WebBuilder.Templates.BlazorWebAssembly", "{683544BE-F616-4285-B008-DB5AFBD880CC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBuilder2.Templates.BlazorWebAssembly.Server", "..\WebBuilder2.Templates.BlazorWebAssembly.Server\WebBuilder2.Templates.BlazorWebAssembly.Server.csproj", "{708A30A6-8830-4EA4-B36A-358BB8799481}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,22 +33,9 @@ Global
 		{4E06CD05-5771-462D-ABC5-7D013273E05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E06CD05-5771-462D-ABC5-7D013273E05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E06CD05-5771-462D-ABC5-7D013273E05F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1B8E6B2F-4737-4B93-8AC3-6F1A3F95FC22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1B8E6B2F-4737-4B93-8AC3-6F1A3F95FC22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1B8E6B2F-4737-4B93-8AC3-6F1A3F95FC22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1B8E6B2F-4737-4B93-8AC3-6F1A3F95FC22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{708A30A6-8830-4EA4-B36A-358BB8799481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{708A30A6-8830-4EA4-B36A-358BB8799481}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{708A30A6-8830-4EA4-B36A-358BB8799481}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{708A30A6-8830-4EA4-B36A-358BB8799481}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{1B8E6B2F-4737-4B93-8AC3-6F1A3F95FC22} = {683544BE-F616-4285-B008-DB5AFBD880CC}
-		{683544BE-F616-4285-B008-DB5AFBD880CC} = {E3B8C64B-4EE8-4749-8C6F-E922E009E10C}
-		{708A30A6-8830-4EA4-B36A-358BB8799481} = {683544BE-F616-4285-B008-DB5AFBD880CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B4B2A543-2EC8-4150-BECB-044DA9D8A1AE}
