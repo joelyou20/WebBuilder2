@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using WebBuilder2.Client.Managers.Contracts;
+using WebBuilder2.Client.Models;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
@@ -18,6 +21,7 @@ public partial class CreateSiteDialog
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private CreateSiteRequest _createSiteRequest = new();
+    private ObservableCollection<Job> _jobList = new(); 
 
     private readonly Func<RepositoryModel, string> _templateSelectConverter = t => t.Name;
     private readonly Func<ProjectTemplateType, string> _projectTemplateSelectConverter = p => p.ToString();
@@ -30,7 +34,14 @@ public partial class CreateSiteDialog
 
     protected async override Task OnInitializedAsync()
     {
+        _jobList = SiteManager.BuildCreateSiteJobList();
+        _jobList.CollectionChanged += _jobList_CollectionChanged;
         _templateRepositories = (await RepositoryService.GetRepositoriesAsync()).Where(x => x.IsTemplate).ToList();
+    }
+
+    private void _jobList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        StateHasChanged();
     }
 
     public void OnTemplateSelected(RepositoryModel? templateRepository = null)
@@ -63,7 +74,7 @@ public partial class CreateSiteDialog
 
     public void OnValidSubmit() => InvokeAsync(async () =>
     {
-        var createSiteResponse = await SiteManager.CreateSiteAsync(_createSiteRequest);
+        var createSiteResponse = await SiteManager.CreateSiteAsync(_createSiteRequest, _jobList);
 
         if (!createSiteResponse.IsSuccessful)
         {
@@ -72,6 +83,6 @@ public partial class CreateSiteDialog
             return;
         }
 
-        MudDialog.Close(DialogResult.Ok(true));
+        //MudDialog.Close(DialogResult.Ok(true));
     });
 }

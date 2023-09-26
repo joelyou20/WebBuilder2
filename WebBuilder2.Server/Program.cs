@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Octokit;
+using Serilog;
 using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
@@ -62,6 +63,9 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     });
 }
+
+app.UseSerilogIngestion();
+//app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 

@@ -10,5 +10,5 @@ public interface IRepositoryManager
     Task<ValidationResponse<GithubSecret>> AddSecretsAsync(RepositoryModel repo);
     Task<ValidationResponse> CreateCommitAsync(IBrowserFile file, RepositoryModel repo);
     Task<ValidationResponse> CreateCommitAsync(string content, string fileName, RepositoryModel repo);
-    Task<ValidationResponse> CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel);
+    Task<ValidationResponse?> CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel);
 }

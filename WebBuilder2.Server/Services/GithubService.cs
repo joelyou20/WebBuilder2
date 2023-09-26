@@ -332,6 +332,8 @@ public class GithubService : IGithubService
         return gitTree;
     }
 
+    // OctoKit has not implemented functionality for copying the contents of one repo into another, so I am handling
+    //  that by using commands
     public async Task<ValidationResponse> CopyRepoAsync(string clonedRepoName, string newRepoName, string path = ".")
     {
         try
@@ -342,11 +344,11 @@ public class GithubService : IGithubService
             string templateRepoUrl = $"https://github.com/{user.Login}/{clonedRepoName}-template.git";
             string newRepoUrl = $"https://github.com/{user.Login}/{newRepoName}.git";
 
-            powershell.AddScript($"cd .");
+            powershell.AddScript($"cd ~");
             powershell.AddScript(@$"git clone --bare {templateRepoUrl}");
             powershell.AddScript($"cd {clonedRepoName}");
             powershell.AddScript(@$"git push --mirror {newRepoUrl}");
-            powershell.AddScript($"cd ..");
+            powershell.AddScript($"cd ~");
             powershell.AddScript($"rm -rf {clonedRepoName}");
 
             PSDataCollection<PSObject> results = await powershell.InvokeAsync();

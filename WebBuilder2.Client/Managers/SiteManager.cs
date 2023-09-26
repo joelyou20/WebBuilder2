@@ -1,4 +1,6 @@
-﻿using WebBuilder2.Client.Managers.Contracts;
+﻿using System.Collections.ObjectModel;
+using WebBuilder2.Client.Managers.Contracts;
+using WebBuilder2.Client.Models;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Client.Utils;
@@ -25,11 +27,71 @@ public class SiteManager : ISiteManager
         _logger = logger;
     }
 
-    public async Task<ValidationResponse> CreateSiteAsync(CreateSiteRequest createSiteRequest)
+    public ObservableCollection<Job> BuildCreateSiteJobList()
     {
+        return new ObservableCollection<Job>
+        {
+            new Job
+            {
+                Name = "Create Site"
+            },
+            new Job
+            {
+                Name = "Register Domain"
+            },
+            new Job
+            {
+                Name = "Create Buckets"
+            },
+            new Job
+            {
+                Name = "Configure AWS Logging"
+            },
+            new Job
+            {
+                Name = "Create Repository"
+            },
+            new Job
+            {
+                Name = "Add Repository Secrets"
+            },
+            new Job
+            {
+                Name = "Scaffold Repository"
+            },
+            new Job
+            {
+                Name = "Allow Public Access"
+            },
+            new Job
+            {
+                Name = "Add Bucket Policy"
+            },
+        };
+    }
+
+    public async Task<ValidationResponse> CreateSiteAsync(CreateSiteRequest createSiteRequest, ObservableCollection<Job> jobList)
+    {
+        int index = 0;
+
+        void JobComplete(JobStatus jobStatus)
+        {
+            jobList[index] = new Job
+            {
+                Name = jobList[index].Name,
+                Status = jobStatus
+            };
+            if (jobStatus != JobStatus.Success || jobList.Count - 1 == index) return;
+            jobList[index + 1] = new Job
+            {
+                Name = jobList[index + 1].Name,
+                Status = JobStatus.Pending
+            };
+            index++;
+        }
+
         try
         {
-
             _logger.LogInformation("Running site creation");
             var domainBucket = createSiteRequest.Buckets[BucketType.Domain];
             var subDomainBucket = createSiteRequest.Buckets[BucketType.Subdomain];
@@ -37,6 +99,8 @@ public class SiteManager : ISiteManager
 
             // Add Site
             _logger.LogInformation("Creating Site...");
+            jobList[index].Status = JobStatus.Pending;
+
             SiteModel? site = await _siteService.AddSiteAsync(new()
             {
                 Name = createSiteRequest.Name,
@@ -44,13 +108,19 @@ public class SiteManager : ISiteManager
             });
             _logger.LogInformation("Site Created!");
 
-            if (site == null) return ValidationResponse.Failure($"Failed to create site. Site value = {site}");
+            if (site == null)
+            {
+                JobComplete(JobStatus.Failure);
+                return ValidationResponse.Failure($"Failed to create site. Site value = {site}");
+            }
+            JobComplete(JobStatus.Success);
 
             var repo = createSiteRequest.TemplateRepository;
 
             // Register domain
             //_ = await _awsService.PostRegisterDomainAsync(createSiteRequest.Domain.Name) ?? 
             //    throw new Exception($"Failed to register domain {createSiteRequest.Domain.Name}");
+            JobComplete(JobStatus.Success);
 
             // Create AWS Buckets
             _logger.LogInformation("Creating Buckets...");
@@ -61,6 +131,7 @@ public class SiteManager : ISiteManager
             //var createBucketsResponse = await _awsService.CreateBucketsAsync(new AwsCreateBucketRequest { Buckets = createSiteRequest.Buckets.Values });
             //if (!createBucketsResponse.IsSuccessful) return createBucketsResponse;
 
+            JobComplete(JobStatus.Success);
             _logger.LogInformation("Buckets Created!");
 
             // Configure AWS logging
@@ -73,31 +144,48 @@ public class SiteManager : ISiteManager
             //});
             //if (!configureLoggingResponse.IsSuccessful) return configureLoggingResponse;
 
+            JobComplete(JobStatus.Success);
             //_logger.LogInformation("Logging Configured!");
 
             // Create repo
             _logger.LogInformation("Creating Repository...");
             _logger.LogInformation("Repository: {0}", $"{site.Name}-repo");
             ValidationResponse<RepositoryModel> createRepoResponse = await _repositoryManager.CreateRepositoryAsync(repo, site);
-            if (!createRepoResponse.HasValues || createRepoResponse.Values?.Single().Site == null) return createRepoResponse.GetResponse();
+            if (!createRepoResponse.HasValues || createRepoResponse.Values?.Single().Site == null)
+            {
+                JobComplete(JobStatus.Failure);
+                return createRepoResponse.GetResponse();
+            }
 
+            JobComplete(JobStatus.Success);
             _logger.LogInformation("Repository Created!");
 
             // Add secret variables to repo
             _logger.LogInformation("Adding secrets to repository...");
             var addSecretsResponse = await _repositoryManager.AddSecretsAsync(repo);
-            if (!addSecretsResponse.IsSuccessful) return addSecretsResponse.GetResponse();
+            if (!addSecretsResponse.IsSuccessful)
+            {
+                JobComplete(JobStatus.Failure);
+                return addSecretsResponse.GetResponse();
+            }
 
+            JobComplete(JobStatus.Success);
             _logger.LogInformation("Secrets Added!");
 
-            // Add default index.html
+            // Scaffold Repository
             var addTemplateProjectResponse = await AddTemplateProjectToRepoAsync(createSiteRequest.ProjectTemplateType, createRepoResponse.Values);
 
-            if (!addTemplateProjectResponse.IsSuccessful) return addTemplateProjectResponse;
+            if (!addTemplateProjectResponse.IsSuccessful)
+            {
+                JobComplete(JobStatus.Failure);
+                return addTemplateProjectResponse;
+            }
+            JobComplete(JobStatus.Success);
 
             // Allow public access to site
             //var configurePublicAccessBlockResponse = await _awsService.PostConfigurePublicAccessBlockAsync(new AwsPublicAccessBlockRequest { Bucket = domainBucket, BlockPublicAcls = false });
             //if (!configurePublicAccessBlockResponse.IsSuccessful) return configurePublicAccessBlockResponse;
+            JobComplete(JobStatus.Success);
 
             // Add Bucket Policy
             //_logger.LogInformation("Add Bucket Policy...");
@@ -110,6 +198,7 @@ public class SiteManager : ISiteManager
             //var addBucketPolicyResponse = await _awsService.PostBucketPolicyAsync(new AwsAddBucketPolicyRequest { Bucket = domainBucket, Policy = bucketPolicyScript.Data });
             //if (!addBucketPolicyResponse.IsSuccessful) return addBucketPolicyResponse!;
 
+            JobComplete(JobStatus.Success);
             //_logger.LogInformation("Policy Added!");
 
             return ValidationResponse.Success();

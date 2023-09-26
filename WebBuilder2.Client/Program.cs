@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
+using Serilog;
+using Serilog.Core;
+using Serilog.Extensions.Logging;
 using System.Net;
 using System.Net.Http.Headers;
 using WebBuilder2.Client;
@@ -23,8 +26,18 @@ WebAssemblyHostConfiguration configuration = builder.Configuration;
 
 Settings settings = configuration.GetSection("Settings").Get<Settings>()!;
 
-builder.Logging.SetMinimumLevel(LogLevel.Warning);
-builder.Services.AddLogging();
+var levelSwitch = new LoggingLevelSwitch();
+string logTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}]  {Message,-120:j}     {NewLine}{Exception}";
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.ControlledBy(levelSwitch)
+    .Enrich.WithProperty("InstanceId", Guid.NewGuid().ToString("n"))
+    //.WriteTo.BrowserHttp(endpointUrl: builder.HostEnvironment.BaseAddress + "ingest", controlLevelSwitch: levelSwitch)
+    .WriteTo.BrowserConsole(outputTemplate: logTemplate)
+    .CreateLogger();
+
+/* this is used instead of .UseSerilog to add Serilog to providers */
+builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
 // CLIENTS ==========================>
 
