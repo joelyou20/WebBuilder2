@@ -79,9 +79,10 @@
                 <MudCard>
                     @foreach(var job in _jobList)
                     {
-                        <div>
-                            @($"{job.Name}: {job.Status}")
+                        <div class="csd-job-line">
+                            <MudText>@($"{_jobList.IndexOf(job) + 1}: {job.Name}")</MudText><MudText Color="GetStatusColor(job.Status)">@job.Status</MudText>
                         </div>
+                        <MudDivider />
                     }
                 </MudCard>
             </div>

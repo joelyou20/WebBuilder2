@@ -85,4 +85,12 @@ public partial class CreateSiteDialog
 
         //MudDialog.Close(DialogResult.Ok(true));
     });
+
+    public Color GetStatusColor(JobStatus status) => status switch
+    {
+        JobStatus.Success => Color.Success,
+        JobStatus.Failure => Color.Warning,
+        JobStatus.Pending => Color.Info,
+        _ => Color.Default,
+    };
 }
