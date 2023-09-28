@@ -9,5 +9,5 @@ namespace WebBuilder2.Shared.Models;
 public enum ProjectTemplateType
 {
     Default,
-    BlazorWebAssembly
+    Blazor
 }

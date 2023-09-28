@@ -107,7 +107,7 @@ public class RepositoryManager : IRepositoryManager
     {
         var response = await _githubService.PostCopyRepoAsync(new GithubCopyRepoRequest
         {
-            ClonedRepoName = $"{projectTemplateType}-template",
+            ClonedRepoName = $"{projectTemplateType}-Template",
             NewRepoName = repositoryModel.Name,
             Path = null
         });

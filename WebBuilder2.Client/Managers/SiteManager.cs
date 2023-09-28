@@ -220,9 +220,9 @@ public class SiteManager : ISiteManager
                 ScriptModel? defaultIndexScript = await _scriptService.GetScriptByNameAsync("default-index");
                 if (defaultIndexScript == null) return ValidationResponse.Failure("Failed to locate default index.html script");
                 return await _repositoryManager.CreateCommitAsync(defaultIndexScript.Data, "index.html", repos.First());
-            case ProjectTemplateType.BlazorWebAssembly:
+            case ProjectTemplateType.Blazor:
                 _logger.LogInformation("Adding Blazor WebAssembly project template to repo...");
-                return await _repositoryManager.CreateTemplateRepoAsync(ProjectTemplateType.BlazorWebAssembly, repos.First());
+                return await _repositoryManager.CreateTemplateRepoAsync(ProjectTemplateType.Blazor, repos.First());
             default:
                 break;
         }
