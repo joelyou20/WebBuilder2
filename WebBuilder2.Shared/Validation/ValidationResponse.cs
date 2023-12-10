@@ -1,4 +1,5 @@
-﻿using WebBuilder2.Shared.Models;
+﻿using Newtonsoft.Json;
+using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Shared.Validation;
 
@@ -26,7 +27,10 @@ public class ValidationResponse<T> where T : class
     {
         IsSuccessful = false,
         Message = message ?? "Failure",
-        Values = values
+        Values = values,
+        Errors = new List<ApiError> { 
+            new ApiError(message)
+        }
     };
     public static ValidationResponse<T> Failure(T value, string? message = null) => Failure(new List<T>() { value }, message);
 
@@ -34,7 +38,13 @@ public class ValidationResponse<T> where T : class
     {
         IsSuccessful = false,
         Message = e.Message ?? "Failure",
-        Errors = new List<ApiError>() { new ApiError(e.Message ?? "Failure", ApiErrorSeverity.Error) }
+        Errors = new List<ApiError>() { new ApiError(
+            message: e.Message ?? "Failure", 
+            severity: ApiErrorSeverity.Error, 
+            code: "",
+            resource: e.Source ?? "",
+            field: "",
+            exception: e) }
     };
 
     public static ValidationResponse<T> CouldNotLocateEntity(IEnumerable<T>? values = null, string? message = null) => new()
@@ -63,6 +73,20 @@ public class ValidationResponse<T> where T : class
     };
 
     public static ValidationResponse<T> NotAuthenticated(T value, string? message = null) => NotAuthenticated(new List<T>() { value }, message);
+
+    public static ValidationResponse<T> ToResult(string message, JsonSerializerSettings? settings = null)
+    {
+        try
+        {
+            var result = JsonConvert.DeserializeObject<ValidationResponse<T>>(message, settings);
+
+            return result!;
+        }
+        catch
+        {
+            return ValidationResponse<T>.Failure(message: message);
+        }
+    }
 
     public List<T> GetValues() => Values?.ToList() ?? new List<T>();
 
@@ -107,7 +131,13 @@ public class ValidationResponse
     {
         IsSuccessful = false,
         Message = e.Message ?? "Failure",
-        Errors = new List<ApiError>() { new ApiError(e.Message ?? "Failure", ApiErrorSeverity.Error) }
+        Errors = new List<ApiError>() { new ApiError(
+            message: e.Message ?? "Failure",
+            severity: ApiErrorSeverity.Error,
+            code: "",
+            resource: e.Source ?? "",
+            field: "",
+            exception: e) }
     };
 
     public static ValidationResponse CouldNotLocateEntity() => new()

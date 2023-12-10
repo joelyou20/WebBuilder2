@@ -40,20 +40,14 @@ public partial class ScriptList
 
     public async Task OnSaveFileClick(ScriptModel script)
     {
-        ScriptModel? result = await ScriptService.UpdateScriptAsync(script);
-
-        if (result == null) _errors.Add(new ApiError("Failed to create script"));
-
+        await ScriptService.UpdateScriptAsync(script);
         await ScriptsChanged.InvokeAsync();
         StateHasChanged();
     }
 
     public async Task OnDeleteFileClick(ScriptModel script)
     {
-        ScriptModel? result = await ScriptService.SoftDeleteScriptAsync(script);
-
-        if (result == null) _errors.Add(new ApiError("Failed to delete script"));
-
+        await ScriptService.SoftDeleteScriptAsync(script);
         await ScriptsChanged.InvokeAsync();
         StateHasChanged();
     }

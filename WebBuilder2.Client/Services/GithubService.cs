@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Amazon.Runtime.Internal;
+using Microsoft.AspNetCore.Components;
 using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
@@ -7,73 +9,97 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services
 {
-    public class GithubService : IGithubService
+    public class GithubService : ServiceBase, IGithubService
     {
         private IGithubClient _client;
         private NavigationManager _navigationManager;
+        private IErrorObserver _errorObserver;
 
-        public GithubService(IGithubClient client, NavigationManager navigationManager)
+        public GithubService(IGithubClient client, NavigationManager navigationManager, IErrorObserver errorObserver, ILogService logService) : base(errorObserver, logService)
         {
             _client = client;
             _navigationManager = navigationManager;
+            _errorObserver = errorObserver;
         }
 
-        public async Task<ValidationResponse<string>> GetGithubUser()
+        public async Task<string?> GetGithubUser()
         {
-            return await _client.GetUserAsync();
+            IEnumerable<string>? result = await ExecuteAsync<string>(_client.GetUserAsync);
+
+            return result?.SingleOrDefault();
         }
 
-        public async Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync()
+        public async Task<List<RepositoryModel>?> GetRepositoriesAsync()
         {
-            return await _client.GetRepositoriesAsync();
+            IEnumerable<RepositoryModel>? result = await ExecuteAsync(_client.GetRepositoriesAsync);
+
+            return result?.ToList();
         }
 
-        public async Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string repoName, string? reference = null)
-        {
-            var userName = await GetLoginAsync();
-            return await _client.PostRepositoryContentAsync(userName, repoName, reference);
-        }
-
-        public async Task<ValidationResponse?> PostCopyRepoAsync(GithubCopyRepoRequest request)
-        {
-            return await _client.PostCopyRepoAsync(request);
-        }
-
-        public async Task<ValidationResponse<GitTreeItem>?> GetGitTreeAsync(string repoName)
+        public async Task<RepoContent?> GetRepositoryContentAsync(string repoName, string? reference = null)
         {
             var userName = await GetLoginAsync();
-            return await _client.GetGitTreeAsync(userName, repoName);
+
+            if (userName == null) throw new Exception("Failed to login to Github");
+
+            IEnumerable<RepoContent>? result = await ExecuteAsync(() => _client.PostRepositoryContentAsync(userName, repoName, reference));
+
+            return result?.SingleOrDefault();
         }
 
-        public async Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync()
+        public async Task PostCopyRepoAsync(GithubCopyRepoRequest request)
         {
-            return await _client.GetGitIgnoreTemplatesAsync();
+            await ExecuteAsync(() => _client.PostCopyRepoAsync(request));
         }
 
-        public async Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync()
-        {
-            return await _client.GetGithubProjectLicensesAsync();
-        }
-
-        public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string repoName)
+        public async Task<List<GitTreeItem>?> GetGitTreeAsync(string repoName)
         {
             var userName = await GetLoginAsync();
-            return await _client.GetSecretsAsync(userName, repoName);
+            IEnumerable<GitTreeItem>? result = await ExecuteAsync(() => _client.GetGitTreeAsync(userName, repoName));
+
+            return result?.ToList();
         }
 
-        public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string repoName) =>
+        public async Task<GitIgnoreTemplateResponse?> GetGitIgnoreTemplatesAsync()
+        {
+            IEnumerable<GitIgnoreTemplateResponse>? result = await ExecuteAsync(_client.GetGitIgnoreTemplatesAsync);
+
+            return result?.SingleOrDefault();
+        }
+
+        public async Task<List<GithubProjectLicense>?> GetGithubProjectLicensesAsync()
+        {
+            IEnumerable<GithubProjectLicense>? result = await ExecuteAsync(_client.GetGithubProjectLicensesAsync);
+
+            return result?.ToList();
+        }
+
+        public async Task<GithubSecretResponse?> GetSecretsAsync(string repoName)
+        {
+            var userName = await GetLoginAsync();
+            IEnumerable<GithubSecretResponse>? result = await ExecuteAsync(() => _client.GetSecretsAsync(userName, repoName));
+
+            return result?.SingleOrDefault();
+        }
+
+        public async Task<List<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string repoName) =>
             await CreateSecretAsync(new GithubSecret[] { secret }, repoName);
 
-        public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName)
+        public async Task<List<GithubSecret>?> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName)
         {
             var userName = await GetLoginAsync();
-            return await _client.CreateSecretAsync(secrets, userName, repoName);
+            IEnumerable<GithubSecret>? result = await ExecuteAsync(() => _client.CreateSecretAsync(secrets, userName, repoName));
+
+            return result?.ToList();
         }
 
-        public async Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string repoName)
+        public async Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName)
         {
-            var userName = await GetLoginAsync();
-            return await _client.CreateCommitAsync(request, userName, repoName);
+            string? userName = await GetLoginAsync();
+
+            if (userName == null) throw new Exception("Failed to login to Github");
+
+            await ExecuteAsync(() => _client.CreateCommitAsync(request, userName, repoName));
         }
 
         public async Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
@@ -81,28 +107,28 @@ namespace WebBuilder2.Client.Services
             return await _client.PostAuthenticateAsync(request);
         }
 
-        public async Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository)
+        public async Task<RepositoryModel?> PostCreateRepoAsync(RepositoryModel repository)
         {
             ValidationResponse authenticateResponse = await PostAuthenticateAsync(new GithubAuthenticationRequest(""));
 
             if (authenticateResponse != null && authenticateResponse.IsSuccessful)
             {
-                return await _client.PostCreateRepoAsync(repository);
+                var result = await ExecuteAsync(() => _client.PostCreateRepoAsync(repository));
+                return result?.SingleOrDefault();
             }
             else
             {
                 _navigationManager.NavigateTo($"/github/auth/{Uri.EscapeDataString(_navigationManager.Uri)}");
-                return ValidationResponse<RepositoryModel>.NotAuthenticated();
+                _errorObserver.AddErrorRange(ValidationResponse<RepositoryModel>.NotAuthenticated().Errors);
+                return null;
             }
         }
 
-        private async Task<string> GetLoginAsync()
+        private async Task<string?> GetLoginAsync()
         {
-            ValidationResponse<string>? userResponse = await _client.GetUserAsync();
+            IEnumerable<string>? result = await ExecuteAsync(_client.GetUserAsync);
 
-            if (userResponse == null || !userResponse.IsSuccessful || userResponse.Values == null || !userResponse.Values.Any()) 
-                throw new Exception("Failed to get Github user.");
-            return userResponse.Values.First();
+            return result?.SingleOrDefault();
         }
     }
 }

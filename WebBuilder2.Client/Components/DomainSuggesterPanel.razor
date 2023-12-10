@@ -1,6 +1,5 @@
-﻿<ErrorContainer Errors="@_errors" />
-<MudTextField Placeholder="Domain Name (example.com)" @bind-Value="@_text">Enter text</MudTextField>
-@if (_loading)
+﻿<MudTextField Placeholder="Domain Name (example.com)" @bind-Value="@_text">Enter text</MudTextField>
+@if (_loading || _domains == null)
 {
     <MudProgressLinear Indeterminate="true" />
 }

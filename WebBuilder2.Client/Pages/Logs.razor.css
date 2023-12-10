@@ -1,0 +1,14 @@
+﻿.log-row {
+    text-overflow: ellipsis;
+    white-space: break-spaces;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-wrap: nowrap;
+}
+
+::deep .mud-table-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

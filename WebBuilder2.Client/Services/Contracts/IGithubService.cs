@@ -6,17 +6,17 @@ namespace WebBuilder2.Client.Services.Contracts;
 
 public interface IGithubService
 {
-    Task<ValidationResponse<string>> GetGithubUser();
-    Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync();
-    Task<ValidationResponse<RepoContent>?> GetRepositoryContentAsync(string repoName, string? path = null);
-    Task<ValidationResponse?> PostCopyRepoAsync(GithubCopyRepoRequest request);
-    Task<ValidationResponse<GitTreeItem>?> GetGitTreeAsync(string repoName);
-    Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
-    Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
+    Task<string?> GetGithubUser();
+    Task<List<RepositoryModel>?> GetRepositoriesAsync();
+    Task<RepoContent?> GetRepositoryContentAsync(string repoName, string? path = null);
+    Task PostCopyRepoAsync(GithubCopyRepoRequest request);
+    Task<List<GitTreeItem>?> GetGitTreeAsync(string repoName);
+    Task<GitIgnoreTemplateResponse?> GetGitIgnoreTemplatesAsync();
+    Task<List<GithubProjectLicense>?> GetGithubProjectLicensesAsync();
     Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
-    Task<ValidationResponse<RepositoryModel>> PostCreateRepoAsync(RepositoryModel repository);
-    Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string repoName);
-    Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string repoName);
-    Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName);
-    Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string repoName);
+    Task<RepositoryModel?> PostCreateRepoAsync(RepositoryModel repository);
+    Task<GithubSecretResponse?> GetSecretsAsync(string repoName);
+    Task<List<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string repoName);
+    Task<List<GithubSecret>?> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName);
+    Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName);
 }

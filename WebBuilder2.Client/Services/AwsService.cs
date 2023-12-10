@@ -1,4 +1,7 @@
-﻿using WebBuilder2.Client.Clients.Contracts;
+﻿using Amazon.Runtime.Internal;
+using System.Xml.Linq;
+using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
@@ -6,75 +9,87 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services;
 
-public class AwsService : IAwsService
+public class AwsService : ServiceBase, IAwsService
 {
     private IAwsClient _client;
 
-    public AwsService(IAwsClient client)
+    public AwsService(IAwsClient client, IErrorObserver errorObserver, ILogService logService) : base(errorObserver, logService)
     {
         _client = client;
     }
 
     public async Task<Bucket?> GetSingleBucketAsync(string name)
     {
-        return await _client.GetSingleBucketAsync(name);
+        IEnumerable<Bucket>? result = await ExecuteAsync(() => _client.GetSingleBucketAsync(name));
+
+        return result?.SingleOrDefault();
     }
 
-    public async Task<IEnumerable<Bucket>> GetBucketsAsync()
+    public async Task<List<Bucket>?> GetBucketsAsync()
     {
-        return await _client.GetBucketsAsync();
+        IEnumerable<Bucket>? result = await ExecuteAsync(_client.GetBucketsAsync);
+        return result?.ToList();
     }
 
-    public async Task<ValidationResponse> CreateBucketsAsync(AwsCreateBucketRequest request)
+    public async Task CreateBucketsAsync(AwsCreateBucketRequest request)
     {
-        return await _client.CreateBucketsAsync(request);
+        await ExecuteAsync(() => _client.CreateBucketsAsync(request));
     }
 
-    public async Task<ValidationResponse> PostConfigureLoggingAsync(AwsConfigureLoggingRequest request)
+    public async Task PostConfigureLoggingAsync(AwsConfigureLoggingRequest request)
     {
-        return await _client.PostConfigureLoggingAsync(request);
+        await ExecuteAsync(() => _client.PostConfigureLoggingAsync(request));
     }
 
-    public async Task<ValidationResponse> PostBucketPolicyAsync(AwsAddBucketPolicyRequest request)
+    public async Task PostBucketPolicyAsync(AwsAddBucketPolicyRequest request)
     {
-        return await _client.PostBucketPolicyAsync(request);
+        await ExecuteAsync(() => _client.PostBucketPolicyAsync(request));
     }
 
-    public async Task<ValidationResponse> PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request)
+    public async Task PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request)
     {
-        return await _client.PostConfigurePublicAccessBlockAsync(request);
+        await ExecuteAsync(() => _client.PostConfigurePublicAccessBlockAsync(request));
     }
 
-    public async Task<IEnumerable<HostedZone>> GetHostedZonesAsync()
+    public async Task<List<HostedZone>?> GetHostedZonesAsync()
     {
-        return await _client.GetHostedZonesAsync();
+        IEnumerable<HostedZone>? result = await ExecuteAsync(_client.GetHostedZonesAsync);
+
+        return result?.ToList();
     }
 
-    public async Task<decimal> GetForecastedCostAsync()
+    public async Task<decimal?> GetForecastedCostAsync()
     {
-        var response = await _client.GetForecastedCostAsync();
-        decimal.TryParse(response, out decimal result);
+        IEnumerable<string>? response = await ExecuteAsync(_client.GetForecastedCostAsync);
+
+        string? cost = response?.SingleOrDefault();
+
+        decimal.TryParse(cost, out decimal result);
 
         return result;
     }
 
-    public async Task<ValidationResponse> CreateAmplifyAppAsync(RepositoryModel repo)
+    public async Task CreateAmplifyAppAsync(RepositoryModel repo)
     {
-        return await _client.PostAppAsync(repo);
+        await ExecuteAsync(() => _client.PostAppAsync(repo));
     }
 
-    public async Task<ValidationResponse<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain)
+    public async Task<List<DomainInquiry>?> GetSuggestedDomainNamesAsync(string domain)
     {
-        return await _client.GetSuggestedDomainNamesAsync(domain);
+        IEnumerable<DomainInquiry>? result = await ExecuteAsync(() => _client.GetSuggestedDomainNamesAsync(domain));
+
+        return result?.ToList();
     }
 
-    public async Task<ValidationResponse<Domain>> GetRegisteredDomainsAsync()
+    public async Task<List<Domain>?> GetRegisteredDomainsAsync()
     {
-        return await _client.GetRegisteredDomainsAsync();
+        IEnumerable<Domain>? result = await ExecuteAsync(_client.GetRegisteredDomainsAsync);
+
+        return result?.ToList();
     }
 
-    public async Task<ValidationResponse> PostRegisterDomainAsync(string domainName)
+    public async Task PostRegisterDomainAsync(string domainName)
     {
-        return await _client.PostRegisterDomainAsync(domainName);
+        await ExecuteAsync(() => _client.PostRegisterDomainAsync(domainName));
     }
 }

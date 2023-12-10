@@ -21,19 +21,19 @@ public class AwsS3Service : IAwsS3Service
         _client = client;
     }
 
-    public async Task<Bucket> GetSingleBucketAsync(string name)
+    public async Task<ValidationResponse<Bucket>> GetSingleBucketAsync(string name)
     {
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync(); 
 
         var bucket = bucketResponse.Buckets.Single(bucket => bucket.BucketName.Equals(name));
 
-        return new Bucket
+        return ValidationResponse<Bucket>.Success(new Bucket
         {
             Name = bucket.BucketName,
-        };
+        });
     }
 
-    public async Task<IEnumerable<Bucket>> GetBucketsAsync()
+    public async Task<ValidationResponse<Bucket>> GetBucketsAsync()
     {
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync();
         IEnumerable<Bucket> buckets = bucketResponse.Buckets.Select(x => new Bucket
@@ -41,7 +41,7 @@ public class AwsS3Service : IAwsS3Service
             Name = x.BucketName
         });
 
-        return buckets;
+        return ValidationResponse<Bucket>.Success(buckets);
     }
 
     public async Task<ValidationResponse> CreateBucketAsync(AwsCreateBucketRequest request)

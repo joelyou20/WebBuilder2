@@ -9,5 +9,5 @@ namespace WebBuilder2.Client.Managers.Contracts;
 public interface ISiteManager
 {
     ObservableCollection<Job> BuildCreateSiteJobList();
-    Task<ValidationResponse> CreateSiteAsync(CreateSiteRequest createSiteRequest, ObservableCollection<Job> jobList);
+    Task CreateSiteAsync(CreateSiteRequest createSiteRequest, ObservableCollection<Job> jobList);
 }

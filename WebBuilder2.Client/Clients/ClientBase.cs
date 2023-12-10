@@ -60,7 +60,7 @@ public class ClientBase<T> where T : AuditableEntity
     private async Task<ValidationResponse<T>> ParseResponseAsync(HttpResponseMessage response)
     {
         var message = await response.Content.ReadAsStringAsync();
-        var result = JsonConvert.DeserializeObject<ValidationResponse<T>>(message);
+        var result = ValidationResponse<T>.ToResult(message)!;
         return result;
     }
 }

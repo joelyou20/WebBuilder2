@@ -14,11 +14,13 @@ public static class ValidationResponseHelper<T> where T : class
             Message = ex.Message,
             Errors = new List<ApiError>
                 {
-                    new ApiError
-                    {
-                        Exception = ex,
-                        Message = ex.Message
-                    }
+                    new ApiError(
+                        message: ex.Message,
+                        severity: ApiErrorSeverity.Error,
+                        code: "",
+                        resource: ex.Source ?? "",
+                        field: "",
+                        exception: ex)
                 }
         };
         return response;
@@ -33,11 +35,13 @@ public static class ValidationResponseHelper<T> where T : class
             Message = ex.Message,
             Errors = new List<ApiError>
                 {
-                    new ApiError
-                    {
-                        Exception = ex,
-                        Message = ex.Message
-                    }
+                    new ApiError(
+                        message: ex.Message,
+                        severity: ApiErrorSeverity.Error,
+                        code: "",
+                        resource: ex.Source ?? "",
+                        field: "",
+                        exception: ex)
                 }
         };
         return response;
@@ -52,11 +56,7 @@ public static class ValidationResponseHelper<T> where T : class
             Message = ex.Message,
             Errors = new List<ApiError>
                 {
-                    new ApiError
-                    {
-                        Exception = ex,
-                        Message = ex.Message
-                    }
+                    new ApiError(message : ex.Message, severity : ApiErrorSeverity.Error, code : "", resource : ex.Source ?? "", field : "", exception : ex)
                 }
         };
         return response;
@@ -73,11 +73,7 @@ public static class ValidationResponseHelper
             Message = ex.Message,
             Errors = new List<ApiError>
                 {
-                    new ApiError
-                    {
-                        Exception = ex,
-                        Message = ex.Message
-                    }
+                    new ApiError(message : ex.Message, severity : ApiErrorSeverity.Error, code : "", resource : ex.Source ?? "", field : "", exception : ex)
                 }
         };
         return response;

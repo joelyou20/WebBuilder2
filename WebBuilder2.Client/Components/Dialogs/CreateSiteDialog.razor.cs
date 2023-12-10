@@ -74,14 +74,7 @@ public partial class CreateSiteDialog
 
     public void OnValidSubmit() => InvokeAsync(async () =>
     {
-        var createSiteResponse = await SiteManager.CreateSiteAsync(_createSiteRequest, _jobList);
-
-        if (!createSiteResponse.IsSuccessful)
-        {
-            _errors.AddRange(createSiteResponse.Errors);
-            StateHasChanged();
-            return;
-        }
+        await SiteManager.CreateSiteAsync(_createSiteRequest, _jobList);
 
         //MudDialog.Close(DialogResult.Ok(true));
     });

@@ -1,4 +1,4 @@
-﻿namespace WebBuilder2.Server.Utils;
+﻿namespace WebBuilder2.Server.Settings;
 
 public class GithubSettings
 {

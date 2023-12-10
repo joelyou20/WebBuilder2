@@ -6,9 +6,9 @@ namespace WebBuilder2.Client.Managers.Contracts;
 
 public interface IRepositoryManager
 {
-    Task<ValidationResponse<RepositoryModel>> CreateRepositoryAsync(RepositoryModel repo, SiteModel site);
-    Task<ValidationResponse<GithubSecret>> AddSecretsAsync(RepositoryModel repo);
-    Task<ValidationResponse> CreateCommitAsync(IBrowserFile file, RepositoryModel repo);
-    Task<ValidationResponse> CreateCommitAsync(string content, string fileName, RepositoryModel repo);
-    Task<ValidationResponse?> CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel);
+    Task<RepositoryModel?> CreateRepositoryAsync(RepositoryModel repo, SiteModel site);
+    Task<List<GithubSecret>?> AddSecretsAsync(RepositoryModel repo);
+    Task CreateCommitAsync(IBrowserFile file, RepositoryModel repo);
+    Task CreateCommitAsync(string content, string fileName, RepositoryModel repo);
+    Task CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel);
 }

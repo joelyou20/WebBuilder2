@@ -114,13 +114,7 @@ public class GithubService : IGithubService
         {
             var response = new ValidationResponse<RepositoryModel>
             {
-                Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError
-                {
-                    Message = error.Message,
-                    Code = error.Code,
-                    Resource = error.Resource,
-                    Field = error.Field
-                }).ToList()
+                Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError(error.Message, ApiErrorSeverity.Error, error.Code, error.Resource, error.Field, ex)).ToList()
             };
 
             return response;

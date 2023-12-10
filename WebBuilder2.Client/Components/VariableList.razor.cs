@@ -14,11 +14,10 @@ public partial class VariableList
     [Inject] public IGithubService GithubService { get; set; } = default!;
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    private string _repoName = string.Empty;
+    private string? _repoName;
     private readonly Func<RepositoryModel, string> _repoSelectConverter = r => r.Name;
-    private List<GithubSecret> _variables = new();
-    private List<ApiError> _errors = new();
-    private List<RepositoryModel> _repositories = new();
+    private List<GithubSecret>? _variables = new();
+    private List<RepositoryModel>? _repositories = new();
     private RepositoryModel? _selectedRepo;
 
     protected override async Task OnInitializedAsync()
@@ -31,24 +30,17 @@ public partial class VariableList
     {
         _repositories = await RepositoryService.GetRepositoriesAsync();
 
-        _repoName = _repositories.First().Name;
-        _selectedRepo = _repositories.First();
+        _repoName = _repositories?.First().Name;
+        _selectedRepo = _repositories?.First();
         StateHasChanged();
     }
 
     private async Task UpdateDataAsync()
     {
-        if (_repositories == null || !_repositories.Any()) return;
+        if (_repositories == null || !_repositories.Any() || _repoName == null) return;
         var result = await GithubService.GetSecretsAsync(_repoName);
 
-        if(!result.IsSuccessful)
-        {
-            _errors.AddRange(result.Errors);
-        }
-        else
-        {
-            _variables = result.GetValues().SelectMany(x => x.GithubSecrets).ToList();
-        }
+        _variables = result?.GithubSecrets.ToList();
 
         StateHasChanged();
     }
@@ -72,7 +64,7 @@ public partial class VariableList
 
         DialogParameters dialogParameters = new()
         {
-            { "RepositoryNames", _repositories.Select(x => x.Name).ToList() }
+            { "RepositoryNames", _repositories?.Select(x => x.Name).ToList() }
         };
 
         var dialog = await DialogService.ShowAsync<CreateGithubVariableDialog>(

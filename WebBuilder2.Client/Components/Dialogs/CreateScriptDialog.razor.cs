@@ -43,14 +43,7 @@ public partial class CreateScriptDialog
 
     public async Task OnValidSubmit()
     {
-        var script = await ScriptService.AddScriptAsync(_script);
-
-        if (script == null)
-        {
-            _errors.Add(new ApiError("Failed to create script"));
-            StateHasChanged();
-            return;
-        }
+        await ScriptService.AddScriptAsync(_script);
 
         MudDialog.Close(DialogResult.Ok(true));
     }

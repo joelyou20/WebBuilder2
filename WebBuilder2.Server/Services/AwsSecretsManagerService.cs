@@ -1,10 +1,7 @@
-﻿using Amazon;
-using Amazon.Route53;
-using Amazon.SecretsManager;
+﻿using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
-using System.Text.Json;
+using Newtonsoft.Json.Linq;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Utils;
 
 namespace WebBuilder2.Server.Services;
 
@@ -22,8 +19,9 @@ public class AwsSecretsManagerService : IAwsSecretsManagerService
         GetSecretValueRequest request = new() { SecretId = name };
         GetSecretValueResponse response = await _client.GetSecretValueAsync(request);
 
-        string secret = JsonSerializer.Deserialize<GithubPAT>(response.SecretString)?.Value ?? "";
+        var jObject = JObject.Parse(response.SecretString);
+        string? secret = jObject[name]?.Value<string>();
 
-        return secret;
+        return secret ?? throw new Exception($"Cannot locate secret with name: {name}");
     }
 }

@@ -3,7 +3,6 @@
 
 @if(_repo != null)
 {
-    <ErrorContainer Errors="@_errors" />
     <MudText>@_repo.Name</MudText>
     <MudFileUpload T="IBrowserFile" FilesChanged="OnUploadFileBtnClicked">
         <ButtonTemplate>

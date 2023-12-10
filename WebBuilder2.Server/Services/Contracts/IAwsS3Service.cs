@@ -7,8 +7,8 @@ namespace WebBuilder2.Server.Services.Contracts
 {
     public interface IAwsS3Service
     {
-        Task<Bucket> GetSingleBucketAsync(string name);
-        Task<IEnumerable<Bucket>> GetBucketsAsync();
+        Task<ValidationResponse<Bucket>> GetSingleBucketAsync(string name);
+        Task<ValidationResponse<Bucket>> GetBucketsAsync();
         Task<ValidationResponse> CreateBucketAsync(AwsCreateBucketRequest request);
         Task<ValidationResponse> ConfigureLoggingAsync(AwsConfigureLoggingRequest request);
         Task<ValidationResponse> AddBucketPolicyAsync(AwsAddBucketPolicyRequest request);

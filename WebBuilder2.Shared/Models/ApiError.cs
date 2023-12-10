@@ -9,22 +9,20 @@ namespace WebBuilder2.Shared.Models;
 
 public class ApiError
 {
-    public string Message { get; set; } = string.Empty;
-    public string Code { get; set; } = string.Empty;
-    public string Resource { get; set; } = string.Empty;
-    public string Field { get; set; } = string.Empty; 
-    public Exception? Exception { get; set; }
-    public ApiErrorSeverity? Severity { get; set; }
+    public string? Message { get; } = string.Empty;
+    public string? Code { get;} = string.Empty;
+    public string? Resource { get; } = string.Empty;
+    public string? Field { get; } = string.Empty; 
+    public Exception? Exception { get; }
+    public ApiErrorSeverity? Severity { get; }
 
-    public ApiError() { }
-
-    public ApiError(string message)
-    {
-        Message = message;
-    }
-    public ApiError(string message, ApiErrorSeverity severity)
+    public ApiError(string? message = null, ApiErrorSeverity? severity = null, string? code = null, string? resource = null, string? field = null, Exception? exception = null)
     {
         Message = message;
         Severity = severity;
+        Code = code;
+        Resource = resource;
+        Field = field;
+        Exception = exception;
     }
 }

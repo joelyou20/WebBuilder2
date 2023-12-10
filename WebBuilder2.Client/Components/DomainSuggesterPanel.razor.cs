@@ -15,22 +15,15 @@ public partial class DomainSuggesterPanel
     [Parameter] public EventCallback<Domain> ValueChanged { get; set; } = new();
 
     private string _text = string.Empty;
-    private List<DomainInquiry> _domains = new();
+    private List<DomainInquiry>? _domains = new();
     private bool _loading;
-    private List<ApiError> _errors = new();
 
     private async Task OnGetSuggestionsButtonClick()
     {
         _loading = true;
         StateHasChanged();
-        ValidationResponse<DomainInquiry> result = await AwsService.GetSuggestedDomainNamesAsync(_text);
+        _domains = await AwsService.GetSuggestedDomainNamesAsync(_text);
 
-        if (!result.IsSuccessful)
-        {
-            _errors.AddRange(result.Errors);
-        }
-
-        _domains = result.GetValues();
         _loading = false;
         StateHasChanged();
     }

@@ -6,6 +6,7 @@ using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Settings;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Server.Utils.Extensions;
 
@@ -31,10 +32,12 @@ builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>();
 builder.Services.AddScoped<IAwsAmplifyService, AwsAmplifyService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
+builder.Services.AddScoped<IGoogleAdSenseService, GoogleAdSenseService>();
 
 builder.Services.AddScoped<ISiteRepository, SiteRepository>();
 builder.Services.AddScoped<IRepositoryRepository, RepositoryRepository>();
 builder.Services.AddScoped<IScriptRepository, ScriptRepository>();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
 
 builder.Services.AddAwsSecretsManagerClient();
 builder.Services.AddAwsS3Client();
@@ -44,13 +47,17 @@ builder.Services.AddAwsCostExplorerClient();
 builder.Services.AddAwsAmplifyClient();
 builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 
+builder.Services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
+
+builder.Services.AddAdSenseService(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
+
 var app = builder.Build();
 
 IEnumerable<string> allowedOrigins = configuration.GetSection("AllowedOrigins").Get<IEnumerable<string>>()!;
 
 app.UseCors(options => options
     .WithOrigins(allowedOrigins.ToArray())
-    .AllowAnyHeader()
+    .AllowAnyHeader() 
     .AllowAnyMethod()
 );
 

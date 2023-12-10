@@ -14,42 +14,35 @@ namespace WebBuilder2.Client.Managers;
 
 public class RepositoryManager : IRepositoryManager
 {
-    private IAwsService _awsService;
     private IGithubService _githubService;
     private IRepositoryService _repositoryService;
 
-    public RepositoryManager(IGithubService githubService, IRepositoryService repositoryService, IAwsService awsService)
+    public RepositoryManager(IGithubService githubService, IRepositoryService repositoryService)
     {
-        _awsService = awsService;
         _githubService = githubService;
         _repositoryService = repositoryService;
     }
 
-    public async Task<ValidationResponse<RepositoryModel>> CreateRepositoryAsync(RepositoryModel repo, SiteModel site)
+    public async Task<RepositoryModel?> CreateRepositoryAsync(RepositoryModel repo, SiteModel site)
     {
         repo.RepoName = $"{site.Name}-repo";
         repo.Description = $"{site.Name}-repo description";
         repo.Homepage = $"{site.Name}-repo Homepage";
 
-        var createRepoResponse = await _githubService.PostCreateRepoAsync(repo);
+        RepositoryModel? createdRepo = await _githubService.PostCreateRepoAsync(repo);
 
-        if (!createRepoResponse.Errors.Any() && createRepoResponse.Values != null && createRepoResponse.Values.Any())
-        {
-            // Add Site data to github created repo response
-            var createdRepo = createRepoResponse.Values.Single();
-            createdRepo.Site = site;
-            createdRepo.SiteId = site.Id;
+        if (createdRepo == null) return null;
 
-            var newRepo = await _repositoryService.AddRepositoriesAsync(new List<RepositoryModel> { createdRepo });
+        // Add Site data to github created repo response
+        createdRepo.Site = site;
+        createdRepo.SiteId = site.Id;
 
-            if (newRepo == null) return ValidationResponse<RepositoryModel>.Failure(message: "Failed to add repo");
+        List<RepositoryModel>? response = await _repositoryService.AddRepositoriesAsync(new List<RepositoryModel> { createdRepo });
 
-        }
-
-        return createRepoResponse;
+        return response?.SingleOrDefault();
     }
 
-    public async Task<ValidationResponse<GithubSecret>> AddSecretsAsync(RepositoryModel repo)
+    public async Task<List<GithubSecret>?> AddSecretsAsync(RepositoryModel repo)
     {
         // Add secrets to repo
 
@@ -65,7 +58,7 @@ public class RepositoryManager : IRepositoryManager
         // Get AWS Region
         string awsRegion = "";
 
-        var createSecretsResponse = await _githubService.CreateSecretAsync(new GithubSecret[]
+        List<GithubSecret>? secrets = await _githubService.CreateSecretAsync(new GithubSecret[]
         {
                 new GithubSecret { Name = "AWS_S3_BUCKET", Value = s3BucketName },
                 new GithubSecret { Name = "AWS_ACCESS_KEY_ID", Value = awsAccessKeyId },
@@ -73,18 +66,16 @@ public class RepositoryManager : IRepositoryManager
                 new GithubSecret { Name = "AWS_REGION", Value = awsRegion }
         }, repo.RepoName);
 
-        if (createSecretsResponse == null) return ValidationResponse<GithubSecret>.Failure(message: "Failed to add repo");
-
-        return createSecretsResponse;
+        return secrets;
     }
 
-    public async Task<ValidationResponse> CreateCommitAsync(IBrowserFile file, RepositoryModel repo)
+    public async Task CreateCommitAsync(IBrowserFile file, RepositoryModel repo)
     {
         string fileAsString = await FileHelper.ReadFileAsync(file);
-        return await CreateCommitAsync(fileAsString, file.Name, repo);
+        await CreateCommitAsync(fileAsString, file.Name, repo);
     }
 
-    public async Task<ValidationResponse> CreateCommitAsync(string content, string fileName, RepositoryModel repo)
+    public async Task CreateCommitAsync(string content, string fileName, RepositoryModel repo)
     {
         GithubCreateCommitRequest request = new()
         {
@@ -100,18 +91,14 @@ public class RepositoryManager : IRepositoryManager
             }
         };
 
-        return await _githubService.CreateCommitAsync(request, repo.Name);
+        await _githubService.CreateCommitAsync(request, repo.Name);
     }
 
-    public async Task<ValidationResponse?> CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel)
-    {
-        var response = await _githubService.PostCopyRepoAsync(new GithubCopyRepoRequest
+    public async Task CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel) => 
+        await _githubService.PostCopyRepoAsync(new GithubCopyRepoRequest
         {
             ClonedRepoName = $"{projectTemplateType}-Template",
             NewRepoName = repositoryModel.Name,
             Path = null
         });
-
-        return response;
-    }
 }

@@ -29,16 +29,9 @@ public partial class CreateGithubVariableDialog
 
     public async Task OnValidSubmit()
     {
-        ValidationResponse<GithubSecret> response = await GithubService.CreateSecretAsync(_secret, _selectedRepo);
+        await GithubService.CreateSecretAsync(_secret, _selectedRepo);
 
-        if (response.IsSuccessful)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            _errors.AddRange(response.Errors);
-        }
+        MudDialog.Close(DialogResult.Ok(true));
 
         StateHasChanged();
     }

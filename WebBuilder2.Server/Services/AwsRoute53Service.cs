@@ -4,6 +4,7 @@ using Amazon.Route53Domains;
 using Amazon.S3;
 using System.Net;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
@@ -16,7 +17,7 @@ public class AwsRoute53Service : IAwsRoute53Service
         _client = client;
     }
 
-    public async Task<IEnumerable<Shared.Models.HostedZone>> GetHostedZonesAsync()
+    public async Task<ValidationResponse<Shared.Models.HostedZone>> GetHostedZonesAsync()
     {
         var response = await _client.ListHostedZonesAsync();
         if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -30,6 +31,6 @@ public class AwsRoute53Service : IAwsRoute53Service
             Name = zone.Name
         });
 
-        return hostedZones;
+        return ValidationResponse<Shared.Models.HostedZone>.Success(hostedZones);
     }
 }

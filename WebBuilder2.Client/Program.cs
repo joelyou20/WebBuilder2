@@ -14,6 +14,8 @@ using WebBuilder2.Client.Clients;
 using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Client.Managers;
 using WebBuilder2.Client.Managers.Contracts;
+using WebBuilder2.Client.Observers;
+using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Client.Utils.Settings;
@@ -39,6 +41,8 @@ Log.Logger = new LoggerConfiguration()
 /* this is used instead of .UseSerilog to add Serilog to providers */
 builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
+builder.Services.AddScoped<IAuthenticationStateProvider,  AuthenticationStateProvider>();
+
 // CLIENTS ==========================>
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
@@ -56,6 +60,8 @@ builder.Services.AddHttpClient<IGithubClient, GithubClient>(client => { client.B
 builder.Services.AddHttpClient<IAwsClient, AwsClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 builder.Services.AddHttpClient<IRepositoryClient, RepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 builder.Services.AddHttpClient<IScriptClient, ScriptClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddHttpClient<IGoogleClient, GoogleClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddHttpClient<ILogClient, LogClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 
 // <================== END OF CLIENTS
 
@@ -76,8 +82,12 @@ builder.Services.AddScoped<IDialogService, DialogService>();
 builder.Services.AddScoped<IAwsService, AwsService>();
 builder.Services.AddScoped<IRepositoryService, RepositoryService>();
 builder.Services.AddScoped<IScriptService, ScriptService>();
+builder.Services.AddScoped<IGoogleService, GoogleService>();
+builder.Services.AddScoped<ILogService, LogService>();
 
 // <================== END OF SERVICES
+
+builder.Services.AddSingleton<IErrorObserver, ErrorObserver>();
 
 builder.Services.AddMudServices();
 var app = builder.Build();

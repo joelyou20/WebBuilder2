@@ -1,98 +1,59 @@
 ﻿using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services;
 
-public class ScriptService : IScriptService
+public class ScriptService : ServiceBase, IScriptService
 {
     private IScriptClient _scriptClient;
 
-    public ScriptService(IScriptClient scriptClient)
+    public ScriptService(IScriptClient scriptClient, IErrorObserver errorObserver, ILogService logService) : base(errorObserver, logService)
     {
         _scriptClient = scriptClient;
     }
 
-    public async Task<List<ScriptModel>> GetScriptsAsync(Dictionary<string, string>? filter = null)
+    public async Task<List<ScriptModel>?> GetScriptsAsync(Dictionary<string, string>? filter = null)
     {
-        ValidationResponse<ScriptModel> response = await _scriptClient.GetScriptsAsync(filter);
+        IEnumerable<ScriptModel>? result = await ExecuteAsync(() => _scriptClient.GetScriptsAsync(filter));
 
-        if (response == null || !response.IsSuccessful)
-        {
-            throw new Exception(response?.Message ?? "Failed to get script Data");
-        }
-
-        return response.GetValues();
+        return result?.ToList();
     }
 
     public async Task<ScriptModel?> GetScriptByIdAsync(long id)
     {
-        ValidationResponse<ScriptModel>? response = await _scriptClient.GetScriptByIdAsync(id);
+        IEnumerable<ScriptModel>? result = await ExecuteAsync(() => _scriptClient.GetScriptByIdAsync(id));
 
-        if (response == null) return null;
-
-        if (!response.IsSuccessful)
-        {
-            throw new Exception(response?.Message ?? "Failed to get script Data");
-        }
-
-        return response.GetValues().SingleOrDefault();
+        return result?.SingleOrDefault();
     }
 
     public async Task<ScriptModel?> GetScriptByNameAsync(string name)
     {
-        ValidationResponse<ScriptModel>? response = await _scriptClient.GetScriptsAsync(new Dictionary<string, string> { { nameof(name), name } });
+        IEnumerable<ScriptModel>? result = await ExecuteAsync(() => _scriptClient.GetScriptsAsync(new Dictionary<string, string> { { nameof(name), name } }));
 
-        if (response == null) return null;
-
-        if (!response.IsSuccessful)
-        {
-            throw new Exception(response?.Message ?? "Failed to get script Data");
-        }
-
-        return response.GetValues().SingleOrDefault();
+        return result?.SingleOrDefault();
     }
 
     public async Task<ScriptModel?> AddScriptAsync(ScriptModel script)
     {
-        ValidationResponse<ScriptModel> response = await _scriptClient.AddScriptAsync(script);
+        IEnumerable<ScriptModel>? result = await ExecuteAsync(() => _scriptClient.AddScriptAsync(script));
 
-        if (response == null) return null;
-
-        if (!response.IsSuccessful)
-        {
-            throw new Exception(response?.Message ?? "Failed to add script Data");
-        }
-
-        return response.GetValues().SingleOrDefault();
+        return result?.SingleOrDefault();
     }
 
     public async Task<ScriptModel?> UpdateScriptAsync(ScriptModel script)
     {
-        ValidationResponse<ScriptModel> response = await _scriptClient.UpdateScriptAsync(script);
+        IEnumerable<ScriptModel>? result = await ExecuteAsync(() => _scriptClient.UpdateScriptAsync(script));
 
-        if (response == null) return null;
-
-        if (!response.IsSuccessful)
-        {
-            throw new Exception(response?.Message ?? "Failed to update script Data");
-        }
-
-        return response.GetValues().SingleOrDefault();
+        return result?.SingleOrDefault();
     }
 
     public async Task<ScriptModel?> SoftDeleteScriptAsync(ScriptModel script)
     {
-        ValidationResponse<ScriptModel> response = await _scriptClient.SoftDeleteScriptAsync(script);
+        IEnumerable<ScriptModel>? result = await ExecuteAsync(() => _scriptClient.SoftDeleteScriptAsync(script));
 
-        if (response == null) return null;
-
-        if (!response.IsSuccessful)
-        {
-            throw new Exception(response?.Message ?? "Failed to delete script");
-        }
-
-        return response.GetValues().SingleOrDefault();
+        return result?.SingleOrDefault();
     }
 }

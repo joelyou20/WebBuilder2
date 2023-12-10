@@ -1,0 +1,4 @@
+﻿Here are some commands to use:
+
+Add-Migration <MIGRATION NAME>
+Update-Database

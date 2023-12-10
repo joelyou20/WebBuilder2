@@ -1,0 +1,17 @@
+﻿@inject IJSRuntime JSRuntime
+@inject IAuthenticationStateProvider AuthenticationStateProvider
+
+<button type="button" @onclick="SignInWithGoogleAsync">Sign In with Google</button>
+
+@code {
+    public async Task SignInWithGoogleAsync()
+    {
+        var authenticationStateProvider = DotNetObjectReference.Create<IAuthenticationStateProvider>(AuthenticationStateProvider);
+        await JSRuntime.InvokeVoidAsync("blazorSchoolGoogleInitialize", "58603316977-34kh4v0orapkkfgiij2aaelge71g5aav.apps.googleusercontent.com", authenticationStateProvider);
+        //The following code might not work in some cases
+        await JSRuntime.InvokeVoidAsync("google.accounts.id.prompt");
+
+        //The following code will execute the prompt function and print the reason of not working to the console if fails.
+        await JSRuntime.InvokeVoidAsync("blazorSchoolGooglePrompt");
+    }
+}

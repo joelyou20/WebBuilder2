@@ -1,0 +1,25 @@
+﻿@page "/logs"
+
+@if(_logs != null)
+{
+    <MudTable Dense="true" Items="@_logs" Hover="true" FixedHeader="true" Breakpoint="Breakpoint.Sm" Loading="@_isLoading" LoadingProgressColor="Color.Info">
+        <ColGroup>
+            <col style="width:25%;"/>
+            <col style="width:25%;"/>
+            <col style="width:25%;"/>
+            <col style="width:25%;"/>
+        </ColGroup>
+        <HeaderContent>
+            <MudTh Style="width:25%;">Message</MudTh>
+            <MudTh Style="width:25%;">StackTrace</MudTh>
+            <MudTh Style="width:25%;">Exception</MudTh>
+            <MudTh Style="width:25%;">CreatedDateTime</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Message"><span class="log-row">@context.Message</span></MudTd>
+            <MudTd DataLabel="StackTrace"><span class="log-row">@context.StackTrace</span></MudTd>
+            <MudTd DataLabel="Exception"><span class="log-row">@context.Exception</span></MudTd>
+            <MudTd DataLabel="CreatedDateTime"><span class="log-row">@context.CreatedDateTime</span></MudTd>
+        </RowTemplate>
+    </MudTable>
+}

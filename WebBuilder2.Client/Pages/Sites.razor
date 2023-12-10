@@ -1,25 +1,27 @@
 ﻿@page "/sites"
 
 <div class="sites-container">
-    <ErrorContainer Errors="_errors" />
-    <MudPaper>
-        <div class="sites-domain-container">
-            <MudText>Domains</MudText>
-            <MudSimpleTable>
-                <thead>
-                    <tr>Name</tr>
-                </thead>
-                <tbody>
-                    @foreach(Domain domain in _registeredDomains)
-                    {
-                        <tr>
-                            <td>@domain.Name</td>
-                        </tr>
-                    }
-                </tbody>
-            </MudSimpleTable>
-        </div>
-    </MudPaper>
+    @if(_registeredDomains != null)
+    {
+        <MudPaper>
+            <div class="sites-domain-container">
+                <MudText>Domains</MudText>
+                <MudSimpleTable>
+                    <thead>
+                        <tr>Name</tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Domain domain in _registeredDomains)
+                        {
+                            <tr>
+                                <td>@domain.Name</td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            </div>
+        </MudPaper>
+    }
     <div class="btn-row">
         <MudButton class="create-site-btn" Variant="Variant.Filled" OnClick="@OnCreateSiteBtnClicked">Create Site</MudButton>
         <MudButton class="add-existing-site-btn" Variant="Variant.Filled" OnClick="@OnAddExistingSiteBtnClicked">Add Existing Site</MudButton>

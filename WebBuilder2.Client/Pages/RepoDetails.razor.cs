@@ -39,22 +39,9 @@ public partial class RepoDetails
 
         if (_repo == null) throw new KeyNotFoundException($"Repository with Id of {Id} was not found in database.");
 
-        ValidationResponse<GitTreeItem>? gitTreeResponse = await GithubService.GetGitTreeAsync(_repo.Name);
+        List<GitTreeItem>? gitTreeResponse = await GithubService.GetGitTreeAsync(_repo.Name);
 
-        if (gitTreeResponse == null)
-        {
-            var errorMessage = $"Failed to retrieve Repository content for repo with name: {_repo.Name}";
-            _errors.AddRange(new ApiError[] { new ApiError($"Failed to retrieve Repository content for repo with name: {_repo.Name}") });
-            throw new Exception(errorMessage);
-        }
-        else if (gitTreeResponse != null && !gitTreeResponse.HasValues)
-        {
-            _errors.AddRange(gitTreeResponse.Errors);
-        }
-        else
-        {
-            _repoTree = gitTreeResponse!.GetValues().ToHashSet();
-        }
+        _repoTree = gitTreeResponse!.ToHashSet();
 
         StateHasChanged();
     }
@@ -71,17 +58,11 @@ public partial class RepoDetails
     {
         if(_repo == null || item == null || item.Type == GitTreeType.Tree) return;
 
-        ValidationResponse<RepoContent>? repoContentResponse = await GithubService.GetRepositoryContentAsync(_repo.Name, item.Path);
+        RepoContent? repoContent = await GithubService.GetRepositoryContentAsync(_repo.Name, item.Path);
 
-        if (repoContentResponse == null) throw new ArgumentNullException(nameof(repoContentResponse));
+        if(repoContent == null) throw new Exception("Failed to get repository content");
 
-        if(repoContentResponse != null && !repoContentResponse.HasValues)
-        {
-            _errors.AddRange(repoContentResponse.Errors);
-            return;
-        }
-
-        _fileContent = repoContentResponse!.GetValues().First().Content;
+        _fileContent = repoContent.Content;
 
         if(_codeEditor != null) await _codeEditor.Refresh(_fileContent, GetSyntax(item.Path));
 

@@ -1,4 +1,35 @@
 ﻿@page "/costandprofit"
 
 <MudCard>@_forecastedMonthlyCost</MudCard>
-
+@if (_accounts != null)
+{
+    <MudCard>
+        <MudList>
+            @foreach (var account in _accounts)
+            {
+                <MudListItem>@($"{account.DisplayName}: {account.State}")</MudListItem>
+            }
+        </MudList>
+    </MudCard>
+}
+@if(_adClients != null)
+{
+    <MudList>
+        @foreach (var client in _adClients)
+        {
+            <MudListItem>@($"{client.Name}: {client.State}")</MudListItem>
+        }
+    </MudList>
+}
+<MudTable Dense="true" Items="@_payments" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_isLoading" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Date</MudTh>
+        <MudTh>Amount</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Date">@context.Date</MudTd>
+        <MudTd DataLabel="Amount">@context.Amount</MudTd>
+    </RowTemplate>
+</MudTable>

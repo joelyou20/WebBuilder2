@@ -7,15 +7,15 @@ namespace WebBuilder2.Client.Services.Contracts;
 public interface IAwsService
 {
     Task<Bucket?> GetSingleBucketAsync(string name);
-    Task<IEnumerable<Bucket>> GetBucketsAsync();
-    Task<ValidationResponse> CreateBucketsAsync(AwsCreateBucketRequest request);
-    Task<ValidationResponse> PostConfigureLoggingAsync(AwsConfigureLoggingRequest request);
-    Task<ValidationResponse> PostBucketPolicyAsync(AwsAddBucketPolicyRequest request);
-    Task<ValidationResponse> PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
-    Task<IEnumerable<HostedZone>> GetHostedZonesAsync();
-    Task<decimal> GetForecastedCostAsync();
-    Task<ValidationResponse> CreateAmplifyAppAsync(RepositoryModel repo);
-    Task<ValidationResponse<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain);
-    Task<ValidationResponse<Domain>> GetRegisteredDomainsAsync();
-    Task<ValidationResponse> PostRegisterDomainAsync(string domainName);
+    Task<List<Bucket>?> GetBucketsAsync();
+    Task CreateBucketsAsync(AwsCreateBucketRequest request);
+    Task PostConfigureLoggingAsync(AwsConfigureLoggingRequest request);
+    Task PostBucketPolicyAsync(AwsAddBucketPolicyRequest request);
+    Task PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
+    Task<List<HostedZone>?> GetHostedZonesAsync();
+    Task<decimal?> GetForecastedCostAsync();
+    Task CreateAmplifyAppAsync(RepositoryModel repo);
+    Task<List<DomainInquiry>?> GetSuggestedDomainNamesAsync(string domain);
+    Task<List<Domain>?> GetRegisteredDomainsAsync();
+    Task PostRegisterDomainAsync(string domainName);
 }

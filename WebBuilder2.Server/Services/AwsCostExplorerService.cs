@@ -3,6 +3,7 @@ using Amazon.CostExplorer.Model;
 using Amazon.S3.Model;
 using System.Net;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
@@ -15,7 +16,7 @@ public class AwsCostExplorerService : IAwsCostExplorerService
         _client = client;
     }
 
-    public async Task<string> GetForecastedCostAsync()
+    public async Task<ValidationResponse<string>> GetForecastedCostAsync()
     {
         var request = new GetCostForecastRequest
         {
@@ -33,9 +34,9 @@ public class AwsCostExplorerService : IAwsCostExplorerService
         if(response == null || response.HttpStatusCode != HttpStatusCode.OK)
         {
             // Handle error
-            return string.Empty;
+            return ValidationResponse<string>.Failure();
         }
 
-        return response.Total.Amount;
+        return ValidationResponse<string>.Success(response.Total.Amount);
     }
 }

@@ -5,7 +5,6 @@
 
 <MudDialog>
     <DialogContent>
-        <ErrorContainer Errors="@_errors" />
         <EditForm Model="@_script" OnValidSubmit="@OnValidSubmit">
             <DataAnnotationsValidator />
             <MudTextField Label="Script Name" T="string" @bind-Value="@_script.Name" Required="true" For="@(() => _script.Name)"></MudTextField>

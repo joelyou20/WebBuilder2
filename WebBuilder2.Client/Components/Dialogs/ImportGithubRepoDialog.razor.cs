@@ -32,8 +32,8 @@ public partial class ImportGithubRepoDialog
 
         if (authenticateResponse != null && authenticateResponse.IsSuccessful)
         {
-            var response = await GithubService.GetRepositoriesAsync();
-            response.GetValues().ForEach(x =>
+            var repositories = await GithubService.GetRepositoriesAsync();
+            repositories?.ForEach(x =>
             {
                 if(!ExistingIds.Contains(x.Id)) _githubRepositories.Add(x, false);
             });

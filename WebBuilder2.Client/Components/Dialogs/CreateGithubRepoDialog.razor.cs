@@ -20,9 +20,9 @@ public partial class CreateGithubRepoDialog
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private RepositoryModel _model = new();
-    private List<string> _gitIgnoreTemplates = new();
-    private List<GithubProjectLicense> _licenses = new();
-    private List<SiteModel> _disconnectedSites = new();
+    private List<string>? _gitIgnoreTemplates = new();
+    private List<GithubProjectLicense>? _licenses = new();
+    private List<SiteModel>? _disconnectedSites = new();
     private readonly Func<RepositoryModel, string> _templateSelectConverter = r => r.Name;
     private readonly Func<SiteModel, string> _siteSelectConverter = r => r.Name;
     private List<ApiError> _errors = new();
@@ -30,9 +30,9 @@ public partial class CreateGithubRepoDialog
 
     protected override async Task OnInitializedAsync()
     {
-        _gitIgnoreTemplates = (await GithubService.GetGitIgnoreTemplatesAsync()).GetValues().SelectMany(x => x.Templates).ToList();
-        _licenses = (await GithubService.GetGithubProjectLicensesAsync()).GetValues();
-        _disconnectedSites = (await SiteService.GetSitesAsync()).Where(x => x.Repository == null).ToList();
+        _gitIgnoreTemplates = (await GithubService.GetGitIgnoreTemplatesAsync())?.Templates.ToList();
+        _licenses = await GithubService.GetGithubProjectLicensesAsync();
+        _disconnectedSites = (await SiteService.GetSitesAsync())?.Where(x => x.Repository == null).ToList();
     }
 
     public void OnTemplateSelected(RepositoryModel? templateRepository = null)
@@ -69,16 +69,9 @@ public partial class CreateGithubRepoDialog
     {
         if (_selectedSite == null) throw new InvalidOperationException("No site selected.");
 
-        ValidationResponse<RepositoryModel> response = await RepositoryManager.CreateRepositoryAsync(_model, _selectedSite);
+        await RepositoryManager.CreateRepositoryAsync(_model, _selectedSite);
 
-        if (response.IsSuccessful)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-        else
-        {
-            _errors.AddRange(response.Errors);
-        }
+        MudDialog.Close(DialogResult.Ok(true));
 
         StateHasChanged();
     });

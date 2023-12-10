@@ -2,7 +2,6 @@
 
 <MudDialog>
     <DialogContent>
-        <ErrorContainer Errors="@_errors" />
         <EditForm Model="@_secret" OnValidSubmit="@OnValidSubmit">
             <DataAnnotationsValidator />
             <MudSelect T="string" Label="Repository" Value="@_selectedRepo" Clearable="false" AnchorOrigin="Origin.BottomCenter" Required="true" ValueChanged="OnRepoSelected">

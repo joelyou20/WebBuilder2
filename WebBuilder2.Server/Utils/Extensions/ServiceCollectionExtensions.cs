@@ -4,10 +4,13 @@ using Amazon.Route53;
 using Amazon.Route53Domains;
 using Amazon.S3;
 using Amazon.SecretsManager;
-using Microsoft.Extensions.DependencyInjection;
+using Google.Apis.Adsense.v2;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Http;
+using Google.Apis.Services;
 using Octokit;
-using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Settings;
 
 namespace WebBuilder2.Server.Utils.Extensions
 {
@@ -109,6 +112,30 @@ namespace WebBuilder2.Server.Utils.Extensions
 
 
             return services.AddScoped(sp => new AmazonAmplifyClient(credentials, awsConfig));
+        }
+
+        public static IServiceCollection AddAdSenseService(this IServiceCollection services, Func<IServiceProvider, IAwsSecretsManagerService> serviceProvider, ConfigurationManager configuration)
+        {
+            var awsSecretsManagerService = serviceProvider.Invoke(services.BuildServiceProvider());
+
+            var clientSecret = awsSecretsManagerService.GetSecretAsync(AwsSecret.GoogleClientSecret).Result;
+
+            var googleSettings = configuration.GetSection(nameof(GoogleSettings)).Get<GoogleSettings>()!;
+
+            var credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    new ClientSecrets
+                    {
+                        ClientId = googleSettings.ClientId,
+                        ClientSecret = clientSecret,
+                    },
+                    new string[] { AdsenseService.Scope.Adsense },
+                    "WebBuilder2",
+                    CancellationToken.None).Result;
+
+            return services.AddScoped(sp => new AdsenseService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential
+            }));
         }
 
     }

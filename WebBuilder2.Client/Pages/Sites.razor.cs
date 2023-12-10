@@ -18,7 +18,7 @@ public partial class Sites
     [Inject] public IDialogService DialogService { get; set; } = default!;
 
     private List<SiteModel> _siteList = new();
-    private List<Domain> _registeredDomains = new();
+    private List<Domain>? _registeredDomains;
     private List<ApiError> _errors = new();
 
     protected override async Task OnInitializedAsync()
@@ -29,15 +29,7 @@ public partial class Sites
 
     private async Task UpdateDomainsAsync()
     {
-        var response = await AwsService.GetRegisteredDomainsAsync();
-
-        if(!response.IsSuccessful)
-        {
-            _errors.AddRange(response.Errors);
-            StateHasChanged();
-        }
-
-        _registeredDomains = response.GetValues();
+        _registeredDomains = await AwsService.GetRegisteredDomainsAsync();
     }
 
     private async Task UpdateSitesAsync()

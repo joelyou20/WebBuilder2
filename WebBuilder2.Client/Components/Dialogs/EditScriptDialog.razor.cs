@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WebBuilder2.Client.Models;
-using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebBuilder2.Client.Components.Dialogs;
 
@@ -15,9 +13,6 @@ public partial class EditScriptDialog
     [Parameter] public ScriptModel Script { get; set; } = new();
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-
-    private List<ApiError> _errors = new();
-
     public void OnFileChanged(ScriptEditorFile file)
     {
         Script.Data = file.Content;
@@ -25,14 +20,7 @@ public partial class EditScriptDialog
 
     public async Task OnSaveBtnClick()
     {
-        var script = await ScriptService.UpdateScriptAsync(Script);
-
-        if (script == null)
-        {
-            _errors.Add(new ApiError("Failed to update script"));
-            StateHasChanged();
-            return;
-        }
+        await ScriptService.UpdateScriptAsync(Script);
 
         MudDialog.Close(DialogResult.Ok(true));
     }
