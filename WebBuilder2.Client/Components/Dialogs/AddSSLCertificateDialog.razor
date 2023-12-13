@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using WebBuilder2.Client.Components.Forms
+
+<MudDialog>
+    <DialogContent>
+        <EditForm OnValidSubmit="@OnValidSubmit" Model="@_request">
+            <DataAnnotationsValidator />
+            <MudTextField T="string" Placeholder="Domain Name" @bind-Value="_request.DomainName" For="(() => _request.DomainName)" />
+            <MudButton Variant="Variant.Filled" OnClick="OnAddAlternateDomainName">Add Alternate Domain Name</MudButton>
+            @* @foreach(var domainName in _alternateDomainNames)
+            {    
+                <MudTextField T="string" Placeholder="Alternate Domain Name" @bind-Value="domainName" Required="true" /><MudButton Variant="Variant.Filled" OnClick="(() => OnRemoveAlternateDomainName(domainName))">X</MudButton>
+            } *@
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Save</MudButton>
+        </EditForm>
+    </DialogContent>
+</MudDialog>

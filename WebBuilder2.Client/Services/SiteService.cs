@@ -41,5 +41,12 @@ namespace WebBuilder2.Client.Services
 
             return result?.SingleOrDefault();
         }
+
+        public async Task<SiteModel?> UpdateSiteAsync(SiteModel site)
+        {
+            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.UpdateSiteAsync(site));
+
+            return result?.SingleOrDefault();
+        }
     }
 }

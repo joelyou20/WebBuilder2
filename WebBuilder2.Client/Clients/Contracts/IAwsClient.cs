@@ -18,4 +18,5 @@ public interface IAwsClient
     Task<ValidationResponse<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain);
     Task<ValidationResponse<Domain>> GetRegisteredDomainsAsync();
     Task<ValidationResponse> PostRegisterDomainAsync(string domainName);
+    Task<ValidationResponse<AwsNewSSLCertificateResponse>> PostNewSSLCertificateAsync(AwsNewSSLCertificateRequest request);
 }

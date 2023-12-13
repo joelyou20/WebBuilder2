@@ -15,6 +15,8 @@ public class SiteModel : AuditableEntity
     [JsonProperty("description")]
     public string Description { get; set; } = "";
     public RepositoryModel? Repository { get; set; }
+    [JsonProperty("sslCertificateIssueDate")]
+    public DateTime? SSLCertificateIssueDate { get; set; }
 
     public SiteModel() { }
 

@@ -15,9 +15,9 @@ public class GoogleService : ServiceBase, IGoogleService
         _client = client;
     }
     
-    public async Task<List<GoogleAdSenseAccount>?> GetAccountsAsync(string? name = null)
+    public async Task<List<GoogleAdSenseAccount>?> GetAccountsAsync()
     {
-        IEnumerable<GoogleAdSenseAccount>? result = await ExecuteAsync(() => _client.GetAccountsAsync(name));
+        IEnumerable<GoogleAdSenseAccount>? result = await ExecuteAsync(() => _client.GetAccountsAsync());
         return result?.ToList();
     }
 

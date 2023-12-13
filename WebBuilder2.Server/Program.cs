@@ -31,6 +31,7 @@ builder.Services.AddScoped<IAwsRoute53DomainsService, AwsRoute53DomainsService>(
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>();
 builder.Services.AddScoped<IAwsAmplifyService, AwsAmplifyService>();
+builder.Services.AddScoped<IAwsCertificateManagerService, AwsCertificateManagerService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<IGoogleAdSenseService, GoogleAdSenseService>();
 
@@ -45,6 +46,7 @@ builder.Services.AddAwsRoute53Client();
 builder.Services.AddAwsRoute53DomainsClient();
 builder.Services.AddAwsCostExplorerClient();
 builder.Services.AddAwsAmplifyClient();
+builder.Services.AddAwsCertificateManagerClient();
 builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 
 builder.Services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));

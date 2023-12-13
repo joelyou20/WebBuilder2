@@ -157,4 +157,18 @@ public class ValidationResponse
         IsSuccessful = false,
         Message = "User not Authenticated",
     };
+
+    public static ValidationResponse ToResult(string message, JsonSerializerSettings? settings = null)
+    {
+        try
+        {
+            var result = JsonConvert.DeserializeObject<ValidationResponse>(message, settings);
+
+            return result!;
+        }
+        catch
+        {
+            return Failure(message: message);
+        }
+    }
 }

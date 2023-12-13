@@ -11,4 +11,5 @@ public interface ISiteClient
     Task<ValidationResponse<SiteModel>> GetSitesAsync(Dictionary<string, string>? filter = null);
     Task<ValidationResponse<SiteModel>> SoftDeleteSiteAsync(SiteModel site);
     Task<ValidationResponse<SiteModel>> SoftDeleteRangeSiteAsync(IEnumerable<SiteModel> sites);
+    Task<ValidationResponse<SiteModel>> UpdateSiteAsync(SiteModel site);
 }

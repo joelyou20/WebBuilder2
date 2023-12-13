@@ -5,7 +5,7 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Clients;
 
-public class ClientBase<T> where T : AuditableEntity
+public class ClientBase<T> where T : class
 {
     private HttpClient _httpClient;
     private string _endpoint;
@@ -37,7 +37,7 @@ public class ClientBase<T> where T : AuditableEntity
         return await ParseResponseAsync(response);
     }
 
-    private async Task<ValidationResponse<T>> PostAsync(string? path = null, JsonContent? content = null)
+    public async Task<ValidationResponse<T>> PostAsync(string? path = null, JsonContent? content = null)
     {
         HttpResponseMessage response = await _httpClient.PostAsync(path == null ? 
             $"{_httpClient.BaseAddress}{_endpoint}" : 
@@ -61,6 +61,93 @@ public class ClientBase<T> where T : AuditableEntity
     {
         var message = await response.Content.ReadAsStringAsync();
         var result = ValidationResponse<T>.ToResult(message)!;
+        return result;
+    }
+}
+
+public class ClientBase
+{
+    private HttpClient _httpClient;
+    private string _endpoint;
+
+    public ClientBase(HttpClient httpClient, string endpoint)
+    {
+        _httpClient = httpClient;
+        _endpoint = endpoint;
+    }
+
+    public async Task<ValidationResponse<T>> AddAsync<T>(T value) where T : class => await AddRangeAsync(new T[] { value });
+    public async Task<ValidationResponse<T>> AddRangeAsync<T>(IEnumerable<T> values) where T : class => await PutAsync<T>(content: JsonContent.Create(values));
+    public async Task<ValidationResponse<T>> GetSingleAsync<T>(long id) where T : class => await GetAsync<T>(path: id.ToString());
+    public async Task<ValidationResponse<T>> SoftDeleteAsync<T>(T value) where T : class => await SoftDeleteRangeAsync(new T[] { value });
+    public async Task<ValidationResponse<T>> SoftDeleteRangeAsync<T>(IEnumerable<T> values) where T : class => await PostAsync<T>("delete", JsonContent.Create(values));
+    public async Task<ValidationResponse<T>> UpdateAsync<T>(T value) where T : class => await UpdateRangeAsync(new T[] { value });
+    public async Task<ValidationResponse<T>> UpdateRangeAsync<T>(IEnumerable<T> values) where T : class => await PostAsync<T>("update", JsonContent.Create(values));
+
+    public async Task<ValidationResponse<T>> GetAsync<T>(string? path = null, Dictionary<string, string>? filter = null) where T : class
+    {
+        var url = $"{_httpClient.BaseAddress}{_endpoint}";
+        if (path != null) url = $"{url}/{path}";
+        if (filter != null) url = $"{url}?{string.Join('&', filter.Select(kv => $"{kv.Key}={kv.Value}"))}";
+
+        HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+        response.EnsureSuccessStatusCode();
+
+        return await ParseResponseAsync<T>(response);
+    }
+
+    public async Task<ValidationResponse<T>> PostAsync<T>(string? path = null, JsonContent? content = null) where T : class
+    {
+        HttpResponseMessage response = await _httpClient.PostAsync(path == null ?
+            $"{_httpClient.BaseAddress}{_endpoint}" :
+            $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+        response.EnsureSuccessStatusCode();
+
+        return await ParseResponseAsync<T>(response);
+    }
+
+    public async Task<ValidationResponse> PostAsync(string? path = null, JsonContent? content = null)
+    {
+        HttpResponseMessage response = await _httpClient.PostAsync(path == null ?
+            $"{_httpClient.BaseAddress}{_endpoint}" :
+            $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+        response.EnsureSuccessStatusCode();
+
+        return await ParseResponseAsync(response);
+    }
+
+    public async Task<ValidationResponse<T>> PutAsync<T>(string? path = null, JsonContent? content = null) where T : class
+    {
+        HttpResponseMessage response = await _httpClient.PutAsync(path == null ?
+            $"{_httpClient.BaseAddress}{_endpoint}" :
+            $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+        response.EnsureSuccessStatusCode();
+
+        return await ParseResponseAsync<T>(response);
+    }
+
+    public async Task<ValidationResponse> PutAsync(string? path = null, JsonContent? content = null)
+    {
+        HttpResponseMessage response = await _httpClient.PutAsync(path == null ?
+            $"{_httpClient.BaseAddress}{_endpoint}" :
+            $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+        response.EnsureSuccessStatusCode();
+
+        return await ParseResponseAsync(response);
+    }
+
+    private async Task<ValidationResponse<T>> ParseResponseAsync<T>(HttpResponseMessage response) where T : class
+    {
+        var message = await response.Content.ReadAsStringAsync();
+        var result = ValidationResponse<T>.ToResult(message)!;
+        return result;
+    }
+
+    private async Task<ValidationResponse> ParseResponseAsync(HttpResponseMessage response)
+    {
+        var message = await response.Content.ReadAsStringAsync();
+        var result = ValidationResponse.ToResult(message)!;
         return result;
     }
 }

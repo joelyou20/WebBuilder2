@@ -4,6 +4,7 @@ using Amazon.Route53;
 using Amazon.Route53Domains;
 using Amazon.S3;
 using Amazon.SecretsManager;
+using Amazon.CertificateManager;
 using Google.Apis.Adsense.v2;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Http;
@@ -110,7 +111,6 @@ namespace WebBuilder2.Server.Utils.Extensions
 
             var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
 
-
             return services.AddScoped(sp => new AmazonAmplifyClient(credentials, awsConfig));
         }
 
@@ -138,5 +138,17 @@ namespace WebBuilder2.Server.Utils.Extensions
             }));
         }
 
+        public static IServiceCollection AddAwsCertificateManagerClient(this IServiceCollection services)
+        {
+            AmazonCertificateManagerConfig awsconfig = new()
+            {
+                UseAlternateUserAgentHeader = AwsConfig.UseAlternateUserAgentHeader,
+                RegionEndpoint = AwsConfig.RegionEndpoint
+            };
+
+            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
+
+            return services.AddScoped(sp => new AmazonCertificateManagerClient(credentials, awsconfig));
+        }
     }
 }

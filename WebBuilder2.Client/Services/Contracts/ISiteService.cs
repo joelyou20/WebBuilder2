@@ -10,5 +10,6 @@ namespace WebBuilder2.Client.Services.Contracts
         Task<SiteModel?> GetSingleSiteAsync(long id);
         Task<SiteModel?> AddSiteAsync(SiteModel site);
         Task<SiteModel?> SoftDeleteSiteAsync(SiteModel site);
+        Task<SiteModel?> UpdateSiteAsync(SiteModel site);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
@@ -62,6 +63,20 @@ public class SiteController : ControllerBase
         try
         {
             var result = _siteRepository.SoftDeleteRange(sites);
+            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(result)));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
+        }
+    }
+
+    [HttpPost("/site/update")]
+    public IActionResult Update([FromBody] IEnumerable<SiteModel> sites)
+    {
+        try
+        {
+            var result = _siteRepository.UpdateRange(sites);
             return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(result)));
         }
         catch (Exception ex)

@@ -34,7 +34,8 @@ namespace WebBuilder2.Server.Repositories
                 Repository = s.Repository == null ? null : s.Repository.FromDto(),
                 CreatedDateTime = s.CreatedDateTime,
                 ModifiedDateTime = s.ModifiedDateTime,
-                DeletedDateTime = s.DeletedDateTime
+                DeletedDateTime = s.DeletedDateTime,
+                SSLCertificateIssueDate = s.SSLCertificateIssueDate
             });
         }
 
@@ -100,7 +101,8 @@ namespace WebBuilder2.Server.Repositories
             Description = site.Description,
             CreatedDateTime = site.CreatedDateTime,
             ModifiedDateTime = site.ModifiedDateTime,
-            DeletedDateTime = site.DeletedDateTime
+            DeletedDateTime = site.DeletedDateTime,
+            SSLCertificateIssueDate = site.SSLCertificateIssueDate
         };
     }
 }

@@ -19,16 +19,18 @@ namespace WebBuilder2.Server.Controllers
         private IAwsRoute53DomainsService _awsRoute53DomainsService;
         private IAwsCostExplorerService _awsCostExplorerService;
         private IAwsAmplifyService _awsAmplifyService;
+        private IAwsCertificateManagerService _awsCertificateManagerService;
 
         public AwsController(IAwsS3Service awsS3Service, IAwsRoute53Service awsRoute53Service, 
             IAwsCostExplorerService awsCostExplorerService, IAwsAmplifyService awsAmplifyService,
-            IAwsRoute53DomainsService awsRoute53DomainsService)
+            IAwsRoute53DomainsService awsRoute53DomainsService, IAwsCertificateManagerService awsCertificateManagerService)
         {
             _awsS3Service = awsS3Service;
             _awsRoute53Service = awsRoute53Service;
             _awsRoute53DomainsService = awsRoute53DomainsService;
             _awsCostExplorerService = awsCostExplorerService;
             _awsAmplifyService = awsAmplifyService;
+            _awsCertificateManagerService = awsCertificateManagerService;
         }
 
         [HttpGet("/aws/bucket/{name}")]
@@ -312,6 +314,31 @@ namespace WebBuilder2.Server.Controllers
             try
             {
                 return Ok(JsonConvert.SerializeObject(await _awsRoute53DomainsService.RegisterDomainAsync(domainName)));
+            }
+            catch (HttpRequestException ex)
+            {
+                return (ex.StatusCode) switch
+                {
+                    HttpStatusCode.NoContent => NoContent(),
+                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
+                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
+                };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+            }
+        }
+
+        [HttpPost("/aws/cert")]
+        public async Task<IActionResult> PostNewSSLCertificate([FromBody] AwsNewSSLCertificateRequest request)
+        {
+            try
+            {
+                return Ok(JsonConvert.SerializeObject(await _awsCertificateManagerService.ProvisionNewCertificateAsync(request)));
             }
             catch (HttpRequestException ex)
             {
