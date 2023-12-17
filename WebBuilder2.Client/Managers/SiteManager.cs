@@ -103,6 +103,7 @@ public class SiteManager : ISiteManager
         {
             Name = createSiteRequest.Name,
             Description = createSiteRequest.Description,
+            Region = createSiteRequest.Region
         });
         _logger.LogInformation("Site Created!");
 

@@ -1,4 +1,5 @@
-﻿<div>
+﻿@using WebBuilder2.Shared.Utils
+<div>
     @if(!Sites.Any())
     {
         <MudCard>
@@ -21,10 +22,18 @@
                     {
                         <MudText>Repo Name: NULL</MudText>
                     }
+                    @if(site.SSLCertificateIssueDate != null)
+                    {
+                        <MudText class="card-site-name">SSL Issue Date: @site.SSLCertificateIssueDate</MudText>
+                        <MudText class="card-site-name">SSL ARN: <MudLink Href=@($"https://{site.Region.EnumValue()}.console.aws.amazon.com/acm/home?region={site.Region.EnumValue()}#/certificates/{site.CertificateID}") Target="_blank">@site.SSLARN</MudLink></MudText>
+                    }
                 </div>
                 <div class="st-btn-row">
                     <MudButton class="st-card-delete-site-btn" Variant="Variant.Filled" OnClick="@(() => OnDeleteSiteBtnClicked(site))">Delete Site</MudButton>
-                    <MudButton class="st-card-add-ssl-cert-btn" Variant="Variant.Filled" OnClick="@(() => OnAddSSLCertBtnClicked(site))">Add SSL Certificate</MudButton>
+                    @if (site.SSLCertificateIssueDate == null)
+                    {
+                        <MudButton class="st-card-add-ssl-cert-btn" Variant="Variant.Filled" OnClick="@(() => OnAddSSLCertBtnClicked(site))">Add SSL Certificate</MudButton>
+                    }
                 </div>
             </div>
         </MudCard>

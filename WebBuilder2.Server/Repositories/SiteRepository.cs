@@ -35,7 +35,9 @@ namespace WebBuilder2.Server.Repositories
                 CreatedDateTime = s.CreatedDateTime,
                 ModifiedDateTime = s.ModifiedDateTime,
                 DeletedDateTime = s.DeletedDateTime,
-                SSLCertificateIssueDate = s.SSLCertificateIssueDate
+                SSLCertificateIssueDate = s.SSLCertificateIssueDate,
+                SSLARN = s.SSLARN,
+                Region = s.Region
             });
         }
 
@@ -102,7 +104,9 @@ namespace WebBuilder2.Server.Repositories
             CreatedDateTime = site.CreatedDateTime,
             ModifiedDateTime = site.ModifiedDateTime,
             DeletedDateTime = site.DeletedDateTime,
-            SSLCertificateIssueDate = site.SSLCertificateIssueDate
+            SSLCertificateIssueDate = site.SSLCertificateIssueDate,
+            SSLARN = site.SSLARN,
+            Region = site.Region
         };
     }
 }

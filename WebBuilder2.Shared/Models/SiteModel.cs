@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace WebBuilder2.Shared.Models;
 
@@ -17,6 +16,11 @@ public class SiteModel : AuditableEntity
     public RepositoryModel? Repository { get; set; }
     [JsonProperty("sslCertificateIssueDate")]
     public DateTime? SSLCertificateIssueDate { get; set; }
+    [JsonProperty("sslArn")]
+    public string? SSLARN { get; set; }
+    [JsonIgnore]
+    public string? CertificateID => SSLARN?.Split('/').Last() ?? null;
+    public Region Region { get; set; } = Region.USEast1;
 
     public SiteModel() { }
 

@@ -11,37 +11,28 @@ public partial class AddSSLCertificateDialog
     [Inject] public IAwsService AwsService { get; set; } = default!;
     [Inject] public ISiteService SiteService { get; set; } = default!;
 
-    [Parameter] public SiteModel Site { get; set; } = default!;
+    [Parameter] public SiteModel? Site { get; set; }
+    [Parameter] public bool IsReadOnly { get; set; } = true;
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     private AwsNewSSLCertificateRequest _request { get; set; } = new();
 
-    private List<string> _alternateDomainNames { get; set; } = new();
-
     public void OnValidSubmit() => InvokeAsync(async () =>
     {
-        _request.AlternativeNames = _alternateDomainNames;
+        _request.AlternativeNames = new List<string>
+        {
+            _request.DomainName.Replace("www.", "")
+        };
+
         AwsNewSSLCertificateResponse? response = await AwsService.PostNewSSLCertificateAsync(_request);
 
-        if(response != null)
+        if (response != null && Site != null)
         {
+            Site.SSLCertificateIssueDate = DateTime.Now;
+            Site.SSLARN = response.Arn;
             SiteModel? updateResponse = await SiteService.UpdateSiteAsync(Site);
-
-            if (updateResponse == null) MudDialog.Close(DialogResult.Ok(false));
         }
 
         MudDialog.Close(DialogResult.Ok(true));
     });
-
-    public void OnAddAlternateDomainName()
-    {
-        _alternateDomainNames.Add("");
-        StateHasChanged();
-    }
-
-    public void OnRemoveAlternateDomainName(string domainName)
-    {
-        _alternateDomainNames.Remove(domainName);
-        StateHasChanged();
-    }
 }

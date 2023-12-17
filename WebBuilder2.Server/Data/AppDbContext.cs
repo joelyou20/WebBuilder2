@@ -1,17 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Server.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
     public DbSet<Site> Site { get; set; }
     public DbSet<Script> Script { get; set; }
     public DbSet<Repository> Repository { get; set; }
     public DbSet<Log> Logs { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder
+            .Entity<Site>()
+            .Property(d => d.Region)
+            .HasConversion(new EnumToStringConverter<Region>());
+    }
 
     public override int SaveChanges()
     {

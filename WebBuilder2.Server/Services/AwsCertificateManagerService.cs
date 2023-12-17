@@ -11,14 +11,21 @@ namespace WebBuilder2.Server.Services
     public class AwsCertificateManagerService : IAwsCertificateManagerService
     {
         private AmazonCertificateManagerClient _client;
+        private IAwsRoute53Service _awsRoute53Service;
 
-        public AwsCertificateManagerService(AmazonCertificateManagerClient client)
+        public AwsCertificateManagerService(AmazonCertificateManagerClient client, IAwsRoute53Service awsRoute53Service)
         {
             _client = client;
+            _awsRoute53Service = awsRoute53Service;
         }
 
+        // TODO: Create DNS Records in Route 53 automatically
         public async Task<ValidationResponse<AwsNewSSLCertificateResponse>> ProvisionNewCertificateAsync(AwsNewSSLCertificateRequest request)
         {
+            var validationResult = await ValidateDomainAsync<AwsNewSSLCertificateResponse>(request.AlternativeNames.First());
+
+            if (validationResult != null) return validationResult;
+
             RequestCertificateRequest awsRequest = new()
             {
                 DomainName = request.DomainName,
@@ -39,6 +46,24 @@ namespace WebBuilder2.Server.Services
             };
 
             return ValidationResponse<AwsNewSSLCertificateResponse>.Success(response);
+        }
+
+        private async Task<ValidationResponse<T>?> ValidateDomainAsync<T>(string domainName) where T : class
+        {
+            var hostedZonesResponse = await _awsRoute53Service.GetHostedZonesAsync();
+            if(hostedZonesResponse.IsSuccessful)
+            {
+                bool? result = hostedZonesResponse.Values?.Any(x => x.Name.Equals($"{domainName}."));
+
+                if (!result.HasValue || !result.Value)
+                {
+                    return ValidationResponse<T>.Failure(message: "Hosted Zone does not exist.");
+                }
+
+                return null;
+            }
+
+            return ValidationResponse<T>.Failure(message: hostedZonesResponse.Message);
         }
     }
 }

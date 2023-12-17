@@ -22,7 +22,7 @@ public class AwsRoute53Service : IAwsRoute53Service
         var response = await _client.ListHostedZonesAsync();
         if (response.HttpStatusCode != HttpStatusCode.OK)
         {
-            // Handle Error
+            return ValidationResponse<Shared.Models.HostedZone>.Failure(message: "", code: response.HttpStatusCode);
         }
 
         var hostedZones = response.HostedZones.Select(zone => new Shared.Models.HostedZone

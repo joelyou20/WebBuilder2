@@ -106,5 +106,29 @@ public partial class Sites
         );
     }
 
+    public void OnAddSSLCertBtnClicked() => InvokeAsync(async () =>
+    {
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center,
+            FullWidth = true,
+        };
+
+        DialogParameters dialogParameters = new()
+        {
+            { "IsReadOnly", false }
+        };
+
+        var dialog = await DialogService.ShowAsync<AddSSLCertificateDialog>(
+            title: "Add New SSL Certificate to Site",
+            options: options,
+            parameters: dialogParameters
+        );
+
+        await dialog.Result;
+    });
+
     public void OnSiteTableValueChanged() => InvokeAsync(UpdateSitesAsync);
 }

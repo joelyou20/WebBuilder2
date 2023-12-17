@@ -25,6 +25,7 @@
     <div class="btn-row">
         <MudButton class="create-site-btn" Variant="Variant.Filled" OnClick="@OnCreateSiteBtnClicked">Create Site</MudButton>
         <MudButton class="add-existing-site-btn" Variant="Variant.Filled" OnClick="@OnAddExistingSiteBtnClicked">Add Existing Site</MudButton>
+        <MudButton class="create-site-btn" Variant="Variant.Filled" OnClick="@OnAddSSLCertBtnClicked">Add Manual SSL Certificate</MudButton>
         <MudButton Variant="Variant.Filled" OnClick="@OnGetSuggestedDomainNamesClicked">Get Domain Names</MudButton>
     </div>
     <SiteTable Sites="@_siteList" ValueChanged="@OnSiteTableValueChanged" />

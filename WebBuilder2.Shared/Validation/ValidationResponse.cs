@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Net;
 using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Shared.Validation;
@@ -23,13 +24,13 @@ public class ValidationResponse<T> where T : class
 
     public static ValidationResponse<T> Success(T value, string? message = null) => Success(new List<T> { value }, message);
 
-    public static ValidationResponse<T> Failure(IEnumerable<T>? values = null, string? message = null) => new()
+    public static ValidationResponse<T> Failure(IEnumerable<T>? values = null, string? message = null, HttpStatusCode? code = null) => new()
     {
         IsSuccessful = false,
         Message = message ?? "Failure",
         Values = values,
         Errors = new List<ApiError> { 
-            new ApiError(message)
+            new(message, code: code.HasValue ? ((int)code!.Value).ToString() : null)
         }
     };
     public static ValidationResponse<T> Failure(T value, string? message = null) => Failure(new List<T>() { value }, message);

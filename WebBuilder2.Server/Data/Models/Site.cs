@@ -15,6 +15,8 @@ namespace WebBuilder2.Server.Data.Models
         public string Description { get; set; } = string.Empty;
         public Repository? Repository { get; set; }
         public DateTime? SSLCertificateIssueDate { get; set; }
+        public string? SSLARN { get; set; }
+        public Region Region { get; set; } = Region.USEast1;
 
         public SiteModel FromDto() => new() 
         { 
@@ -25,7 +27,9 @@ namespace WebBuilder2.Server.Data.Models
             CreatedDateTime = CreatedDateTime,
             ModifiedDateTime = ModifiedDateTime,
             DeletedDateTime = DeletedDateTime,
-            SSLCertificateIssueDate = SSLCertificateIssueDate
+            SSLCertificateIssueDate = SSLCertificateIssueDate,
+            SSLARN = SSLARN,
+            Region = Region
         };
     }
 }
