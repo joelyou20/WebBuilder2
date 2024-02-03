@@ -40,7 +40,7 @@ public class GithubService : IGithubService
         return ValidationResponse<RepositoryModel>.Success(repos);
     }
 
-    public async Task<ValidationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request)
+    public async Task<ValidationResponse> AuthenticateUserAsync()
     {
         try
         {
@@ -52,12 +52,16 @@ public class GithubService : IGithubService
                 Message = "Success",
             };
         }
-        catch (AuthorizationException)
+        catch (AuthorizationException ex)
         {
             return new ValidationResponse
             {
                 IsSuccessful = false,
                 Message = "Failed to Authenticate",
+                Errors = new List<Shared.Models.ApiError>
+                {
+                    new(exception: ex)
+                }
             };
         }
     }
@@ -148,7 +152,6 @@ public class GithubService : IGithubService
         HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Get, "actions/secrets", userName, repoName);
 
         HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
 
         string message = await response.Content.ReadAsStringAsync();
         GithubSecretResponse? result = JsonConvert.DeserializeObject<GithubSecretResponse>(message);
@@ -176,7 +179,6 @@ public class GithubService : IGithubService
             HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Put, $"actions/secrets/{secret.Name}", userName, repoName, content);
 
             HttpResponseMessage response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
         }
 
         return ValidationResponse<GithubSecret>.Success(secrets);
@@ -385,7 +387,6 @@ public class GithubService : IGithubService
         HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Get, "actions/secrets/public-key", userName, repoName);
 
         HttpResponseMessage response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
 
         string message = await response.Content.ReadAsStringAsync();
         GithubPublicKey? result = JsonConvert.DeserializeObject<GithubPublicKey>(message);

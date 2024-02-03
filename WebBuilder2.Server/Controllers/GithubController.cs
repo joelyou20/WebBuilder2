@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Octokit;
 using System.Net;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
@@ -66,7 +67,7 @@ namespace WebBuilder2.Server.Controllers
             {
                 return Ok(JsonConvert.SerializeObject(await _githubService.GetUserAsync()));
             }
-            catch (Exception ex)
+            catch (AuthorizationException ex)
             {
                 return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<string>.BuildFailedResponse(ex)));
             }
@@ -186,15 +187,15 @@ namespace WebBuilder2.Server.Controllers
         #region Auth
 
         [HttpPost("/github/auth")]
-        public async Task<IActionResult> Authenticate([FromBody] GithubAuthenticationRequest request)
+        public async Task<IActionResult> Authenticate()
         {
             try
             {
-                return Ok(JsonConvert.SerializeObject(await _githubService.AuthenticateUserAsync(request)));
+                return Ok(JsonConvert.SerializeObject(await _githubService.AuthenticateUserAsync()));
             }
             catch (Exception ex)
             {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<GithubAuthenticationRequest>.BuildFailedResponse(request, ex)));
+                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
             }
         }
 

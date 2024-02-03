@@ -32,9 +32,7 @@ public class ClientBase<T> where T : class
 
         HttpResponseMessage response = await _httpClient.GetAsync(url);
 
-        response.EnsureSuccessStatusCode();
-
-        return await ParseResponseAsync(response);
+        return await ValidationResponse<T>.ParseResponseAsync(response);
     }
 
     public async Task<ValidationResponse<T>> PostAsync(string? path = null, JsonContent? content = null)
@@ -42,9 +40,8 @@ public class ClientBase<T> where T : class
         HttpResponseMessage response = await _httpClient.PostAsync(path == null ? 
             $"{_httpClient.BaseAddress}{_endpoint}" : 
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
-        response.EnsureSuccessStatusCode();
 
-        return await ParseResponseAsync(response);
+        return await ValidationResponse<T>.ParseResponseAsync(response);
     }
 
     private async Task<ValidationResponse<T>> PutAsync(string? path = null, JsonContent? content = null)
@@ -52,16 +49,8 @@ public class ClientBase<T> where T : class
         HttpResponseMessage response = await _httpClient.PutAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
-        response.EnsureSuccessStatusCode();
 
-        return await ParseResponseAsync(response);
-    }
-
-    private async Task<ValidationResponse<T>> ParseResponseAsync(HttpResponseMessage response)
-    {
-        var message = await response.Content.ReadAsStringAsync();
-        var result = ValidationResponse<T>.ToResult(message)!;
-        return result;
+        return await ValidationResponse<T>.ParseResponseAsync(response);
     }
 }
 
@@ -92,9 +81,7 @@ public class ClientBase
 
         HttpResponseMessage response = await _httpClient.GetAsync(url);
 
-        response.EnsureSuccessStatusCode();
-
-        return await ParseResponseAsync<T>(response);
+        return await ValidationResponse<T>.ParseResponseAsync(response);
     }
 
     public async Task<ValidationResponse<T>> PostAsync<T>(string? path = null, JsonContent? content = null) where T : class
@@ -102,9 +89,8 @@ public class ClientBase
         HttpResponseMessage response = await _httpClient.PostAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
-        response.EnsureSuccessStatusCode();
 
-        return await ParseResponseAsync<T>(response);
+        return await ValidationResponse<T>.ParseResponseAsync(response);
     }
 
     public async Task<ValidationResponse> PostAsync(string? path = null, JsonContent? content = null)
@@ -112,9 +98,8 @@ public class ClientBase
         HttpResponseMessage response = await _httpClient.PostAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
-        response.EnsureSuccessStatusCode();
 
-        return await ParseResponseAsync(response);
+        return await ValidationResponse.ParseResponseAsync(response);
     }
 
     public async Task<ValidationResponse<T>> PutAsync<T>(string? path = null, JsonContent? content = null) where T : class
@@ -122,9 +107,8 @@ public class ClientBase
         HttpResponseMessage response = await _httpClient.PutAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
-        response.EnsureSuccessStatusCode();
 
-        return await ParseResponseAsync<T>(response);
+        return await ValidationResponse<T>.ParseResponseAsync(response);
     }
 
     public async Task<ValidationResponse> PutAsync(string? path = null, JsonContent? content = null)
@@ -132,22 +116,7 @@ public class ClientBase
         HttpResponseMessage response = await _httpClient.PutAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
-        response.EnsureSuccessStatusCode();
 
-        return await ParseResponseAsync(response);
-    }
-
-    private async Task<ValidationResponse<T>> ParseResponseAsync<T>(HttpResponseMessage response) where T : class
-    {
-        var message = await response.Content.ReadAsStringAsync();
-        var result = ValidationResponse<T>.ToResult(message)!;
-        return result;
-    }
-
-    private async Task<ValidationResponse> ParseResponseAsync(HttpResponseMessage response)
-    {
-        var message = await response.Content.ReadAsStringAsync();
-        var result = ValidationResponse.ToResult(message)!;
-        return result;
+        return await ValidationResponse.ParseResponseAsync(response);
     }
 }

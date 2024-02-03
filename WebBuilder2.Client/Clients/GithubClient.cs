@@ -22,7 +22,7 @@ namespace WebBuilder2.Client.Clients
         public async Task<ValidationResponse<RepoContent>> PostRepositoryContentAsync(string userName, string repoName, string? path = null) => await PostAsync<RepoContent> ($"repos/{userName}/{repoName}", JsonContent.Create(path));
         public async Task<ValidationResponse> PostCopyRepoAsync(GithubCopyRepoRequest request) => await PostAsync("repos/copy", JsonContent.Create(request));
         public async Task<ValidationResponse<GitTreeItem>> GetGitTreeAsync(string userName, string repoName) => await GetAsync<GitTreeItem>($"git/tree/{userName}/{repoName}");
-        public async Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request) => await PostAsync("auth", JsonContent.Create(request));
+        public async Task<ValidationResponse> PostAuthenticateAsync() => await PostAsync("auth");
         public async Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync() => await GetAsync<GitIgnoreTemplateResponse>("gitignore");
         public async Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync() => await GetAsync<GithubProjectLicense>("license");
         public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName) => await GetAsync<GithubSecretResponse>($"secrets/{userName}/{repoName}");

@@ -7,7 +7,7 @@ namespace WebBuilder2.Server.Services.Contracts
     public interface IGithubService
     {
         Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync();
-        Task<ValidationResponse> AuthenticateUserAsync(GithubAuthenticationRequest request);
+        Task<ValidationResponse> AuthenticateUserAsync();
         Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repository);
         Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
         Task<ValidationResponse<GithubProjectLicense>> GetLicenseTemplatesAsync();

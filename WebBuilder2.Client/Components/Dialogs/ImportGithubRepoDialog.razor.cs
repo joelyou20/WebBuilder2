@@ -28,7 +28,7 @@ public partial class ImportGithubRepoDialog
 
     public async Task UpdateReposAsync()
     {
-        ValidationResponse authenticateResponse = await GithubService.PostAuthenticateAsync(new GithubAuthenticationRequest(""));
+        ValidationResponse authenticateResponse = await GithubService.PostAuthenticateAsync();
 
         if (authenticateResponse != null && authenticateResponse.IsSuccessful)
         {

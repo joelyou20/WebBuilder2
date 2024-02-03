@@ -12,12 +12,11 @@ public partial class GithubLogin
 
     [Parameter] public string ReturnUrl { get; set; } = string.Empty;
 
-    private GithubAuthenticationRequest _githubAuthenticationRequest = new();
 
     private void OnValidSubmit(EditContext context) => InvokeAsync(async () =>
     {
-        if (_githubAuthenticationRequest != null) await GithubService.PostAuthenticateAsync(_githubAuthenticationRequest);
-        else throw new Exception("Form invalid");
+        /*if (_githubAuthenticationRequest != null) */ 
+        await GithubService.PostAuthenticateAsync();
 
         NavigationManager.NavigateTo(ReturnUrl);
     });

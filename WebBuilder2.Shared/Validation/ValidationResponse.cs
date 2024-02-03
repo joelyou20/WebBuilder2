@@ -91,12 +91,12 @@ public class ValidationResponse<T> where T : class
 
     public List<T> GetValues() => Values?.ToList() ?? new List<T>();
 
-    public ValidationResponse GetResponse() => new()
+    public static async Task<ValidationResponse<T>> ParseResponseAsync(HttpResponseMessage response)
     {
-        IsSuccessful = IsSuccessful,
-        Errors = Errors,
-        Message = Message
-    };
+        var message = await response.Content.ReadAsStringAsync();
+        var result = ValidationResponse<T>.ToResult(message)!;
+        return result;
+    }
 }
 
 public class ValidationResponse
@@ -171,5 +171,12 @@ public class ValidationResponse
         {
             return Failure(message: message);
         }
+    }
+
+    public static async Task<ValidationResponse> ParseResponseAsync(HttpResponseMessage response)
+    {
+        var message = await response.Content.ReadAsStringAsync();
+        var result = ToResult(message)!;
+        return result;
     }
 }

@@ -12,7 +12,7 @@ public interface IGithubClient
     Task<ValidationResponse<RepoContent>> PostRepositoryContentAsync(string userName, string repoName, string? path = null);
     Task<ValidationResponse> PostCopyRepoAsync(GithubCopyRepoRequest request);
     Task<ValidationResponse<GitTreeItem>> GetGitTreeAsync(string userName, string repoName);
-    Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request);
+    Task<ValidationResponse> PostAuthenticateAsync();
     Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
     Task<ValidationResponse<GithubProjectLicense>> GetGithubProjectLicensesAsync();
     Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName);

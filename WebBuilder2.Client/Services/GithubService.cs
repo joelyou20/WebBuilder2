@@ -102,14 +102,14 @@ namespace WebBuilder2.Client.Services
             await ExecuteAsync(() => _client.CreateCommitAsync(request, userName, repoName));
         }
 
-        public async Task<ValidationResponse> PostAuthenticateAsync(GithubAuthenticationRequest request)
+        public async Task<ValidationResponse> PostAuthenticateAsync()
         {
-            return await _client.PostAuthenticateAsync(request);
+            return await _client.PostAuthenticateAsync();
         }
 
         public async Task<RepositoryModel?> PostCreateRepoAsync(RepositoryModel repository)
         {
-            ValidationResponse authenticateResponse = await PostAuthenticateAsync(new GithubAuthenticationRequest(""));
+            ValidationResponse authenticateResponse = await PostAuthenticateAsync();
 
             if (authenticateResponse != null && authenticateResponse.IsSuccessful)
             {
