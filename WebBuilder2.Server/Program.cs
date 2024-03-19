@@ -39,6 +39,7 @@ builder.Services.AddScoped<ISiteRepository, SiteRepository>();
 builder.Services.AddScoped<IRepositoryRepository, RepositoryRepository>();
 builder.Services.AddScoped<IScriptRepository, ScriptRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
+builder.Services.AddScoped<ISiteRepositoryRepository, SiteRepositoryRepository>();
 
 builder.Services.AddAwsSecretsManagerClient();
 builder.Services.AddAwsS3Client();

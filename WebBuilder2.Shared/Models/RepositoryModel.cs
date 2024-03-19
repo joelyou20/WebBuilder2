@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,9 +14,9 @@ public class RepositoryModel : AuditableEntity
     [Key]
     [JsonPropertyName("id")]
     public long Id { get; set; }
-    [JsonPropertyName("siteId")]
-    public long SiteId { get; set; }
-    public SiteModel? Site { get; set; }
+    [JsonProperty("siteRepositoryId")]
+    public long SiteRepositoryId { get; set; }
+    public SiteRepositoryModel? SiteRepository { get; set; }
     [JsonPropertyName("externalId")]
     public long ExternalId { get; set; }
     [JsonPropertyName("name")]

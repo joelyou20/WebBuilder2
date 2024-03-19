@@ -27,7 +27,6 @@ public class RepositoryController : ControllerBase
             var result = _repositoryRepository.Get(exclude);
             if (id != null) result = result?.Where(x => x.Id == id);
 
-
             if (result == null) throw new Exception(id == null ?
                 "Failed to get repository data from database." :
                 $"Failed to retrieve repository data with ID value of: {id}");

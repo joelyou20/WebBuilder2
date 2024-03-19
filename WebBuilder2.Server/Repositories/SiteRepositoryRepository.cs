@@ -1,47 +1,42 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebBuilder2.Server.Data;
-using WebBuilder2.Server.Data.Models;
-using WebBuilder2.Shared.Models;
 using WebBuilder2.Server.Repositories.Contracts;
-using System.Linq;
+using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Server.Repositories
 {
-    public class SiteRepository : ISiteRepository
+    public class SiteRepositoryRepository : ISiteRepositoryRepository
     {
         private readonly AppDbContext _db;
-        private readonly ILogger<SiteRepository> _logger;
+        private readonly ILogger<SiteRepositoryRepository> _logger;
 
-        public SiteRepository(AppDbContext db, ILogger<SiteRepository> logger)
+        public SiteRepositoryRepository(AppDbContext db, ILogger<SiteRepositoryRepository> logger)
         {
             _db = db;
             _logger = logger;
         }
 
-        public IQueryable<SiteModel>? Get(IEnumerable<long>? exclude = null)
+        public IQueryable<SiteRepositoryModel>? Get(IEnumerable<long>? exclude = null)
         {
-            var query = _db.Site
-                .Include(s => s.SiteRepository)
+            var query = _db.SiteRepository
                 .Where(s => s.DeletedDateTime == null);
 
             if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
 
-            return query.Select(s => new SiteModel
+            return query.Select(s => new SiteRepositoryModel
             {
                 Id = s.Id,
-                Name = s.Name,
-                Description = s.Description,
-                SiteRepository = s.SiteRepository == null ? null : s.SiteRepository.FromDto(),
+                Repository = s.Repository.FromDto(),
+                Site = s.Site.FromDto(),
+                SiteId = s.SiteId,
+                RepositoryId = s.RepositoryId,
                 CreatedDateTime = s.CreatedDateTime,
-                ModifiedDateTime = s.ModifiedDateTime,
                 DeletedDateTime = s.DeletedDateTime,
-                SSLCertificateIssueDate = s.SSLCertificateIssueDate,
-                SSLARN = s.SSLARN,
-                Region = s.Region
+                ModifiedDateTime = s.ModifiedDateTime
             });
         }
 
-        public IEnumerable<SiteModel> AddRange(IEnumerable<SiteModel> values)
+        public IEnumerable<SiteRepositoryModel> AddRange(IEnumerable<SiteRepositoryModel> values)
         {
             if (!values.Any()) throw new ArgumentNullException(paramName: nameof(values));
             var dtos = values.Select(ToDto).ToArray();
@@ -51,29 +46,29 @@ namespace WebBuilder2.Server.Repositories
             return dtos.Select(x => x.FromDto());
         }
 
-        public IEnumerable<SiteModel> UpdateRange(IEnumerable<SiteModel> values)
+        public IEnumerable<SiteRepositoryModel> UpdateRange(IEnumerable<SiteRepositoryModel> values)
         {
             var dtos = values.Select(ToDto).ToArray();
-            _db.Site.UpdateRange(dtos);
+            _db.SiteRepository.UpdateRange(dtos);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
             return dtos.Select(x => x.FromDto());
         }
 
-        public IEnumerable<SiteModel> UpsertRange(IEnumerable<SiteModel> values)
+        public IEnumerable<SiteRepositoryModel> UpsertRange(IEnumerable<SiteRepositoryModel> values)
         {
             IEnumerable<long> valuesList = values.Select(x => x.Id).ToArray();
-            List<SiteModel> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<SiteModel>();
-            List<SiteModel> newValues = values.Where(x => !existingValues.Select(y => y.Id == x.Id).Any()).ToList();
+            List<SiteRepositoryModel> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<SiteRepositoryModel>();
+            List<SiteRepositoryModel> newValues = values.Where(x => !existingValues.Select(y => y.Id == x.Id).Any()).ToList();
 
-            var result = new List<SiteModel>();
+            var result = new List<SiteRepositoryModel>();
 
             if (existingValues.Any()) result.AddRange(UpdateRange(values));
             if (newValues.Any()) result.AddRange(AddRange(newValues));
             return result;
         }
 
-        public IEnumerable<SiteModel> DeleteRange(IEnumerable<SiteModel> values)
+        public IEnumerable<SiteRepositoryModel> DeleteRange(IEnumerable<SiteRepositoryModel> values)
         {
             var dtos = values.Select(ToDto).ToArray();
             _db.RemoveRange(dtos);
@@ -82,7 +77,7 @@ namespace WebBuilder2.Server.Repositories
             return dtos.Select(x => x.FromDto());
         }
 
-        public IEnumerable<SiteModel> SoftDeleteRange(IEnumerable<SiteModel> values)
+        public IEnumerable<SiteRepositoryModel> SoftDeleteRange(IEnumerable<SiteRepositoryModel> values)
         {
             var softDeletedValues = values.Select(x =>
             {
@@ -90,24 +85,20 @@ namespace WebBuilder2.Server.Repositories
                 copy.DeletedDateTime = DateTime.UtcNow;
                 return copy;
             }).ToArray();
-            _db.Site.UpdateRange(softDeletedValues);
+            _db.SiteRepository.UpdateRange(softDeletedValues);
             var result = _db.SaveChanges();
             if (result <= 0) throw new DbUpdateException("Failed to save changes.");
             return softDeletedValues.Select(x => x.FromDto());
         }
 
-        public Site ToDto(SiteModel site) => new()
+        public Data.Models.SiteRepository ToDto(SiteRepositoryModel siteRepository) => new()
         {
-            Id = site.Id,
-            Name = site.Name,
-            Description = site.Description,
-            CreatedDateTime = site.CreatedDateTime,
-            ModifiedDateTime = site.ModifiedDateTime,
-            DeletedDateTime = site.DeletedDateTime,
-            SSLCertificateIssueDate = site.SSLCertificateIssueDate,
-            SSLARN = site.SSLARN,
-            Region = site.Region,
-            SiteRepositoryId = site.SiteRepositoryId,
+            Id = siteRepository.Id,
+            RepositoryId = siteRepository.RepositoryId,
+            SiteId = siteRepository.SiteId,
+            CreatedDateTime = siteRepository.CreatedDateTime,
+            ModifiedDateTime = siteRepository.ModifiedDateTime,
+            DeletedDateTime = siteRepository.DeletedDateTime,
         };
     }
 }

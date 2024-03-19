@@ -13,7 +13,7 @@ public interface IGithubService
     Task<List<GitTreeItem>?> GetGitTreeAsync(string repoName);
     Task<GitIgnoreTemplateResponse?> GetGitIgnoreTemplatesAsync();
     Task<List<GithubProjectLicense>?> GetGithubProjectLicensesAsync();
-    Task<ValidationResponse> PostAuthenticateAsync();
+    Task PostAuthenticateAsync();
     Task<RepositoryModel?> PostCreateRepoAsync(RepositoryModel repository);
     Task<GithubSecretResponse?> GetSecretsAsync(string repoName);
     Task<List<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string repoName);

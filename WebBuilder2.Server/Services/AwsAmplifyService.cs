@@ -21,7 +21,7 @@ public class AwsAmplifyService : IAwsAmplifyService
 
     public async Task<ValidationResponse> CreateAppFromRepoAsync(RepositoryModel repo)
     {
-        if (repo.Site == null) return ValidationResponse.Failure("Attempted to connect site to Amplify, but repo does not have a connected site.");
+        if (repo.SiteRepository == null) return ValidationResponse.Failure("Attempted to connect site to Amplify, but repo does not have a connected site.");
 
         var token = await _awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat);
 
@@ -29,7 +29,7 @@ public class AwsAmplifyService : IAwsAmplifyService
 
         var request = new CreateAppRequest
         {
-            Name = repo.Site.Name,
+            Name = repo.SiteRepository.Site.Name,
             AccessToken = "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",
             Repository = repo.HtmlUrl,
         };

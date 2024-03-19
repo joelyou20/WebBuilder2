@@ -150,11 +150,16 @@ public class SiteManager : ISiteManager
         _logger.LogInformation("Creating Repository...");
         _logger.LogInformation("Repository: {0}", $"{site.Name}-repo");
         RepositoryModel? createdRepo = await _repositoryManager.CreateRepositoryAsync(repo, site);
-
+        
         if (createdRepo == null)
         {
             JobComplete(JobStatus.Failure);
             return;
+        }
+        else
+        {
+            site.SiteRepositoryId = createdRepo.SiteRepositoryId;
+            await _siteService.UpdateSiteAsync(site);
         }
 
         JobComplete(JobStatus.Success);

@@ -6,7 +6,7 @@ namespace WebBuilder2.Client.Managers.Contracts;
 
 public interface IRepositoryManager
 {
-    Task<RepositoryModel?> CreateRepositoryAsync(RepositoryModel repo, SiteModel site);
+    Task<RepositoryModel?> CreateRepositoryAsync(RepositoryModel repo, SiteModel? site = null);
     Task<List<GithubSecret>?> AddSecretsAsync(RepositoryModel repo);
     Task CreateCommitAsync(IBrowserFile file, RepositoryModel repo);
     Task CreateCommitAsync(string content, string fileName, RepositoryModel repo);

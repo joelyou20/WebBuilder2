@@ -16,30 +16,50 @@ public class RepositoryManager : IRepositoryManager
 {
     private IGithubService _githubService;
     private IRepositoryService _repositoryService;
+    private ISiteRepositoryService _siteRepositoryService;
 
-    public RepositoryManager(IGithubService githubService, IRepositoryService repositoryService)
+    public RepositoryManager(IGithubService githubService, IRepositoryService repositoryService, ISiteRepositoryService siteRepositoryService)
     {
         _githubService = githubService;
         _repositoryService = repositoryService;
+        _siteRepositoryService = siteRepositoryService;
     }
 
-    public async Task<RepositoryModel?> CreateRepositoryAsync(RepositoryModel repo, SiteModel site)
+    public async Task<RepositoryModel?> CreateRepositoryAsync(RepositoryModel repo, SiteModel? site = null)
     {
-        repo.RepoName = $"{site.Name}-repo";
-        repo.Description = $"{site.Name}-repo description";
-        repo.Homepage = $"{site.Name}-repo Homepage";
+        repo.RepoName = site == null ? $"{repo.Name}-repo" : $"{site.Name}-repo";
+        repo.Description = site == null ? $"{repo.Name}-repo description" : $"{site.Name}-repo description";
+        repo.Homepage = site == null ? $"{repo.Name}-repo homepage" : $"{site.Name}-repo homepage";
 
         RepositoryModel? createdRepo = await _githubService.PostCreateRepoAsync(repo);
 
         if (createdRepo == null) return null;
 
-        // Add Site data to github created repo response
-        createdRepo.Site = site;
-        createdRepo.SiteId = site.Id;
+        RepositoryModel? response = await _repositoryService.AddRepositoryAsync(createdRepo);
 
-        List<RepositoryModel>? response = await _repositoryService.AddRepositoriesAsync(new List<RepositoryModel> { createdRepo });
+        if(site != null && response != null)
+        {
+            response = await ConnectSiteAsync(response, site);
+        }
 
-        return response?.SingleOrDefault();
+        return response;
+    }
+
+    private async Task<RepositoryModel?> ConnectSiteAsync(RepositoryModel repo, SiteModel site)
+    {
+        SiteRepositoryModel? siteRepo = await _siteRepositoryService.AddSiteRepositoryAsync(new SiteRepositoryModel
+        {
+            SiteId = site.Id,
+            Site = site,
+            RepositoryId = repo.Id,
+            Repository = repo,
+        });
+
+        if (siteRepo == null) return null;
+
+        repo.SiteRepositoryId = siteRepo.Id;
+
+        return await _repositoryService.UpdateRepositoryAsync(repo);
     }
 
     public async Task<List<GithubSecret>?> AddSecretsAsync(RepositoryModel repo)
@@ -97,7 +117,7 @@ public class RepositoryManager : IRepositoryManager
     public async Task CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel) => 
         await _githubService.PostCopyRepoAsync(new GithubCopyRepoRequest
         {
-            ClonedRepoName = $"{projectTemplateType}-Template",
+            ClonedRepoName = $"{projectTemplateType}Template",
             NewRepoName = repositoryModel.Name,
             Path = null
         });

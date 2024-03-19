@@ -35,9 +35,9 @@
     <RowTemplate>
         <MudTd DataLabel="Id"><MudLink Href="@($"/repository/{context.Id}")">@context.ExternalId</MudLink></MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
-        @if(context.Site != null)
+        @if(context.SiteRepository != null)
         {
-            <MudTd DataLabel="Site"><MudLink Href=@($"/sites/{context.SiteId}")>@context.Site.Name</MudLink></MudTd>
+            <MudTd DataLabel="Site"><MudLink Href=@($"/sites/{context.SiteRepository.Id}")>@context.SiteRepository.Site.Name</MudLink></MudTd>
         }
         else
         {

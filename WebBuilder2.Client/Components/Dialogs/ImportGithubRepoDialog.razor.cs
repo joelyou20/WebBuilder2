@@ -28,22 +28,13 @@ public partial class ImportGithubRepoDialog
 
     public async Task UpdateReposAsync()
     {
-        ValidationResponse authenticateResponse = await GithubService.PostAuthenticateAsync();
-
-        if (authenticateResponse != null && authenticateResponse.IsSuccessful)
+        var repositories = await GithubService.GetRepositoriesAsync();
+        repositories?.ForEach(x =>
         {
-            var repositories = await GithubService.GetRepositoriesAsync();
-            repositories?.ForEach(x =>
-            {
-                if(!ExistingIds.Contains(x.Id)) _githubRepositories.Add(x, false);
-            });
-            _dataIsLoading = false;
-            StateHasChanged();
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/github/auth/{Uri.EscapeDataString(NavigationManager.Uri)}");
-        }
+            if(!ExistingIds.Contains(x.Id)) _githubRepositories.Add(x, false);
+        });
+        _dataIsLoading = false;
+        StateHasChanged();
     }
 
     private void OnCheckboxChecked(RepositoryModel repo)

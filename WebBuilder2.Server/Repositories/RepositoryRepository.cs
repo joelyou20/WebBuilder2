@@ -23,7 +23,7 @@ public class RepositoryRepository : IRepositoryRepository
     public IQueryable<RepositoryModel>? Get(IEnumerable<long>? exclude = null)
     {
         var query = _db.Repository
-            .Include(x => x.Site)
+            .Include(x => x.SiteRepository)
             .Where(s => s.DeletedDateTime == null);
 
         if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
@@ -31,8 +31,6 @@ public class RepositoryRepository : IRepositoryRepository
         return query.Select(r => new RepositoryModel()
         {
             Id = r.Id,
-            SiteId = r.SiteId,
-            Site = r.Site.FromDto(),
             ExternalId = r.ExternalId,
             AllowAutoMerge = r.AllowAutoMerge,
             AllowMergeCommit = r.AllowMergeCommit,
@@ -122,7 +120,6 @@ public class RepositoryRepository : IRepositoryRepository
     public Repository ToDto(RepositoryModel repository) => new()
     {
         Id = repository.Id,
-        SiteId = repository.SiteId,
         ExternalId = repository.ExternalId,
         Name = repository.Name,
         AllowAutoMerge = repository.AllowAutoMerge,
@@ -149,6 +146,7 @@ public class RepositoryRepository : IRepositoryRepository
         UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault,
         Visibility = repository.Visibility,
         HtmlUrl = repository.HtmlUrl,
-        GitUrl = repository.GitUrl
+        GitUrl = repository.GitUrl,
+        SiteRepositoryId = repository.SiteRepositoryId,
     };
 }

@@ -11,9 +11,8 @@ namespace WebBuilder2.Server.Data.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-        public long SiteId { get; set; }
-        [ForeignKey("SiteId")]
-        public Site Site { get; set; } = default!;
+        public long SiteRepositoryId { get; set; }
+        public SiteRepository? SiteRepository { get; set; }
         public long ExternalId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string RepoName { get; set; } = string.Empty;
@@ -44,7 +43,6 @@ namespace WebBuilder2.Server.Data.Models
         public RepositoryModel FromDto() => new()
         {
             Id = Id,
-            SiteId = SiteId,
             ExternalId = ExternalId,
             AllowAutoMerge = AllowAutoMerge,
             AllowMergeCommit = AllowMergeCommit,
@@ -71,7 +69,8 @@ namespace WebBuilder2.Server.Data.Models
             GitUrl = GitUrl,
             CreatedDateTime = CreatedDateTime,
             DeletedDateTime = DeletedDateTime,
-            ModifiedDateTime = ModifiedDateTime
+            ModifiedDateTime = ModifiedDateTime,
+            SiteRepositoryId = SiteRepositoryId
         };
     }
 }

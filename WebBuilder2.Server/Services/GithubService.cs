@@ -42,28 +42,13 @@ public class GithubService : IGithubService
 
     public async Task<ValidationResponse> AuthenticateUserAsync()
     {
-        try
+        // Check if client is already authenticated. _client.User.Current() will throw an AuthorizationException if the client is not authenticated
+        User user = await _client.User.Current();
+        return new ValidationResponse
         {
-            // Check if client is already authenticated. _client.User.Current() will throw an AuthorizationException if the client is not authenticated
-            User user = await _client.User.Current();
-            return new ValidationResponse
-            {
-                IsSuccessful = true,
-                Message = "Success",
-            };
-        }
-        catch (AuthorizationException ex)
-        {
-            return new ValidationResponse
-            {
-                IsSuccessful = false,
-                Message = "Failed to Authenticate",
-                Errors = new List<Shared.Models.ApiError>
-                {
-                    new(exception: ex)
-                }
-            };
-        }
+            IsSuccessful = true,
+            Message = "Success",
+        };
     }
 
     public async Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repository)

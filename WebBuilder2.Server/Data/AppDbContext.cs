@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Script> Script { get; set; }
     public DbSet<Repository> Repository { get; set; }
     public DbSet<Log> Logs { get; set; }
+    public DbSet<SiteRepository> SiteRepository { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

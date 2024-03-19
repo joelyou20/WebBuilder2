@@ -14,9 +14,9 @@
                 <div class="st-card-info">
                     <MudText class="card-site-name">Site Name: @site.Name</MudText>
                     <MudText class="card-site-name">Site Description: @site.Description</MudText>
-                    @if (site.Repository != null)
+                    @if (site.SiteRepository != null)
                     {
-                        <MudText>Repo Name: @site.Repository.Name</MudText>
+                        <MudText>Repo Name: @site.SiteRepository.Repository.Name</MudText>
                     }
                     else
                     {

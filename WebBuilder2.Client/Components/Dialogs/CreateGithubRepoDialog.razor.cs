@@ -32,7 +32,7 @@ public partial class CreateGithubRepoDialog
     {
         _gitIgnoreTemplates = (await GithubService.GetGitIgnoreTemplatesAsync())?.Templates.ToList();
         _licenses = await GithubService.GetGithubProjectLicensesAsync();
-        _disconnectedSites = (await SiteService.GetSitesAsync())?.Where(x => x.Repository == null).ToList();
+        _disconnectedSites = (await SiteService.GetSitesAsync())?.Where(x => x.SiteRepository == null).ToList();
     }
 
     public void OnTemplateSelected(RepositoryModel? templateRepository = null)

@@ -37,7 +37,7 @@ namespace WebBuilder2.Client.Services
 
         public async Task<SiteModel?> SoftDeleteSiteAsync(SiteModel site)
         {
-            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.AddSiteAsync(site));
+            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.SoftDeleteSiteAsync(site));
 
             return result?.SingleOrDefault();
         }
