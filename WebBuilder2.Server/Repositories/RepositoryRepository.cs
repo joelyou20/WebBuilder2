@@ -24,6 +24,7 @@ public class RepositoryRepository : IRepositoryRepository
     {
         var query = _db.Repository
             .Include(x => x.SiteRepository)
+            .ThenInclude(s => s!.Site)
             .Where(s => s.DeletedDateTime == null);
 
         if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
@@ -57,7 +58,9 @@ public class RepositoryRepository : IRepositoryRepository
             GitUrl = r.GitUrl,
             CreatedDateTime = r.CreatedDateTime,
             DeletedDateTime = r.DeletedDateTime,
-            ModifiedDateTime = r.ModifiedDateTime
+            ModifiedDateTime = r.ModifiedDateTime,
+            SiteRepositoryId = r.SiteRepositoryId,
+            SiteRepository = r.SiteRepositoryId != 0 ? r.SiteRepository!.Initialize() : null
         });
     }
 

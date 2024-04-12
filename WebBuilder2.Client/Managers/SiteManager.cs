@@ -224,6 +224,10 @@ public class SiteManager : ISiteManager
                 _logger.LogInformation("Adding Blazor WebAssembly project template to repo...");
                 await _repositoryManager.CreateTemplateRepoAsync(ProjectTemplateType.Blazor, repos.First());
                 break;
+            case ProjectTemplateType.VueJS: 
+                _logger.LogInformation("Adding VueJS project template to repo...");
+                await _repositoryManager.CreateTemplateRepoAsync(ProjectTemplateType.VueJS, repos.First());
+                break;
             default:
                 break;
         }

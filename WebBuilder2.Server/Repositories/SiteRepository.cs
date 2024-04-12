@@ -22,6 +22,7 @@ namespace WebBuilder2.Server.Repositories
         {
             var query = _db.Site
                 .Include(s => s.SiteRepository)
+                .ThenInclude(s => s!.Repository)
                 .Where(s => s.DeletedDateTime == null);
 
             if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
@@ -31,7 +32,8 @@ namespace WebBuilder2.Server.Repositories
                 Id = s.Id,
                 Name = s.Name,
                 Description = s.Description,
-                SiteRepository = s.SiteRepository == null ? null : s.SiteRepository.FromDto(),
+                SiteRepositoryId = s.SiteRepositoryId,
+                SiteRepository = s.SiteRepository == null ? null : s.SiteRepository.Initialize(),
                 CreatedDateTime = s.CreatedDateTime,
                 ModifiedDateTime = s.ModifiedDateTime,
                 DeletedDateTime = s.DeletedDateTime,

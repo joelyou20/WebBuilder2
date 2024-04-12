@@ -22,7 +22,7 @@ public partial class SiteTable
     {
         Sites.Remove(site);
         // TODO: For the time being I will be soft deleting connected repos when sites are deleted
-        if(site.SiteRepository != null) await RepositoryService.SoftDeleteRepositoryAsync(site.SiteRepository.Repository);
+        if(site.SiteRepository != null && site.SiteRepository.Repository != null) await RepositoryService.SoftDeleteRepositoryAsync(site.SiteRepository.Repository);
         await SiteService.SoftDeleteSiteAsync(site);
         await ValueChanged.InvokeAsync();
     });

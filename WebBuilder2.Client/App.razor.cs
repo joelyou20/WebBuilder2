@@ -12,6 +12,6 @@ public partial class App
 
     protected override async Task OnInitializedAsync()
     {
-        await GithubService.PostAuthenticateAsync();
+        //await GithubService.PostAuthenticateAsync();
     }
 }

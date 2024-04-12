@@ -11,10 +11,10 @@ namespace WebBuilder2.Server.Data.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public long SiteId { get; set; }
-        [ForeignKey("SiteId")]
+        [ForeignKey(nameof(SiteId))]
         public Site Site { get; set; } = default!;
         public long RepositoryId { get; set; }
-        [ForeignKey("RepositoryId")]
+        [ForeignKey(nameof(RepositoryId))]
         public Repository Repository { get; set; } = default!;
 
         public SiteRepositoryModel FromDto() => new()
@@ -24,7 +24,19 @@ namespace WebBuilder2.Server.Data.Models
             RepositoryId = RepositoryId,
             CreatedDateTime = CreatedDateTime,
             DeletedDateTime = DeletedDateTime,
-            ModifiedDateTime = ModifiedDateTime
+            ModifiedDateTime = ModifiedDateTime,
+        };
+
+        public SiteRepositoryModel Initialize() => new()
+        {
+            Id = Id,
+            SiteId = Id,
+            RepositoryId = RepositoryId,
+            CreatedDateTime = CreatedDateTime,
+            DeletedDateTime = DeletedDateTime,
+            ModifiedDateTime = ModifiedDateTime,
+            Site = Site?.FromDto(),
+            Repository = Repository?.FromDto()
         };
     }
 }

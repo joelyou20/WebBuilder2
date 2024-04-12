@@ -19,6 +19,8 @@ namespace WebBuilder2.Server.Repositories
         public IQueryable<SiteRepositoryModel>? Get(IEnumerable<long>? exclude = null)
         {
             var query = _db.SiteRepository
+                .Include(s => s.Site)
+                .Include(s => s.Repository)
                 .Where(s => s.DeletedDateTime == null);
 
             if (exclude != null) query = query.Where(s => !exclude.Any(e => s.Id == e));
@@ -27,9 +29,9 @@ namespace WebBuilder2.Server.Repositories
             {
                 Id = s.Id,
                 Repository = s.Repository.FromDto(),
+                RepositoryId = s.RepositoryId,
                 Site = s.Site.FromDto(),
                 SiteId = s.SiteId,
-                RepositoryId = s.RepositoryId,
                 CreatedDateTime = s.CreatedDateTime,
                 DeletedDateTime = s.DeletedDateTime,
                 ModifiedDateTime = s.ModifiedDateTime

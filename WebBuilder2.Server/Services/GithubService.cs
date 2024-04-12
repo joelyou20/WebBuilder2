@@ -319,23 +319,12 @@ public class GithubService : IGithubService
     {
         try
         {
-            path ??= ".";
-            using PowerShell powershell = PowerShell.Create();
             User user = await _client.User.Current();
+            string currentDirectory = System.IO.Directory.GetCurrentDirectory();
+            string scriptPath = @".\Scripts\CopyGitRepo.sh";
+            bool isSuccessful = await ScriptRunner.RunAsync(scriptPath, [clonedRepoName, newRepoName, user.Login]);
 
-            string templateRepoUrl = $"https://github.com/{user.Login}/{clonedRepoName}";
-            string newRepoUrl = $"https://github.com/{user.Login}/{newRepoName}";
-
-            powershell.AddScript($"cd ~");
-            powershell.AddScript(@$"git clone --bare {templateRepoUrl}");
-            powershell.AddScript($"cd {clonedRepoName}.git");
-            powershell.AddScript(@$"git push --mirror {newRepoUrl}");
-            powershell.AddScript($"cd ~");
-            powershell.AddScript($"rm -rf {clonedRepoName}.git");
-
-            PSDataCollection<PSObject> results = await powershell.InvokeAsync();
-
-            return ValidationResponse.Success();
+            return isSuccessful ? ValidationResponse.Failure() : ValidationResponse.Success();
         }
         catch (Exception ex)
         {

@@ -38,12 +38,7 @@ public partial class Sites
 
         if (sites == null) return;
 
-        List<SiteModel> newSiteList = new();
-
-        foreach (SiteModel site in sites)
-        {
-            newSiteList.Add(site);
-        }
+        List<SiteModel> newSiteList = [.. sites];
 
         _siteList = newSiteList;
 

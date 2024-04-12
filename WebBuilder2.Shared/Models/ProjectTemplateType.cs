@@ -9,5 +9,6 @@ namespace WebBuilder2.Shared.Models;
 public enum ProjectTemplateType
 {
     Default,
-    Blazor
+    Blazor,
+    VueJS
 }
