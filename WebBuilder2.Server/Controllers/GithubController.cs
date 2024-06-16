@@ -256,12 +256,12 @@ namespace WebBuilder2.Server.Controllers
 
         #region Commit
 
-        [HttpPut("/github/commit/{owner}/{repoName}")]
-        public async Task<IActionResult> CreateCommit([FromRoute] string owner, [FromRoute] string repoName, [FromBody] GithubCreateCommitRequest commit)
+        [HttpPut("/github/commit/{owner}/{repoId:long}")]
+        public async Task<IActionResult> CreateCommitV2([FromRoute] string owner, [FromRoute] long repoId, [FromBody] GithubCreateCommitRequest commit)
         {
             try
             {
-                return Created($"github/commit/{owner}/{repoName}", JsonConvert.SerializeObject(await _githubService.CreateCommitAsync(owner, repoName, commit)));
+                return Created($"github/commit/{owner}/{repoId}", JsonConvert.SerializeObject(await _githubService.CreateCommitAsync(owner, repoId, commit)));
             }
             catch (HttpRequestException ex)
             {

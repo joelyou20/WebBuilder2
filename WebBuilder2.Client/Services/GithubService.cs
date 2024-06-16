@@ -103,13 +103,19 @@ namespace WebBuilder2.Client.Services
             return result?.ToList();
         }
 
-        public async Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName)
+        //public async Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName)
+        //{
+        //    string? userName = await GetLoginAsync() ?? throw new Exception("Failed to login to Github");
+        //    await ExecuteAsync(() => _client.CreateCommitAsync(request, userName, repoName));
+        //}
+
+        public async Task CreateCommitAsync(GithubCreateCommitRequest request, long repoId)
         {
-            string? userName = await GetLoginAsync();
-
-            if (userName == null) throw new Exception("Failed to login to Github");
-
-            await ExecuteAsync(() => _client.CreateCommitAsync(request, userName, repoName));
+            string? userName = await GetLoginAsync() ?? throw new Exception("Failed to login to Github");
+            var repos = (await _client.GetRepositoriesAsync());
+            var repoName = repos?.Values?.FirstOrDefault(x => x.ExternalId == repoId)?.Name ?? 
+                throw new Exception($"Cannot find Github Repository with ID = {repoId}");
+            await ExecuteAsync(() => _client.CreateCommitAsync(request, userName, repoId));
         }
 
         public async Task PostAuthenticateAsync()

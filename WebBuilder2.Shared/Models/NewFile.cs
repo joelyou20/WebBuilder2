@@ -12,6 +12,8 @@ public class NewFile
     public string Content { get; set; } = string.Empty;
     public FileType FileType { get; set; }
     public bool IsImage { get; set; } = false;
+    public string Name => Path.Split('/').Last();
+    public string Extension { get; set; } = string.Empty;
     public string Mode => FileType switch
     {
         FileType.File => System.IO.Path.GetExtension(Path).Equals(".exe", StringComparison.InvariantCultureIgnoreCase) ? "100755" : "100644",

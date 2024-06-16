@@ -9,5 +9,6 @@ namespace WebBuilder2.Shared.Models.Projections;
 public class GithubCreateCommitRequest
 {
     public string Message { get; set; } = string.Empty;
-    public List<NewFile> Files { get; set; } = new List<NewFile>();
+    public List<NewFile> Files { get; set; } = [];
+    public string Branch { get; set; } = string.Empty;
 }

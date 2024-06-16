@@ -9,5 +9,5 @@ public interface IScriptService
     Task<ScriptModel?> AddScriptAsync(ScriptModel script);
     Task<ScriptModel?> UpdateScriptAsync(ScriptModel script);
     Task<ScriptModel?> SoftDeleteScriptAsync(ScriptModel script);
-    Task<ScriptModel?> GetScriptByNameAsync(string v);
+    Task<ScriptModel?> GetScriptByNameAsync(string name);
 }

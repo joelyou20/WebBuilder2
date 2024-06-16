@@ -1,10 +1,12 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Amazon.S3.Model;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Octokit;
 using Sodium;
 using System.Collections.ObjectModel;
 using System.Management.Automation;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Text;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
@@ -12,6 +14,7 @@ using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Utils;
 using WebBuilder2.Shared.Validation;
+using static Azure.Core.HttpHeader;
 
 namespace WebBuilder2.Server.Services;
 
@@ -175,37 +178,45 @@ public class GithubService : IGithubService
         return ValidationResponse<string>.Success(user.Login);
     }
 
-    public async Task<ValidationResponse> CreateCommitAsync(string owner, string repoName, GithubCreateCommitRequest request)
+    public async Task<ValidationResponse<Reference>> CreateBranchAsync(string owner, long repoId, string branchName, Commit? commit = null)
     {
-        var headMasterRef = "heads/master";
-
-        // Get reference of master branch
-        var masterReference = await _client.Git.Reference.Get(owner, repoName, headMasterRef);
-
-        // Get the laster commit of this branch
-        var latestCommit = await _client.Git.Commit.Get(owner, repoName, masterReference.Object.Sha);
-
-        var nt = new NewTree { BaseTree = latestCommit.Tree.Sha };
-
-        foreach (var file in request.Files)
+        try
         {
-            // Create blob
-            var blob = new NewBlob { Encoding = file.IsImage ? EncodingType.Base64 : EncodingType.Utf8, Content = (file.Content) };
-            var blobRef = await _client.Git.Blob.Create(owner, repoName, blob);
+            commit ??= await GetMasterRefAsync(owner, repoId);
+            var reference = new NewReference($"refs/heads/{branchName}", commit.Sha);
+            var branches = await _client.Git.Reference.GetAll(repoId);
+            var existingBranch = branches.FirstOrDefault(x => x.Ref == reference.Ref);
 
-            nt.Tree.Add(new NewTreeItem { Path = file.Path, Mode = file.Mode, Type = file.FileType == FileType.File ? TreeType.Blob : TreeType.Tree, Sha = blobRef.Sha });
+            if (existingBranch != null) return ValidationResponse<Reference>.Success(existingBranch);
+
+            var branch = await _client.Git.Reference.Create(repoId, reference);
+
+            return ValidationResponse<Reference>.Success(branch);
         }
+        catch (Exception ex)
+        {
+            return ValidationResponse<Reference>.Failure(ex);
+        }
+    }
 
-        var newTree = await _client.Git.Tree.Create(owner, repoName, nt);
+    public async Task<ValidationResponse> CreateCommitAsync(string owner, long repoId, GithubCreateCommitRequest request)
+    {
+        try
+        {
+            var user = await _client.User.Current();
 
-        // Create Commit
-        NewCommit newCommit = new(request.Message, newTree.Sha, masterReference.Object.Sha);
-        var commit = await _client.Git.Commit.Create(owner, repoName, newCommit);
+            foreach (NewFile file in request.Files)
+            {
+                CreateFileRequest createFileRequest = new(request.Message, file.Content);
+                var createFileResult = await _client.Repository.Content.CreateFile(repoId, file.Path, createFileRequest);
+            }
 
-        // Update HEAD with the commit
-        await _client.Git.Reference.Update(owner, repoName, headMasterRef, new ReferenceUpdate(commit.Sha));
-
-        return ValidationResponse.Success();
+            return ValidationResponse.Success();
+        }
+        catch (Exception ex)
+        {
+            return ValidationResponse.Failure(ex);
+        }
     }
 
     public async Task<ValidationResponse<RepoContent>> GetRepositoryContentAsync(string owner, string repoName, string? path = null)
@@ -317,19 +328,12 @@ public class GithubService : IGithubService
     //  that by using commands
     public async Task<ValidationResponse> CopyRepoAsync(string clonedRepoName, string newRepoName, string? path)
     {
-        try
-        {
-            User user = await _client.User.Current();
-            string currentDirectory = System.IO.Directory.GetCurrentDirectory();
-            string scriptPath = @".\Scripts\CopyGitRepo.sh";
-            bool isSuccessful = await ScriptRunner.RunAsync(scriptPath, [clonedRepoName, newRepoName, user.Login]);
+        User user = await _client.User.Current();
+        string currentDirectory = System.IO.Directory.GetCurrentDirectory();
+        string scriptPath = @".\Scripts\CopyGitRepo.sh";
+        bool isSuccessful = await ScriptRunner.RunAsync(scriptPath, [clonedRepoName, newRepoName, user.Login]);
 
-            return isSuccessful ? ValidationResponse.Failure() : ValidationResponse.Success();
-        }
-        catch (Exception ex)
-        {
-            return ValidationResponse.Failure(ex);
-        }
+        return isSuccessful ? ValidationResponse.Failure() : ValidationResponse.Success();
     }
 
 
@@ -416,6 +420,17 @@ public class GithubService : IGithubService
         GitUrl = repo.GitUrl,
         HtmlUrl = repo.HtmlUrl,
     };
+
+    private async Task<Commit> GetMasterRefAsync(string owner, long repoId)
+    {
+        var headMasterRef = "heads/master";
+
+        // Get reference of master branch
+        var masterReference = await _client.Git.Reference.Get(repoId, headMasterRef);
+
+        // Get the laster commit of this branch
+        return await _client.Git.Commit.Get(repoId, masterReference.Object.Sha);
+    }
 
     #endregion
 }

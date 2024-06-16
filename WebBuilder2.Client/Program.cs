@@ -72,6 +72,7 @@ builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
 builder.Services.AddScoped<ISiteManager, SiteManager>();
 builder.Services.AddScoped<IGithubTemplateManager, GithubTemplateManager>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+builder.Services.AddScoped<IScriptManager, ScriptManager>();
 
 // <================== END OF MANAGERS
 

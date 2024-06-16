@@ -44,5 +44,29 @@ public partial class Scripts
         await UpdateScriptsAsync();
     }
 
+    public async Task OnPushScriptToRepoBtnClick()
+    {
+        DialogOptions options = new()
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            Position = DialogPosition.Center,
+            FullWidth = true
+        };
+
+        DialogParameters dialogParameters = new()
+        {
+            { "Scripts", _scripts }
+        };
+
+        var dialog = await DialogService.ShowAsync<PushScriptToRepoDialog>(
+            title: "Push Script to Repository",
+            options: options,
+            parameters: dialogParameters
+        );
+
+        await dialog.Result;
+    }
+
     //public async Task OnScriptsChanged() => await UpdateScriptsAsync();
 }

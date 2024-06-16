@@ -29,6 +29,7 @@ namespace WebBuilder2.Client.Clients
         public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(GithubSecret secret, string userName, string repoName) => await CreateSecretAsync(new GithubSecret[] { secret }, userName, repoName);
         public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName) => await PutAsync<GithubSecret>($"secrets/{userName}/{repoName}", JsonContent.Create(secrets));
         public async Task<ValidationResponse<string>> GetUserAsync() => await GetAsync<string>("user");
-        public async Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string userName, string repoName) => await PutAsync($"commit/{userName}/{repoName}", JsonContent.Create(request));
+        //public async Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string userName, string repoName) => await PutAsync($"commit/{userName}/{repoName}", JsonContent.Create(request));
+        public async Task<ValidationResponse> CreateCommitAsync(GithubCreateCommitRequest request, string userName, long repoId) => await PutAsync($"commit/{userName}/{repoId}", JsonContent.Create(request));
     }
 }

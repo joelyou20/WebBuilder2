@@ -18,5 +18,6 @@ public interface IGithubService
     Task<GithubSecretResponse?> GetSecretsAsync(string repoName);
     Task<List<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string repoName);
     Task<List<GithubSecret>?> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName);
-    Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName);
+    //Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName);
+    Task CreateCommitAsync(GithubCreateCommitRequest request, long repoId);
 }

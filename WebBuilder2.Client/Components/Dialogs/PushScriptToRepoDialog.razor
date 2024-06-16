@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+
+<MudDialog>
+    <DialogContent>
+        <MudSelect T="RepositoryModel" Label="Repositories" @bind-Value="@_selectedRepository" ToStringFunc="@_repoSelectConverter">
+            @if(_repositories != null && _repositories.Any())
+            {
+                @foreach (RepositoryModel repo in _repositories)
+                {
+                    <MudSelectItem Value="@repo"></MudSelectItem>
+                }
+            }
+        </MudSelect>
+        <MudSelect T="ScriptModel" Label="Scripts" @bind-Value="@_selectedScript" ToStringFunc="@_scriptSelectConverter">
+            @if (Scripts != null && Scripts.Any())
+            {
+                @foreach (ScriptModel script in Scripts)
+                {
+                    <MudSelectItem Value="@script"></MudSelectItem>
+                }
+            }
+        </MudSelect>
+        <MudTextField Label="Path" Placeholder="workflows/" @bind-Value="@_path"/>
+        <MudButton Variant="Variant.Filled" OnClick="@OnSaveBtnClick">Save</MudButton>
+    </DialogContent>
+</MudDialog>

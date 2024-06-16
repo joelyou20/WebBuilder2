@@ -1,29 +1,17 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
-using MudBlazor;
-using System.IO;
 using WebBuilder2.Client.Managers.Contracts;
-using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Client.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
-using WebBuilder2.Shared.Utils;
-using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Managers;
 
-public class RepositoryManager : IRepositoryManager
+public class RepositoryManager(IGithubService githubService, IRepositoryService repositoryService, ISiteRepositoryService siteRepositoryService) : IRepositoryManager
 {
-    private IGithubService _githubService;
-    private IRepositoryService _repositoryService;
-    private ISiteRepositoryService _siteRepositoryService;
-
-    public RepositoryManager(IGithubService githubService, IRepositoryService repositoryService, ISiteRepositoryService siteRepositoryService)
-    {
-        _githubService = githubService;
-        _repositoryService = repositoryService;
-        _siteRepositoryService = siteRepositoryService;
-    }
+    private readonly IGithubService _githubService = githubService;
+    private readonly IRepositoryService _repositoryService = repositoryService;
+    private readonly ISiteRepositoryService _siteRepositoryService = siteRepositoryService;
 
     public async Task<RepositoryModel?> CreateRepositoryAsync(RepositoryModel repo, SiteModel? site = null)
     {
@@ -80,10 +68,10 @@ public class RepositoryManager : IRepositoryManager
 
         List<GithubSecret>? secrets = await _githubService.CreateSecretAsync(new GithubSecret[]
         {
-                new GithubSecret { Name = "AWS_S3_BUCKET", Value = s3BucketName },
-                new GithubSecret { Name = "AWS_ACCESS_KEY_ID", Value = awsAccessKeyId },
-                new GithubSecret { Name = "AWS_SECRET_ACCESS_KEY", Value = awsSecretAccessKey },
-                new GithubSecret { Name = "AWS_REGION", Value = awsRegion }
+                new() { Name = "AWS_S3_BUCKET", Value = s3BucketName },
+                new() { Name = "AWS_ACCESS_KEY_ID", Value = awsAccessKeyId },
+                new() { Name = "AWS_SECRET_ACCESS_KEY", Value = awsSecretAccessKey },
+                new() { Name = "AWS_REGION", Value = awsRegion }
         }, repo.RepoName);
 
         return secrets;
@@ -100,18 +88,18 @@ public class RepositoryManager : IRepositoryManager
         GithubCreateCommitRequest request = new()
         {
             Message = $"Add file {fileName}",
-            Files = new List<NewFile>
-            {
+            Files =
+            [
                 new NewFile
                 {
                     Content = content,
                     Path = $"{fileName.Replace(' ', '_')}",
                     FileType = FileType.File
                 }
-            }
+            ]
         };
 
-        await _githubService.CreateCommitAsync(request, repo.Name);
+        await _githubService.CreateCommitAsync(request, repo.ExternalId);
     }
 
     public async Task CreateTemplateRepoAsync(ProjectTemplateType projectTemplateType, RepositoryModel repositoryModel) => 

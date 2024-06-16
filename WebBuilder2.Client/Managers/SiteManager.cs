@@ -57,6 +57,10 @@ public class SiteManager : ISiteManager
             },
             new Job
             {
+                Name = "Add Scripts to Repo"
+            },
+            new Job
+            {
                 Name = "Scaffold Repository"
             },
             new Job
@@ -185,6 +189,18 @@ public class SiteManager : ISiteManager
             JobComplete(JobStatus.Failure);
             return;
         }
+
+        JobComplete(JobStatus.Success);
+
+        var script = await _scriptService.GetScriptByNameAsync("Deploy");
+
+        if (script == null)
+        {
+            JobComplete(JobStatus.Failure);
+            return;
+        }
+
+        await _repositoryManager.CreateCommitAsync(script.Data, script.Name, repo);
 
         JobComplete(JobStatus.Success);
 

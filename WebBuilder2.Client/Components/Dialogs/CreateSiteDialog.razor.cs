@@ -79,6 +79,11 @@ public partial class CreateSiteDialog
         //MudDialog.Close(DialogResult.Ok(true));
     });
 
+    public void OnInvalidSubmit() => InvokeAsync(async () =>
+    {
+        return;
+    });
+
     public Color GetStatusColor(JobStatus status) => status switch
     {
         JobStatus.Success => Color.Success,

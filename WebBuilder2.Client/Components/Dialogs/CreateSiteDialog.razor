@@ -5,7 +5,7 @@
 <MudDialog>
     <DialogContent>
         <div class="csd-main">
-            <EditForm OnValidSubmit="@OnValidSubmit" Model="@_createSiteRequest">
+            <EditForm OnValidSubmit="@OnValidSubmit" OnInvalidSubmit="@OnInvalidSubmit" Model="@_createSiteRequest">
                 <DataAnnotationsValidator />
                 <MudTextField Label="Name" T="string" @bind-Value="@_createSiteRequest.Name" Required="true" For="@(() => _createSiteRequest.Name)" />
                 <MudTextField Label="Description" Lines="5" T="string" @bind-Value="@_createSiteRequest.Description" Required="true" For="@(() => _createSiteRequest.Description)" />
@@ -47,7 +47,7 @@
                            Clearable="true"
                            AnchorOrigin="Origin.BottomCenter"
                            ToStringFunc="@_domainSelectConverter"
-                           Required="false"
+                           Required="true"
                            @bind-Value="@_createSiteRequest.Domain"
                            For="@(() => _createSiteRequest.Domain)">
                     @foreach (Domain domain in RegisteredDomains)
