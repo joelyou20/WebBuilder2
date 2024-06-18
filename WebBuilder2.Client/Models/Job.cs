@@ -2,6 +2,17 @@
 
 public class Job
 {
-    public string Name { get; set; } = string.Empty;
+    public Job(JobType jobType)
+    {
+        Type = jobType;
+    }
+
+    public Job(JobType jobType, JobStatus jobStatus)
+    {
+        Type = jobType;
+        Status = jobStatus;
+    }
+
+    public JobType Type { get; set; } 
     public JobStatus Status { get; set; } = JobStatus.NotStarted;
 }

@@ -72,7 +72,7 @@ public class RepositoryManager(IGithubService githubService, IRepositoryService 
                 new() { Name = "AWS_ACCESS_KEY_ID", Value = awsAccessKeyId },
                 new() { Name = "AWS_SECRET_ACCESS_KEY", Value = awsSecretAccessKey },
                 new() { Name = "AWS_REGION", Value = awsRegion }
-        }, repo.RepoName);
+        }, repo.Name);
 
         return secrets;
     }
@@ -80,10 +80,10 @@ public class RepositoryManager(IGithubService githubService, IRepositoryService 
     public async Task CreateCommitAsync(IBrowserFile file, RepositoryModel repo)
     {
         string fileAsString = await FileHelper.ReadFileAsync(file);
-        await CreateCommitAsync(fileAsString, file.Name, repo);
+        await CreateCommitAsync(fileAsString, file.Name, "", repo);
     }
 
-    public async Task CreateCommitAsync(string content, string fileName, RepositoryModel repo)
+    public async Task CreateCommitAsync(string content, string fileName, string path, RepositoryModel repo)
     {
         GithubCreateCommitRequest request = new()
         {
@@ -93,7 +93,7 @@ public class RepositoryManager(IGithubService githubService, IRepositoryService 
                 new NewFile
                 {
                     Content = content,
-                    Path = $"{fileName.Replace(' ', '_')}",
+                    Path = string.IsNullOrEmpty(path) ? fileName : $"{path}/{fileName}",
                     FileType = FileType.File
                 }
             ]

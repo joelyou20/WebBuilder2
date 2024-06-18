@@ -8,6 +8,6 @@ namespace WebBuilder2.Client.Managers.Contracts;
 
 public interface ISiteManager
 {
-    ObservableCollection<Job> BuildCreateSiteJobList();
-    Task CreateSiteAsync(CreateSiteRequest createSiteRequest, ObservableCollection<Job> jobList);
+    ObservableCollection<Job> JobList { get; }
+    Task CreateSiteAsync(CreateSiteRequest createSiteRequest);
 }

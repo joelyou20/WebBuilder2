@@ -76,10 +76,10 @@
             </EditForm>
             <div class="csd-console-container">
                 <MudCard>
-                    @foreach(var job in _jobList)
+                    @foreach(var job in SiteManager.JobList)
                     {
                         <div class="csd-job-line">
-                            <MudText>@($"{_jobList.IndexOf(job) + 1}: {job.Name}")</MudText><MudText Color="GetStatusColor(job.Status)">@job.Status</MudText>
+                            <MudText>@($"{SiteManager.JobList.IndexOf(job) + 1}: {job.Type}")</MudText><MudText Color="GetStatusColor(job.Status)">@job.Status</MudText>
                         </div>
                         <MudDivider />
                     }
