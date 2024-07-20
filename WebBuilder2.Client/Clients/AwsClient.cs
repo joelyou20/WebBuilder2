@@ -5,6 +5,7 @@ using WebBuilder2.Client.Clients.Contracts;
 using WebBuilder2.Client.Observers;
 using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
 

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using WebBuilder2.Server.Data.Models.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Server.Data.Models
 {

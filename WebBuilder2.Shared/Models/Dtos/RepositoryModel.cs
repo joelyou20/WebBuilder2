@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace WebBuilder2.Shared.Models;
+namespace WebBuilder2.Shared.Models.Dtos;
 
 public class RepositoryModel : AuditableEntity
 {

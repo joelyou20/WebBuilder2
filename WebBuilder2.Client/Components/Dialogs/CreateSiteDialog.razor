@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 @using WebBuilder2.Client.Components.Forms
 @using WebBuilder2.Client.Utils;
+@using WebBuilder2.Shared.Models.Dtos;
 
 <MudDialog>
     <DialogContent>
@@ -72,6 +73,9 @@
                         </MudCard>
                     </div>
                 }
+                <MudExpansionPanel Text="Create New Database" IsExpandedChanged="@(() => _createDatabaseExpanded = !_createDatabaseExpanded)">
+                    <MudTextField Label="Database Name" T="string" @bind-Value="@_createSiteRequest.DatabaseName" Required="false" For="@(() => _createSiteRequest.DatabaseName)"></MudTextField>
+                </MudExpansionPanel>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled">Create</MudButton>
             </EditForm>
             <div class="csd-console-container">

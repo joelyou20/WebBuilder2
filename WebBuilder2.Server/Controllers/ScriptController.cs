@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Utils;
-using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Controllers;

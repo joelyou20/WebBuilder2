@@ -9,6 +9,7 @@ using WebBuilder2.Client.Services.Contracts;
 using Blace.Components;
 using WebBuilder2.Client.Models;
 using Blace.Editing;
+using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Client.Components.Dialogs;
 

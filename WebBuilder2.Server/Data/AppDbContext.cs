@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebBuilder2.Server.Data.Models;
+using WebBuilder2.Server.Repositories;
 using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Server.Data;
@@ -11,7 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Script> Script { get; set; }
     public DbSet<Repository> Repository { get; set; }
     public DbSet<Log> Logs { get; set; }
-    public DbSet<SiteRepository> SiteRepository { get; set; }
+    public DbSet<Models.SiteRepository> SiteRepository { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

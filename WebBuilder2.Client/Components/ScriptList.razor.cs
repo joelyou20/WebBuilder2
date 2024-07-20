@@ -7,6 +7,7 @@ using WebBuilder2.Client.Components.Dialogs;
 using WebBuilder2.Client.Models;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebBuilder2.Client.Components;

@@ -1,4 +1,5 @@
 ﻿using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 
 namespace WebBuilder2.Client.Models;

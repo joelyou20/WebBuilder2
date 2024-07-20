@@ -11,6 +11,7 @@ using WebBuilder2.Client.Components;
 using System.Text;
 using WebBuilder2.Client.Managers.Contracts;
 using Blace.Editing;
+using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Client.Pages;
 

@@ -2,7 +2,7 @@
 using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Repositories.Contracts;
-using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Server.Repositories;
 

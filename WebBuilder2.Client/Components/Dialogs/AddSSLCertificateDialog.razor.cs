@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using WebBuilder2.Client.Services.Contracts;
-using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 
 namespace WebBuilder2.Client.Components.Dialogs;

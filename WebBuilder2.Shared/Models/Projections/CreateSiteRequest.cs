@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Shared.Models.Projections;
 
@@ -17,6 +18,7 @@ public class CreateSiteRequest
     public Region Region { get; set; } = new();
     public RepositoryModel TemplateRepository { get; set; } = new();
     public ProjectTemplateType ProjectTemplateType { get; set; }
+    public string? DatabaseName { get; set; } = string.Empty;
     public Dictionary<BucketType, Bucket> Buckets => new()
     {
         { 

@@ -5,19 +5,27 @@ using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Client.Utils;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Utils;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Managers;
 
-public class SiteManager(ISiteService siteService, IRepositoryManager repositoryManager, IAwsService awsService, IScriptService scriptService, ILogger<SiteManager> logger) : ISiteManager
+public class SiteManager(
+    ISiteService siteService, 
+    IRepositoryManager repositoryManager, 
+    IAwsService awsService, 
+    IScriptService scriptService, 
+    ILogger<SiteManager> logger, 
+    IDatabaseService databaseService) : ISiteManager
 {
     private ISiteService _siteService = siteService;
     private IRepositoryManager _repositoryManager = repositoryManager;
     private IAwsService _awsService = awsService;
     private IScriptService _scriptService = scriptService;
     private ILogger<SiteManager> _logger = logger;
+    private IDatabaseService _databaseService = databaseService;
 
     private readonly SiteCreationState _state = new();
 
@@ -31,25 +39,26 @@ public class SiteManager(ISiteService siteService, IRepositoryManager repository
 
     public async Task CreateSiteAsync(CreateSiteRequest createSiteRequest)
     {
-        try
-        {
-            _logger.LogInformation("Running site creation");
+        _logger.LogInformation("Running site creation");
 
-            await CreateSiteJobAsync(createSiteRequest);
-            //await RegisterDomainJobAsync(createSiteRequest);
-            //await CreateAwsBucketsJobAsync(createSiteRequest);
-            //await ConfigureAwsLoggingJobAsync();
-            await CreateRepositoryJobAsync(createSiteRequest);
-            await AddRepositorySecretsJobAsync();
-            await ScaffoldRepositoryJobAsync(createSiteRequest);
-            await AddScriptsToRepositoryJobAsync();
-            //await AllowPublicAccessJobAsync();
-            //await AddBucketPolicyJobAsync(createSiteRequest);
-        }
-        catch (Exception ex)
-        {
-            return;
-        }
+        //await CreateSiteJobAsync(createSiteRequest);
+        //await RegisterDomainJobAsync(createSiteRequest);
+        //await CreateAwsBucketsJobAsync(createSiteRequest);
+        //await ConfigureAwsLoggingJobAsync();
+        //await CreateRepositoryJobAsync(createSiteRequest);
+        //await AddRepositorySecretsJobAsync();
+        //await ScaffoldRepositoryJobAsync(createSiteRequest);
+        //await AddScriptsToRepositoryJobAsync();
+        //await AllowPublicAccessJobAsync();
+        //await AddBucketPolicyJobAsync(createSiteRequest);
+        await CreateDatabaseAsync(createSiteRequest);
+    }
+
+    private async Task CreateDatabaseAsync(CreateSiteRequest createSiteRequest)
+    {
+        if (createSiteRequest.DatabaseName == null) return;
+
+        await _databaseService.PostCreateDatabaseAsync($"{createSiteRequest.DatabaseName}_database");
     }
 
     private async Task AddBucketPolicyJobAsync(CreateSiteRequest createSiteRequest)

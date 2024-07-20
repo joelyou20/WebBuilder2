@@ -8,6 +8,7 @@ using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
 
@@ -15,14 +16,9 @@ namespace WebBuilder2.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GithubController : ControllerBase
+    public class GithubController(IGithubService githubService) : ControllerBase
     {
-        private IGithubService _githubService;
-
-        public GithubController(IGithubService githubService)
-        {
-            _githubService = githubService;
-        }
+        private readonly IGithubService _githubService = githubService;
 
         #region GitIgnore
 

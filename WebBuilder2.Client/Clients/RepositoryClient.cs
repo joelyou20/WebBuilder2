@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Net.Http.Json;
 using WebBuilder2.Client.Clients.Contracts;
-using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Clients

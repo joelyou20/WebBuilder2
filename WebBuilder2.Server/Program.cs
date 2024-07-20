@@ -34,6 +34,7 @@ builder.Services.AddScoped<IAwsAmplifyService, AwsAmplifyService>();
 builder.Services.AddScoped<IAwsCertificateManagerService, AwsCertificateManagerService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<IGoogleAdSenseService, GoogleAdSenseService>();
+builder.Services.AddScoped<ISqlService, SqlService>();
 
 builder.Services.AddScoped<ISiteRepository, SiteRepository>();
 builder.Services.AddScoped<IRepositoryRepository, RepositoryRepository>();

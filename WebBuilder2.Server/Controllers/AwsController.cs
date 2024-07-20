@@ -4,7 +4,7 @@ using System.Net;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
-using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Validation;
 

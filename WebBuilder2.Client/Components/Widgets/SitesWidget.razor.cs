@@ -4,7 +4,7 @@ using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Pages;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
-using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Client.Components.Widgets;
 

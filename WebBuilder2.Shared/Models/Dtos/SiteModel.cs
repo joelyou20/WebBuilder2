@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace WebBuilder2.Shared.Models;
+namespace WebBuilder2.Shared.Models.Dtos;
 
 [Serializable]
 public class SiteModel : AuditableEntity

@@ -9,6 +9,7 @@ using WebBuilder2.Client.Models;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models;
+using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 
 namespace WebBuilder2.Client.Components.Dialogs;
@@ -29,6 +30,7 @@ public partial class CreateSiteDialog
     private RepositoryModel? _repoModel;
     private List<RepositoryModel> _templateRepositories = new();
     private bool _useNewDomain = false;
+    private bool _createDatabaseExpanded = false;
 
     private List<ApiError> _errors = new();
 

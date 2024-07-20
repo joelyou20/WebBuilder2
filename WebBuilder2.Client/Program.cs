@@ -63,6 +63,7 @@ builder.Services.AddHttpClient<IScriptClient, ScriptClient>(client => { client.B
 builder.Services.AddHttpClient<IGoogleClient, GoogleClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 builder.Services.AddHttpClient<ILogClient, LogClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 builder.Services.AddHttpClient<ISiteRepositoryClient, SiteRepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddHttpClient<IDatabaseClient, DatabaseClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 
 // <================== END OF CLIENTS
 
@@ -87,6 +88,7 @@ builder.Services.AddScoped<IScriptService, ScriptService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<ISiteRepositoryService, SiteRepositoryService>();
+builder.Services.AddScoped<IDatabaseService, DatabaseService>();
 
 // <================== END OF SERVICES
 
