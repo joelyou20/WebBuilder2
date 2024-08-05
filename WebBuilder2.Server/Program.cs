@@ -1,6 +1,10 @@
+using Google;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Octokit;
 using Serilog;
+using System.Configuration;
+using System.Web.Services.Description;
 using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
@@ -9,6 +13,7 @@ using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Settings;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Server.Utils.Extensions;
+using ConfigurationManager = Microsoft.Extensions.Configuration.ConfigurationManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,9 +27,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
 
+builder.Services.ConfigureIdentityServices();
+
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+
 builder.Services.AddScoped<DbContextOptions<AppDbContext>>();
 builder.Services.AddScoped<AppDbContextFactory>();
-builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContextFactory>().CreateDbContext(Array.Empty<string>()));
+builder.Services.AddScoped(dbContext => dbContext.GetRequiredService<AppDbContextFactory>().CreateDbContext([]));
 builder.Services.AddScoped<IAwsS3Service, AwsS3Service>();
 builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
 builder.Services.AddScoped<IAwsRoute53DomainsService, AwsRoute53DomainsService>();
@@ -35,12 +45,20 @@ builder.Services.AddScoped<IAwsCertificateManagerService, AwsCertificateManagerS
 builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<IGoogleAdSenseService, GoogleAdSenseService>();
 builder.Services.AddScoped<ISqlService, SqlService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<ISiteRepository, SiteRepository>();
 builder.Services.AddScoped<IRepositoryRepository, RepositoryRepository>();
 builder.Services.AddScoped<IScriptRepository, ScriptRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
 builder.Services.AddScoped<ISiteRepositoryRepository, SiteRepositoryRepository>();
+
+builder.Services.AddTransient<TokenAuthorizationFilter>();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<TokenAuthorizationFilter>();
+});
 
 builder.Services.AddAwsSecretsManagerClient();
 builder.Services.AddAwsS3Client();
@@ -73,7 +91,25 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     });
+    app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapBlazorHub();
+app.MapFallbackToFile("index.html");
+app.MapRazorPages();
 
 app.UseSerilogIngestion();
 //app.UseSerilogRequestLogging();

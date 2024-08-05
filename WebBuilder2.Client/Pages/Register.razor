@@ -1,0 +1,11 @@
+﻿@page "/identity/account/register"
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@_request" OnValidSubmit="@HandleRegistration">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <MudTextField id="email" @bind-Value="_request.Email" T="string" Placeholder="Email Address" Variant="Variant.Outlined" Required="true" For="@(() => _request.Email)" />
+    <MudTextField id="password" @bind-Value="_password" T="string" Placeholder="Password" Variant="Variant.Outlined" Required="true" For="@(() => _password)" />
+    <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit">Register</MudButton>
+</EditForm>
+

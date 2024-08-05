@@ -1,0 +1,11 @@
+﻿@page "/identity/account/login"
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@_request" OnValidSubmit="@HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <MudTextField id="email" @bind-Value="_request.Username" T="string" Placeholder="Email Address" Variant="Variant.Outlined" Required="true" For="@(() => _request.Username)" />
+    <MudTextField id="password" @bind-Value="_request.Password" T="string" Placeholder="Password" Variant="Variant.Outlined" Required="true" For="@(() => _request.Password)" />
+    <MudCheckBox Label="Remember Me" @bind-Checked="_request.RememberMe" T="bool" For="@(() => _request.RememberMe)"></MudCheckBox>
+    <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit">Login</MudButton>
+</EditForm>

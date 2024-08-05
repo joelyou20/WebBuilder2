@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webbuilder2.Server.Tests", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8CA77175-060E-4010-AB6C-21C0E994845E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBuilder2.Server.IntegrationTests", "..\WebBuilder2.Server.IntegrationTests\WebBuilder2.Server.IntegrationTests.csproj", "{72E11991-B7AB-442E-8874-D201B196B67F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBuilder2.Server.IntegrationTests", "..\WebBuilder2.Server.IntegrationTests\WebBuilder2.Server.IntegrationTests.csproj", "{72E11991-B7AB-442E-8874-D201B196B67F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

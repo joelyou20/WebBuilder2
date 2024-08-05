@@ -1,0 +1,12 @@
+﻿<div class="tb-container">
+    <MudButton Variant="Variant.Filled" OnClick="OnLogoutBtnClick">Logout</MudButton>
+    <MudAvatar></MudAvatar>
+    @if(_user != null)
+    {
+        <MudText>@_user.UserName</MudText>
+    }
+    else
+    {
+        <MudText>User Not Found</MudText>
+    }
+</div>

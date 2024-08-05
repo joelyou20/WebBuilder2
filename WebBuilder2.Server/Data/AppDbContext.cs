@@ -1,12 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebBuilder2.Server.Data.Models;
 using WebBuilder2.Server.Repositories;
+using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Server.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser, IdentityRole, string>(options)
 {
     public DbSet<Site> Site { get; set; }
     public DbSet<Script> Script { get; set; }
@@ -20,6 +23,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .Entity<Site>()
             .Property(d => d.Region)
             .HasConversion(new EnumToStringConverter<Region>());
+
+        base.OnModelCreating(modelBuilder);
     }
 
     public override int SaveChanges()

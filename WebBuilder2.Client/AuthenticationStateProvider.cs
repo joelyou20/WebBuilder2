@@ -1,18 +1,21 @@
 ﻿using Microsoft.JSInterop;
 using System.Security.Claims;
+using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Models;
+using WebBuilder2.Client.Utils;
+using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Client;
 
-public class AuthenticationStateProvider : IAuthenticationStateProvider
+public class AuthenticationStateProvider() : IAuthenticationStateProvider
 {
-    public User CurrentUser = new();
+    public UserModel? CurrentUser = new();
 
     [JSInvokable]
     public void GoogleLogin(GoogleResponse googleResponse)
     {
         var principal = new ClaimsPrincipal();
-        var user = User.FromGoogleJwt(googleResponse.Credential);
+        var user = JwtHelper.FromGoogleJwt(googleResponse.Credential);
         CurrentUser = user;
 
         if (user == null) throw new Exception("User is null");

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
@@ -12,6 +13,7 @@ using System.Net.Http.Headers;
 using WebBuilder2.Client;
 using WebBuilder2.Client.Clients;
 using WebBuilder2.Client.Clients.Contracts;
+using WebBuilder2.Client.Handlers;
 using WebBuilder2.Client.Managers;
 using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Observers;
@@ -19,6 +21,7 @@ using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Client.Utils.Settings;
+using WebBuilder2.Shared.Models;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -43,6 +46,8 @@ builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose:
 
 builder.Services.AddScoped<IAuthenticationStateProvider,  AuthenticationStateProvider>();
 
+builder.Services.AddScoped<IPasswordHasher<ApplicationUser>, PasswordHasher<ApplicationUser>>();
+
 // CLIENTS ==========================>
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
@@ -55,15 +60,28 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 //     new MediaTypeWithQualityHeaderValue("application/json"));
 //});
 // <--- END OF HACK --->
-builder.Services.AddHttpClient<ISiteClient, SiteClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<IGithubClient, GithubClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<IAwsClient, AwsClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<IRepositoryClient, RepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<IScriptClient, ScriptClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<IGoogleClient, GoogleClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<ILogClient, LogClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<ISiteRepositoryClient, SiteRepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
-builder.Services.AddHttpClient<IDatabaseClient, DatabaseClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
+builder.Services.AddTransient<TokenHandler>();
+
+builder.Services.AddHttpClient<ISiteClient, SiteClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IGithubClient, GithubClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IAwsClient, AwsClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IRepositoryClient, RepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IScriptClient, ScriptClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IGoogleClient, GoogleClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<ILogClient, LogClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<ISiteRepositoryClient, SiteRepositoryClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IDatabaseClient, DatabaseClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IUserClient, UserClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
+    .AddHttpMessageHandler<TokenHandler>();
 
 // <================== END OF CLIENTS
 
@@ -74,6 +92,7 @@ builder.Services.AddScoped<ISiteManager, SiteManager>();
 builder.Services.AddScoped<IGithubTemplateManager, GithubTemplateManager>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IScriptManager, ScriptManager>();
+builder.Services.AddScoped<IUserManager, UserManager>();
 
 // <================== END OF MANAGERS
 
@@ -89,11 +108,14 @@ builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<ISiteRepositoryService, SiteRepositoryService>();
 builder.Services.AddScoped<IDatabaseService, DatabaseService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 
 // <================== END OF SERVICES
 
 builder.Services.AddSingleton<IErrorObserver, ErrorObserver>();
 
 builder.Services.AddMudServices();
+
 var app = builder.Build();
 await app.RunAsync();

@@ -29,7 +29,7 @@ public class SqlServerIntegrationTest
             var connectionStringName = "test";
 
             // Act
-            await _sqlService.CreateDatabaseAsync(serverName, databaseName, connectionStringName);
+            await _sqlService.CreateDatabaseAsync(databaseName, connectionStringName);
             await _sqlService.GetDatabaseListAsync(serverName, databaseName, connectionStringName);
             // Assert
         }

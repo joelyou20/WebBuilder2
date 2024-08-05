@@ -10,4 +10,6 @@ main {
     flex-direction: column;
     width: 100%;
     padding-left: 19rem;
+    margin-top: 4rem;
+    z-index: 1;
 }
