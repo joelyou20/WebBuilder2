@@ -1,19 +1,43 @@
 ﻿@page "/identity/account/login"
 @using Microsoft.AspNetCore.Components.Forms
+@using WebBuilder2.Client.Layouts
+@layout BaseLayout
 
-<div class="login-overlay">
-    <MudImage Src="../resources/pexels-mdx014-814499.jpg"></MudImage>
+<div class="login-body">
+    <MudImage Class="login-hero" Src="../resources/WebBuilderLoginPageCropped.png"></MudImage>
     <div class="login-container">
+        <MudImage Class="login-logo" Src="../resources/WebBuilderLogo.png"></MudImage>
         <div class="login-content">
-            <MudText>Welcome to WebBuilder2! Please login to continue!</MudText>
             <EditForm Model="@_request" OnValidSubmit="@HandleLogin">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-                <MudTextField id="email" @bind-Value="_request.Username" T="string" Placeholder="Email Address" Variant="Variant.Outlined" Required="true" For="@(() => _request.Username)" />
-                <MudTextField id="password" @bind-Value="_request.Password" T="string" Placeholder="Password" Variant="Variant.Outlined" Required="true" For="@(() => _request.Password)" />
-                <MudCheckBox Label="Remember Me" @bind-Checked="_request.RememberMe" T="bool" For="@(() => _request.RememberMe)"></MudCheckBox>
-                <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit">Login</MudButton>
-                <MudButton Variant="Variant.Filled" Href="/identity/account/register">Register</MudButton>
+                <MudText Color="Color.Primary" Class="login-welcome-text">Welcome back!</MudText>
+                <MudTextField id="email"
+                              Class="login-input-field"
+                              @bind-Value="_request.Username"
+                              T="string"
+                              Label="Email Address"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              For="@(() => _request.Username)" />
+                <MudTextField id="password"
+                              Class="login-input-field"
+                              @bind-Value="_request.Password"
+                              T="string"
+                              Label="Password"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              For="@(() => _request.Password)" />
+                <div class="login-util-row">
+                    <MudCheckBox Label="Remember Me" @bind-Checked="_request.RememberMe" T="bool" For="@(() => _request.RememberMe)"></MudCheckBox>
+                    <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="OnResetPasswordBtnClicked">Reset Password</MudButton>
+                </div>
+                <MudButton Class="login-signin-btn" Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit">Sign In</MudButton>
+                <div class="login-register-row">
+                    <MudText>Don't have an account? <MudButton Color="Color.Secondary" Variant="Variant.Text" Href="/identity/account/register">Sign Up</MudButton></MudText>
+                </div>
+                @* <h2><span> or </span></h2> *@
+                @* <MudButton>GOOGLE</MudButton> DO THIS -> https://blazorschool.com/tutorial/blazor-wasm/dotnet7/authentication-with-google-oauth-2-931158 *@
             </EditForm>
         </div>
     </div>

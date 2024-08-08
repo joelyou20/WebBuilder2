@@ -1,19 +1,30 @@
-﻿::deep img {
-    z-index: 0;
-    position: absolute;
-    object-fit: cover;
+﻿h2 {
     width: 100%;
-    height: 100%;
+    text-align: center;
+    border-bottom: 1px solid grey;
+    line-height: 0.1em;
+    margin: 2rem 0;
+    color: grey;
 }
 
-.login-overlay {
+    h2 span {
+        background: #fff;
+        padding: 0 10px;
+    }
+
+::deep .login-hero {
+    width: 60%;
+    object-fit: cover;
+}
+
+::deep .login-logo {
     width: 100%;
-    top: 0;
-    position: absolute;
-    left: 0;
+}
+
+.login-body {
+    display: flex;
+    width: 100%;
     height: 100%;
-    background: white;
-    z-index: 5;
 }
 
 .login-container {
@@ -22,13 +33,50 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 10rem;
 }
 
 .login-content {
-    box-shadow: #000000 5px 6px 13px 3px;
-    padding: 1rem;
-    border-radius: 20px;
-    min-width: 30rem;
-    background: white;
-    z-index: 5;
+    width: 100%;
+}
+
+.login-util-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+::deep .login-signin-btn {
+    width: 100%;
+    margin: 0.5rem 0;
+}
+
+.login-register-row ::deep * {
+    font-size: small;
+}
+
+    .login-register-row > ::deep p {
+        display: flex;
+        justify-content: flex-start;
+        margin: 1rem 0;
+        align-items: center;
+    }
+
+        .login-register-row > ::deep p > a {
+            padding: 0;
+        }
+
+::deep .login-welcome-text {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0 3rem 0;
+    font-size: x-large;
+    font-weight: bold;
+}
+
+::deep .login-input-field ::after {
+    content: unset !important;
 }

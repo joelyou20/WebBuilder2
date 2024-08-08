@@ -29,4 +29,9 @@ public partial class Login
             ErrorObserver.AddError(ex);
         }
     }
+
+    private async Task OnResetPasswordBtnClicked()
+    {
+
+    }
 }

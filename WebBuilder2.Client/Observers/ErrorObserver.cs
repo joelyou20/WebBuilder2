@@ -9,7 +9,7 @@ public class ErrorObserver : IErrorObserver
 {
     public event EventHandler<List<ApiError>> ErrorsChanged = default!;
 
-    protected List<ApiError> Errors { get; private set; } = new();
+    protected List<ApiError> Errors { get; private set; } = [];
 
     public void AddErrorRange(IEnumerable<ApiError> errors)
     {
