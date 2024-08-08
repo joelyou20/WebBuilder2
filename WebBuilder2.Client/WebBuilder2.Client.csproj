@@ -32,6 +32,12 @@
     <Content Update="wwwroot\js\bundle.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\resources\pexels-mdx014-814499.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\resources\WebBuilderFavicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\site-repositories.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

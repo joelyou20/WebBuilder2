@@ -11,9 +11,10 @@
 .nb-container {
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: sticky;
     height: 100%;
     z-index: 2;
+    top: 0;
 }
 
 
