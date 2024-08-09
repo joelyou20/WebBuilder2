@@ -17,4 +17,14 @@
     top: 0;
 }
 
+::deep .nb-list-item {
+    color: white;
+}
 
+    ::deep .nb-list-item svg {
+        color: white;
+    }
+
+::deep .mud-collapse-container {
+    background-color: #b30d29;
+}
