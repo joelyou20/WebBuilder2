@@ -1,12 +1,8 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using System.Net.Sockets;
-using WebBuilder2.Server.Repositories;
-using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
-using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
@@ -21,19 +17,19 @@ public class AwsS3Service : IAwsS3Service
         _client = client;
     }
 
-    public async Task<ValidationResponse<Bucket>> GetSingleBucketAsync(string name)
+    public async Task<Bucket> GetSingleBucketAsync(string name)
     {
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync(); 
 
         var bucket = bucketResponse.Buckets.Single(bucket => bucket.BucketName.Equals(name));
 
-        return ValidationResponse<Bucket>.Success(new Bucket
+        return new Bucket
         {
             Name = bucket.BucketName,
-        });
+        };
     }
 
-    public async Task<ValidationResponse<Bucket>> GetBucketsAsync()
+    public async Task<IEnumerable<Bucket>> GetBucketsAsync()
     {
         ListBucketsResponse bucketResponse = await _client.ListBucketsAsync();
         IEnumerable<Bucket> buckets = bucketResponse.Buckets.Select(x => new Bucket
@@ -41,39 +37,53 @@ public class AwsS3Service : IAwsS3Service
             Name = x.BucketName
         });
 
-        return ValidationResponse<Bucket>.Success(buckets);
+        return buckets;
     }
 
-    public async Task<ValidationResponse> CreateBucketAsync(AwsCreateBucketRequest request)
+    public async Task CreateBucketAsync(AwsCreateBucketRequest request)
     {
         foreach(var bucket in request.Buckets)
         {
             // Create bucket
             var putBucketRequest = BuildPutBucketRequest(bucket);
             var putBucketResponse = await _client.PutBucketAsync(putBucketRequest);
-            if (putBucketResponse == null) return ValidationResponse.Failure($"Failed to create bucket {bucket.Name}.");
+            if (putBucketResponse == null || 
+                (putBucketResponse != null && putBucketResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) ||
+                (putBucketResponse != null && putBucketResponse.HttpStatusCode != System.Net.HttpStatusCode.Created))
+            {
+                throw new AmazonS3Exception($"Failed to create bucket {bucket.Name}.");
+            }
+
 
             if (bucket.ConfigureForWebsiteHosting)
             {
                 // Apply website configuration to existing bucket
                 var putWebsiteBucketRequest = BuildPutBucketWebsiteRequest(bucket);
                 var putWebsiteBucketResponse = await _client.PutBucketWebsiteAsync(putWebsiteBucketRequest);
-                if (putWebsiteBucketResponse == null) return ValidationResponse.Failure($"Failed to create website bucket {bucket.Name}.");
+                if (putWebsiteBucketResponse == null ||
+                    (putWebsiteBucketResponse != null && putWebsiteBucketResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) ||
+                    (putWebsiteBucketResponse != null && putWebsiteBucketResponse.HttpStatusCode != System.Net.HttpStatusCode.Created))
+                {
+                    throw new AmazonS3Exception($"Failed to create website bucket {bucket.Name}.");
+                }
             }
 
             if(bucket.ConfigureForLogging)
             {
-                // Apply website configuration to existing bucket
+                // Apply logging configuration to existing bucket
                 var putObjectRequest = BuildPutObjectRequest(bucket, "logs/");
                 var putObjectResponse = await _client.PutObjectAsync(putObjectRequest);
-                if (putObjectResponse == null) return ValidationResponse.Failure($"Failed to create website bucket {bucket.Name}.");
+                if (putObjectResponse == null ||
+                    (putObjectResponse != null && putObjectResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) ||
+                    (putObjectResponse != null && putObjectResponse.HttpStatusCode != System.Net.HttpStatusCode.Created))
+                {
+                    throw new AmazonS3Exception($"Failed to create logging bucket {bucket.Name}.");
+                }
             }
         }
-
-        return ValidationResponse.Success();
     }
 
-    public async Task<ValidationResponse> ConfigureLoggingAsync(AwsConfigureLoggingRequest request)
+    public async Task<PutBucketLoggingResponse> ConfigureLoggingAsync(AwsConfigureLoggingRequest request)
     {
         var loggingConfig = new S3BucketLoggingConfig
         {
@@ -86,14 +96,14 @@ public class AwsS3Service : IAwsS3Service
             BucketName = request.Bucket.Name,
             LoggingConfig = loggingConfig,
         };
-        var response = await _client.PutBucketLoggingAsync(putBucketLoggingRequest);
+        PutBucketLoggingResponse response = await _client.PutBucketLoggingAsync(putBucketLoggingRequest);
 
-        if (response == null) return ValidationResponse.Failure($"Failed to enable logging for {request.Bucket.Name}.");
+        if (response == null) throw new AmazonS3Exception($"Failed to enable logging for {request.Bucket.Name}.");
 
-        return ValidationResponse.Success();
+        return response;
     }
 
-    public async Task<ValidationResponse> AddBucketPolicyAsync(AwsAddBucketPolicyRequest request)
+    public async Task<PutBucketPolicyResponse> AddBucketPolicyAsync(AwsAddBucketPolicyRequest request)
     {
         PutBucketPolicyResponse response = await _client.PutBucketPolicyAsync(new PutBucketPolicyRequest
         {
@@ -101,12 +111,12 @@ public class AwsS3Service : IAwsS3Service
             Policy = request.Policy,
         });
 
-        if (response == null) return ValidationResponse.Failure($"Failed to add bucket policy for {request.Bucket.Name}.");
+        if (response == null) throw new AmazonS3Exception($"Failed to add bucket policy for {request.Bucket.Name}.");
 
-        return ValidationResponse.Success();
+        return response;
     }
 
-    public async Task<ValidationResponse> ConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request)
+    public async Task<PutPublicAccessBlockResponse> ConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request)
     {
         PutPublicAccessBlockResponse response = await _client.PutPublicAccessBlockAsync(new PutPublicAccessBlockRequest
         {
@@ -117,9 +127,9 @@ public class AwsS3Service : IAwsS3Service
             }
         });
 
-        if (response == null) return ValidationResponse.Failure($"Failed to update public access block for {request.Bucket.Name}.");
+        if (response == null) throw new AmazonS3Exception($"Failed to update public access block for {request.Bucket.Name}.");
 
-        return ValidationResponse.Success();
+        return response;
     }
 
     private PutObjectRequest BuildPutObjectRequest(Bucket bucket, string path) => new()

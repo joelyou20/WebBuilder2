@@ -22,43 +22,36 @@ public class GoogleAdSenseService : IGoogleAdSenseService
         _googleSettings = googleSettings.Value;
     }
 
-    public async Task<ValidationResponse<GoogleAdSenseAccount>> GetAccountsAsync(string? name = null)
+    public async Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync(string? name = null)
     {
-        try
+        List<GoogleAdSenseAccount> googleAdsenseAccounts = new();
+        if (string.IsNullOrEmpty(name))
         {
-            List<GoogleAdSenseAccount> googleAdsenseAccounts = new();
-            if (string.IsNullOrEmpty(name))
+            var accountsListRequest = _adSenseService.Accounts.List();
+            var accounts = await accountsListRequest.ExecuteAsync();
+            googleAdsenseAccounts.AddRange(accounts.Accounts.Select(account => new GoogleAdSenseAccount
             {
-                var accountsListRequest = _adSenseService.Accounts.List();
-                var accounts = await accountsListRequest.ExecuteAsync();
-                googleAdsenseAccounts.AddRange(accounts.Accounts.Select(account => new GoogleAdSenseAccount
-                {
-                    Name = account.Name,
-                    DisplayName = account.DisplayName,
-                    State = account.State,
-                }));
-            }
-            else
+                Name = account.Name,
+                DisplayName = account.DisplayName,
+                State = account.State,
+            }));
+        }
+        else
+        {
+            var accountGetRequest = _adSenseService.Accounts.Get(name);
+            var account = await accountGetRequest.ExecuteAsync();
+            googleAdsenseAccounts.Add(new GoogleAdSenseAccount
             {
-                var accountGetRequest = _adSenseService.Accounts.Get(name);
-                var account = await accountGetRequest.ExecuteAsync();
-                googleAdsenseAccounts.Add(new GoogleAdSenseAccount
-                {
-                    Name = account.Name,
-                    DisplayName = account.DisplayName,
-                    State = account.State,
-                });
-            }
+                Name = account.Name,
+                DisplayName = account.DisplayName,
+                State = account.State,
+            });
+        }
 
-            return ValidationResponse<GoogleAdSenseAccount>.Success(googleAdsenseAccounts);
-        }
-        catch (Exception ex)
-        {
-            return ValidationResponse<GoogleAdSenseAccount>.Failure(ex);
-        }
+        return googleAdsenseAccounts;
     }
 
-    public async Task<ValidationResponse<GooglePayment>> GetPaymentsAsync()
+    public async Task<IEnumerable<GooglePayment>> GetPaymentsAsync()
     {
         var features = _adSenseService.Features;
         var payments = _adSenseService.Accounts.Payments.List(_googleSettings.AdsenseAccountId);
@@ -74,28 +67,21 @@ public class GoogleAdSenseService : IGoogleAdSenseService
             Amount = payment.Amount,
         });
 
-        return ValidationResponse<GooglePayment>.Success(result);
+        return result;
     }
 
-    public async Task<ValidationResponse<GoogleAdClient>> GetClientsAsync()
+    public async Task<IEnumerable<GoogleAdClient>> GetClientsAsync()
     {
-        try
-        {
-            var clients = _adSenseService.Accounts.Adclients.List(_googleSettings.AdsenseAccountId);
-            var response = await clients.ExecuteAsync();
+        var clients = _adSenseService.Accounts.Adclients.List(_googleSettings.AdsenseAccountId);
+        var response = await clients.ExecuteAsync();
 
-            var result = response.AdClients.Select(client => new GoogleAdClient
-            {
-                Name = client.Name,
-                ProductCode = client.ProductCode,
-                State = client.State
-            });
-
-            return ValidationResponse<GoogleAdClient>.Success(result);
-        }
-        catch (Exception ex)
+        var result = response.AdClients.Select(client => new GoogleAdClient
         {
-            return ValidationResponse<GoogleAdClient>.Failure(ex);
-        }
+            Name = client.Name,
+            ProductCode = client.ProductCode,
+            State = client.State
+        });
+
+        return result;
     }
 }

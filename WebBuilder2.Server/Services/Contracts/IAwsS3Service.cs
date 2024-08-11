@@ -7,11 +7,11 @@ namespace WebBuilder2.Server.Services.Contracts
 {
     public interface IAwsS3Service
     {
-        Task<ValidationResponse<Bucket>> GetSingleBucketAsync(string name);
-        Task<ValidationResponse<Bucket>> GetBucketsAsync();
-        Task<ValidationResponse> CreateBucketAsync(AwsCreateBucketRequest request);
-        Task<ValidationResponse> ConfigureLoggingAsync(AwsConfigureLoggingRequest request);
-        Task<ValidationResponse> AddBucketPolicyAsync(AwsAddBucketPolicyRequest request);
-        Task<ValidationResponse> ConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
+        Task<Bucket> GetSingleBucketAsync(string name);
+        Task<IEnumerable<Bucket>> GetBucketsAsync();
+        Task CreateBucketAsync(AwsCreateBucketRequest request);
+        Task<PutBucketLoggingResponse> ConfigureLoggingAsync(AwsConfigureLoggingRequest request);
+        Task<PutBucketPolicyResponse> AddBucketPolicyAsync(AwsAddBucketPolicyRequest request);
+        Task<PutPublicAccessBlockResponse> ConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
     }
 }

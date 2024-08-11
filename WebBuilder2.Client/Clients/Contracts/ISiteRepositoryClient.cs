@@ -5,11 +5,11 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface ISiteRepositoryClient
 {
-    Task<ValidationResponse<SiteRepositoryModel>> AddSiteRepositoryAsync(SiteRepositoryModel siteRepository);
-    Task<ValidationResponse<SiteRepositoryModel>> AddRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories);
-    Task<ValidationResponse<SiteRepositoryModel>> GetSingleSiteRepositoryAsync(long id);
-    Task<ValidationResponse<SiteRepositoryModel>> GetSiteRepositoriesAsync(Dictionary<string, string>? filter = null);
-    Task<ValidationResponse<SiteRepositoryModel>> SoftDeleteSiteRepositoryAsync(SiteRepositoryModel siteRepository);
-    Task<ValidationResponse<SiteRepositoryModel>> SoftDeleteRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories);
-    Task<ValidationResponse<SiteRepositoryModel>> UpdateSiteRepositoryAsync(SiteRepositoryModel siteRepository);
+    Task<SiteRepositoryModel> AddSiteRepositoryAsync(SiteRepositoryModel siteRepository);
+    Task<IEnumerable<SiteRepositoryModel>> AddRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories);
+    Task<SiteRepositoryModel> GetSingleSiteRepositoryAsync(long id);
+    Task<IEnumerable<SiteRepositoryModel>> GetSiteRepositoriesAsync(Dictionary<string, string>? filter = null);
+    Task<SiteRepositoryModel> SoftDeleteSiteRepositoryAsync(SiteRepositoryModel siteRepository);
+    Task<IEnumerable<SiteRepositoryModel>> SoftDeleteRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories);
+    Task<SiteRepositoryModel> UpdateSiteRepositoryAsync(SiteRepositoryModel siteRepository);
 }

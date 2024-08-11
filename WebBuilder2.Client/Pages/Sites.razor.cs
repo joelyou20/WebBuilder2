@@ -20,7 +20,7 @@ public partial class Sites
 
     private List<SiteModel> _siteList = new();
     private List<Domain>? _registeredDomains;
-    private List<ApiError> _errors = new();
+    private List<Error> _errors = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,7 +30,11 @@ public partial class Sites
 
     private async Task UpdateDomainsAsync()
     {
-        _registeredDomains = await AwsService.GetRegisteredDomainsAsync();
+        var response = await AwsService.GetRegisteredDomainsAsync();
+
+        if (response == null) throw new ArgumentNullException(nameof(response));
+
+        _registeredDomains = response.ToList();
     }
 
     private async Task UpdateSitesAsync()

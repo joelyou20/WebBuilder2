@@ -6,7 +6,7 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface IUserClient
 {
-    Task<ValidationResponse<RegisterUserRequest>> RegisterUserAsync(RegisterUserRequest request);
-    Task<ValidationResponse<LoginUserResponse>> LoginUserAsync(LoginUserRequest request);
-    Task<ValidationResponse> LogoutUserAsync();
+    Task<RegisterUserRequest> RegisterUserAsync(RegisterUserRequest request);
+    Task<LoginUserResponse> LoginUserAsync(LoginUserRequest request);
+    Task LogoutUserAsync();
 }

@@ -4,6 +4,6 @@ namespace WebBuilder2.Server.Services.Contracts
 {
     public interface IAwsCostExplorerService
     {
-        Task<ValidationResponse<string>> GetForecastedCostAsync();
+        Task<string> GetForecastedCostAsync();
     }
 }

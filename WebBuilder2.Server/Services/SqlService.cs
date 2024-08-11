@@ -7,7 +7,7 @@ namespace WebBuilder2.Server.Services;
 
 public class SqlService : ISqlService
 {
-    public async Task<ValidationResponse> CreateDatabaseAsync(string databaseName, string connectionStringName = "default")
+    public async Task<bool> CreateDatabaseAsync(string databaseName, string connectionStringName = "default")
     {
         string? connectionString = GetConnectionString(connectionStringName) ?? throw new Exception("Connection string not found.");
         string sqlCreateDBQuery = $"CREATE DATABASE {databaseName}";
@@ -17,7 +17,7 @@ public class SqlService : ISqlService
 
         connection.Open();
         int result = await command.ExecuteNonQueryAsync();
-        return result >= 0 ? ValidationResponse.Success() : ValidationResponse.Failure();
+        return result >= 0;
     }
 
     public async Task GetDatabaseListAsync(string serverName, string databaseName, string connectionStringName)

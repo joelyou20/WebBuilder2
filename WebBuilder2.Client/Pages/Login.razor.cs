@@ -19,15 +19,9 @@ public partial class Login
 
     private async Task HandleLogin()
     {
-        try {
-            var loginResponse = await UserService.LoginUserAsync(_request);
-            await LocalStorageService.SetItemAsync("user", JsonConvert.SerializeObject(loginResponse));
-            NavigationManager.NavigateTo("/");
-        }
-        catch (Exception ex)
-        {
-            ErrorObserver.AddError(ex);
-        }
+        var loginResponse = await UserService.LoginUserAsync(_request);
+        await LocalStorageService.SetItemAsync("user", JsonConvert.SerializeObject(loginResponse));
+        NavigationManager.NavigateTo("/");
     }
 
     private async Task OnResetPasswordBtnClicked()

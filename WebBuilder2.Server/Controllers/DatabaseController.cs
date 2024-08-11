@@ -14,14 +14,8 @@ public class DatabaseController(ISqlService sqlService) : ControllerBase
     [HttpPost("/database/create")]
     public async Task<IActionResult> CreateDatabase([FromBody] string databaseName)
     {
-        try
-        {
-            var response = JsonConvert.SerializeObject(await _sqlService.CreateDatabaseAsync(databaseName));
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<string>.BuildFailedResponse(ex)));
-        }
+        await _sqlService.CreateDatabaseAsync(databaseName);
+
+        return Ok();
     }
 }

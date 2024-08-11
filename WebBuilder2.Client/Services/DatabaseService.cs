@@ -7,12 +7,12 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services;
 
-public class DatabaseService(IDatabaseClient databaseClient, IErrorObserver errorObserver, ILogService logService) : ServiceBase(errorObserver, logService), IDatabaseService 
+public class DatabaseService(IDatabaseClient databaseClient) : IDatabaseService 
 {
     private IDatabaseClient _client = databaseClient;
 
     public async Task PostCreateDatabaseAsync(string databaseName)
     {
-        await ExecuteAsync(() => _client.PostCreateDatabaseAsync(databaseName));
+        await _client.PostCreateDatabaseAsync(databaseName);
     }
 }

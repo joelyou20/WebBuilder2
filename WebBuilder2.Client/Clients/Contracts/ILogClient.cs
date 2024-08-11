@@ -5,10 +5,10 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface ILogClient
 {
-    Task<ValidationResponse<LogModel>> GetLogsAsync();
-    Task<ValidationResponse<LogModel>> GetSingleLogAsync(long id);
-    Task<ValidationResponse<LogModel>> SoftDeleteLogAsync(LogModel log);
-    Task<ValidationResponse<LogModel>> AddLogAsync(LogModel log);
-    Task<ValidationResponse<LogModel>> AddLogsAsync(IEnumerable<LogModel> logs);
-    Task<ValidationResponse<LogModel>> UpdateLogAsync(LogModel log);
+    Task<IEnumerable<LogModel>> GetLogsAsync();
+    Task<LogModel> GetSingleLogAsync(long id);
+    Task<LogModel> SoftDeleteLogAsync(LogModel log);
+    Task<LogModel> AddLogAsync(LogModel log);
+    Task<IEnumerable<LogModel>> AddLogsAsync(IEnumerable<LogModel> logs);
+    Task<LogModel> UpdateLogAsync(LogModel log);
 }

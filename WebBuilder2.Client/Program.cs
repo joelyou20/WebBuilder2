@@ -1,15 +1,10 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
 using Serilog.Core;
-using Serilog.Extensions.Logging;
-using System.Net;
-using System.Net.Http.Headers;
 using WebBuilder2.Client;
 using WebBuilder2.Client.Clients;
 using WebBuilder2.Client.Clients.Contracts;
@@ -20,6 +15,8 @@ using WebBuilder2.Client.Observers;
 using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
+using WebBuilder2.Client.Utils.Providers;
+using WebBuilder2.Client.Utils.Providers.Contracts;
 using WebBuilder2.Client.Utils.Settings;
 using WebBuilder2.Shared.Models;
 
@@ -118,4 +115,5 @@ builder.Services.AddSingleton<IErrorObserver, ErrorObserver>();
 builder.Services.AddMudServices();
 
 var app = builder.Build();
+
 await app.RunAsync();

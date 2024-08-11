@@ -17,7 +17,7 @@ public partial class CreateGithubVariableDialog
 
     private GithubSecret _secret = new GithubSecret();
     private string _selectedRepo = string.Empty;
-    private List<ApiError> _errors = new();
+    private List<WebBuilder2.Shared.Models.Error> _errors = new();
 
     protected override void OnInitialized()
     {

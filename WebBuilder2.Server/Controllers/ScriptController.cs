@@ -10,77 +10,50 @@ namespace WebBuilder2.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ScriptController : ControllerBase
+public class ScriptController(IScriptRepository scriptRepository) : CustomControllerBase
 {
-    private IScriptRepository _scriptRepository;
-
-    public ScriptController(IScriptRepository scriptRepository)
-    {
-        _scriptRepository = scriptRepository;
-    }
+    private readonly IScriptRepository _scriptRepository = scriptRepository;
 
     [HttpGet("/script/{id?}")]
     public IActionResult Get([FromQuery] long? id, [FromQuery] string? name, [FromQuery] IEnumerable<long>? exclude = null)
     {
-        try
-        {
-            IQueryable<ScriptModel>? result = _scriptRepository.Get(exclude);
-            if (id != null) result = result?.Where(x => x.Id == id);
-            if (name != null) result = result?.Where(x => x.Name.Equals(name));
+        IQueryable<ScriptModel>? result = _scriptRepository.Get(exclude);
+        if (id != null) result = result?.Where(x => x.Id == id);
+        if (name != null) result = result?.Where(x => x.Name.Equals(name));
 
-            if (result == null) throw new Exception(id == null ?
-                "Failed to get script data from database." :
-                $"Failed to retrieve script data with ID value of: {id}");
+        if (result == null) throw new Exception(id == null ?
+            "Failed to get script data from database." :
+            $"Failed to retrieve script data with ID value of: {id}");
 
-            List<ScriptModel> resultList = result.ToList();
+        List<ScriptModel> resultList = result.ToList();
 
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(resultList)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(ex)));
-        }
+        return Ok(resultList);
     }
 
     [HttpPut("/script")]
     public IActionResult Put([FromBody] IEnumerable<ScriptModel> scripts)
     {
-        try
-        {
-            var result = _scriptRepository.UpsertRange(scripts);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(scripts, ex)));
-        }
+        ValidateRequest(scripts);
+
+        var result = _scriptRepository.UpsertRange(scripts);
+        return Ok(result);
     }
 
     [HttpPost("/script/delete")]
     public IActionResult SoftDelete([FromBody] IEnumerable<ScriptModel> scripts)
     {
-        try
-        {
-            var result = _scriptRepository.SoftDeleteRange(scripts);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(scripts, ex)));
-        }
+        ValidateRequest(scripts);
+
+        var result = _scriptRepository.SoftDeleteRange(scripts);
+        return Ok(result);
     }
 
     [HttpPost("/script/update")]
     public IActionResult Update([FromBody] IEnumerable<ScriptModel> scripts)
     {
-        try
-        {
-            var result = _scriptRepository.UpdateRange(scripts);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<ScriptModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<ScriptModel>.BuildFailedResponse(scripts, ex)));
-        }
+        ValidateRequest(scripts);
+
+        var result = _scriptRepository.UpdateRange(scripts);
+        return Ok(result);
     }
 }

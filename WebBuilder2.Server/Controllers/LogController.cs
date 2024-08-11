@@ -8,77 +8,49 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Controllers;
 
-public class LogController : ControllerBase
+public class LogController(ILogRepository logRepository) : CustomControllerBase
 {
-    private ILogRepository _logRepository;
-
-    public LogController(ILogRepository logRepository)
-    {
-        _logRepository = logRepository;
-    }
+    private readonly ILogRepository _logRepository = logRepository;
 
     [HttpGet("/log/{id?}")]
     public IActionResult Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
-        try
-        {
-            var result = _logRepository.Get(exclude);
-            if (id != null) result = result?.Where(x => x.Id == id);
+        var result = _logRepository.Get(exclude);
+        if (id != null) result = result?.Where(x => x.Id == id);
 
+        if (result == null) throw new Exception(id == null ?
+            "Failed to get repository data from database." :
+            $"Failed to retrieve repository data with ID value of: {id}");
 
-            if (result == null) throw new Exception(id == null ?
-                "Failed to get repository data from database." :
-                $"Failed to retrieve repository data with ID value of: {id}");
+        IEnumerable<LogModel> resultList = result.ToList();
 
-            List<LogModel> resultList = result.ToList();
-
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<LogModel>.Success(resultList)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<LogModel>.BuildFailedResponse(ex)));
-        }
+        return Ok(resultList);
     }
 
     [HttpPut("/log")]
-    public IActionResult Put([FromBody] IEnumerable<LogModel> repos)
+    public IActionResult Put([FromBody] IEnumerable<LogModel> logs)
     {
-        try
-        {
-            var result = _logRepository.UpsertRange(repos);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<LogModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<LogModel>.BuildFailedResponse(repos, ex)));
-        }
+        ValidateRequest(logs);
+
+        var result = _logRepository.UpsertRange(logs);
+        return Ok(result);
     }
 
     [HttpPost("/log/delete")]
-    public IActionResult SoftDelete([FromBody] IEnumerable<LogModel> repos)
+    public IActionResult SoftDelete([FromBody] IEnumerable<LogModel> logs)
     {
-        try
-        {
-            var result = _logRepository.SoftDeleteRange(repos);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<LogModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<LogModel>.BuildFailedResponse(repos, ex)));
-        }
+        ValidateRequest(logs);
+
+        var result = _logRepository.SoftDeleteRange(logs);
+        return Ok(result);
     }
 
     [HttpPost("/log/update")]
-    public IActionResult Update([FromBody] IEnumerable<LogModel> repos)
+    public IActionResult Update([FromBody] IEnumerable<LogModel> logs)
     {
-        try
-        {
-            var result = _logRepository.UpdateRange(repos);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<LogModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<LogModel>.BuildFailedResponse(repos, ex)));
-        }
+        ValidateRequest(logs);
+
+        var result = _logRepository.UpdateRange(logs);
+        return Ok(result);
     }
 }

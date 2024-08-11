@@ -1,4 +1,6 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using WebBuilder2.Client.Utils.Providers
+@using WebBuilder2.Client.Utils.Providers.Contracts
+@inject IJSRuntime JSRuntime
 @inject IAuthenticationStateProvider AuthenticationStateProvider
 
 <button type="button" @onclick="SignInWithGoogleAsync">Sign In with Google</button>

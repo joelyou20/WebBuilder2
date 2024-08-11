@@ -1,52 +1,46 @@
 ﻿using WebBuilder2.Client.Clients.Contracts;
-using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Client.Services
 {
-    public class SiteService : ServiceBase, ISiteService
+    public class SiteService(ISiteClient siteClient) : ISiteService
     {
-        private ISiteClient _siteClient;
-
-        public SiteService(ISiteClient siteClient, IErrorObserver errorObserver, ILogService logService) : base(errorObserver, logService)
-        {
-            _siteClient = siteClient;
-        }
+        private readonly ISiteClient _siteClient = siteClient;
 
         public async Task<List<SiteModel>?> GetSitesAsync(Dictionary<string, string>? filter = null)
         {
-            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.GetSitesAsync(filter));
+            IEnumerable<SiteModel>? result = await _siteClient.GetSitesAsync(filter);
 
             return result?.ToList();
         }
 
         public async Task<SiteModel?> GetSingleSiteAsync(long id)
         {
-            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.GetSingleSiteAsync(id));
+            SiteModel? result = await _siteClient.GetSingleSiteAsync(id);
 
-            return result?.SingleOrDefault();
+            return result;
         }
 
         public async Task<SiteModel?> AddSiteAsync(SiteModel site)
         {
-            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.AddSiteAsync(site));
+            SiteModel? result = await _siteClient.AddSiteAsync(site);
 
-            return result?.SingleOrDefault();
+            return result;
         }
 
         public async Task<SiteModel?> SoftDeleteSiteAsync(SiteModel site)
         {
-            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.SoftDeleteSiteAsync(site));
+            SiteModel? result = await _siteClient.SoftDeleteSiteAsync(site);
 
-            return result?.SingleOrDefault();
+            return result;
         }
 
         public async Task<SiteModel?> UpdateSiteAsync(SiteModel site)
         {
-            IEnumerable<SiteModel>? result = await ExecuteAsync(() => _siteClient.UpdateSiteAsync(site));
+            SiteModel? result = await _siteClient.UpdateSiteAsync(site);
 
-            return result?.SingleOrDefault();
+            return result;
         }
     }
 }

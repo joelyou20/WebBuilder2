@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models.Dtos;
 
@@ -13,7 +14,11 @@ public partial class Logs
 
     protected override async Task OnInitializedAsync()
     {
-        _logs = await LogService.GetLogsAsync();
+        var response = await LogService.GetLogsAsync();
+
+        if (response == null) throw new ArgumentNullException(nameof(response));
+
+        _logs = response.ToList();
         _isLoading = false;
     }
 }

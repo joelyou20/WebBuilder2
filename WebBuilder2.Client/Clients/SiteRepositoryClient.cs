@@ -8,11 +8,11 @@ public class SiteRepositoryClient : ClientBase<SiteRepositoryModel>, ISiteReposi
 {
     public SiteRepositoryClient(HttpClient httpClient) : base(httpClient, "siteRepository") { }
 
-    public async Task<ValidationResponse<SiteRepositoryModel>> AddSiteRepositoryAsync(SiteRepositoryModel siteRepository) => await AddAsync(siteRepository);
-    public async Task<ValidationResponse<SiteRepositoryModel>> AddRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories) => await AddRangeAsync(siteRepositories);
-    public async Task<ValidationResponse<SiteRepositoryModel>> GetSingleSiteRepositoryAsync(long id) => await GetSingleAsync(id);
-    public async Task<ValidationResponse<SiteRepositoryModel>> GetSiteRepositoriesAsync(Dictionary<string, string>? filter = null) => await GetAsync(filter: filter);
-    public async Task<ValidationResponse<SiteRepositoryModel>> SoftDeleteSiteRepositoryAsync(SiteRepositoryModel siteRepository) => await SoftDeleteAsync(siteRepository);
-    public async Task<ValidationResponse<SiteRepositoryModel>> SoftDeleteRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories) => await SoftDeleteRangeAsync(siteRepositories);
-    public async Task<ValidationResponse<SiteRepositoryModel>> UpdateSiteRepositoryAsync(SiteRepositoryModel siteRepository) => await UpdateAsync(siteRepository);
+    public async Task<SiteRepositoryModel> AddSiteRepositoryAsync(SiteRepositoryModel siteRepository) => await AddAsync(siteRepository);
+    public async Task<IEnumerable<SiteRepositoryModel>> AddRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories) => await AddRangeAsync(siteRepositories);
+    public async Task<SiteRepositoryModel> GetSingleSiteRepositoryAsync(long id) => await GetSingleAsync(id);
+    public async Task<IEnumerable<SiteRepositoryModel>> GetSiteRepositoriesAsync(Dictionary<string, string>? filter = null) => await GetAsync(filter: filter);
+    public async Task<SiteRepositoryModel> SoftDeleteSiteRepositoryAsync(SiteRepositoryModel siteRepository) => await SoftDeleteAsync(siteRepository);
+    public async Task<IEnumerable<SiteRepositoryModel>> SoftDeleteRangeSiteRepositoryAsync(IEnumerable<SiteRepositoryModel> siteRepositories) => await SoftDeleteRangeAsync(siteRepositories);
+    public async Task<SiteRepositoryModel> UpdateSiteRepositoryAsync(SiteRepositoryModel siteRepository) => await UpdateAsync(siteRepository);
 }

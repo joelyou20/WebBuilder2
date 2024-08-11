@@ -1,16 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Octokit;
-using System.Net;
-using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
-using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Controllers
 {
@@ -25,14 +18,9 @@ namespace WebBuilder2.Server.Controllers
         [HttpGet("/github/gitignore")]
         public async Task<IActionResult> GetGitIgnoreTemplates()
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetGitIgnoreTemplatesAsync()));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<string>.BuildFailedResponse(ex)));
-            }
+            GitIgnoreTemplateResponse result = await _githubService.GetGitIgnoreTemplatesAsync();
+
+            return Ok(result);
         }
 
         #endregion
@@ -42,14 +30,9 @@ namespace WebBuilder2.Server.Controllers
         [HttpGet("/github/license")]
         public async Task<IActionResult> GetLicenseTemplates()
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetLicenseTemplatesAsync()));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<GithubProjectLicense>.BuildFailedResponse(ex)));
-            }
+            IEnumerable<GithubProjectLicense> result = await _githubService.GetLicenseTemplatesAsync();
+
+            return Ok(result);
         }
 
         #endregion
@@ -59,14 +42,10 @@ namespace WebBuilder2.Server.Controllers
         [HttpGet("/github/user")]
         public async Task<IActionResult> GetUserAsync()
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetUserAsync()));
-            }
-            catch (AuthorizationException ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<string>.BuildFailedResponse(ex)));
-            }
+            string result = await _githubService.GetUserAsync();
+            string json = JsonConvert.SerializeObject(result);
+
+            return Ok(json);
         }
 
         #endregion
@@ -76,77 +55,38 @@ namespace WebBuilder2.Server.Controllers
         [HttpGet("/github/repos")]
         public async Task<IActionResult> Get()
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetRepositoriesAsync()));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(ex)));
-            }
+            IEnumerable<RepositoryModel> result = await _githubService.GetRepositoriesAsync();
+
+            return Ok(result);
         }
 
         [HttpPost("/github/repos/create")]
         public async Task<IActionResult> Create([FromBody] RepositoryModel repository)
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.CreateRepoAsync(repository)));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repository, ex)));
-            }
+            RepositoryModel result = await _githubService.CreateRepoAsync(repository);
+
+            return Ok(result);
         }
 
         [HttpPost("/github/repos/{owner}/{repoName}")]
         public async Task<IActionResult> PostRepositoryContent([FromRoute] string owner, [FromRoute] string repoName, [FromBody] string? path = null)
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetRepositoryContentAsync(owner, repoName, path)));
-            }
-            catch (HttpRequestException ex)
-            {
-                return (ex.StatusCode) switch
-                {
-                    HttpStatusCode.NoContent => NoContent(),
-                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
-                };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+            IEnumerable<RepoContent> result = await _githubService.GetRepositoryContentAsync(owner, repoName, path);
+
+            return Ok(result);
         }
 
         [HttpPost("/github/repos/copy")]
         public async Task<IActionResult> PostCopyRepoAsync([FromBody] GithubCopyRepoRequest githubCopyRepoRequest)
         {
-            try
+            if (githubCopyRepoRequest == null || githubCopyRepoRequest?.Path == null)
             {
-                return Ok(JsonConvert.SerializeObject(await _githubService.CopyRepoAsync(githubCopyRepoRequest.ClonedRepoName, githubCopyRepoRequest.NewRepoName, githubCopyRepoRequest.Path)));
+                return BadRequest(githubCopyRepoRequest);
             }
-            catch (HttpRequestException ex)
-            {
-                return (ex.StatusCode) switch
-                {
-                    HttpStatusCode.NoContent => NoContent(),
-                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
-                };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+
+            await _githubService.CopyRepoAsync(githubCopyRepoRequest.ClonedRepoName, githubCopyRepoRequest.NewRepoName, githubCopyRepoRequest.Path);
+
+            return Ok(githubCopyRepoRequest);
         }
 
         #endregion
@@ -156,26 +96,9 @@ namespace WebBuilder2.Server.Controllers
         [HttpGet("/github/git/tree/{owner}/{repoName}")]
         public async Task<IActionResult> GetGitTree([FromRoute] string owner, [FromRoute] string repoName)
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetGitTreeAsync(owner, repoName)));
-            }
-            catch (HttpRequestException ex)
-            {
-                return (ex.StatusCode) switch
-                {
-                    HttpStatusCode.NoContent => NoContent(),
-                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
-                };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+            IEnumerable<GitTreeItem> result = await _githubService.GetGitTreeAsync(owner, repoName);
+
+            return Ok(result);
         }
 
         #endregion
@@ -185,14 +108,9 @@ namespace WebBuilder2.Server.Controllers
         [HttpPost("/github/auth")]
         public async Task<IActionResult> Authenticate()
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.AuthenticateUserAsync()));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+            await _githubService.AuthenticateUserAsync();
+
+            return Ok();
         }
 
         #endregion
@@ -202,50 +120,17 @@ namespace WebBuilder2.Server.Controllers
         [HttpGet("/github/secrets/{userName}/{repoName}")]
         public async Task<IActionResult> GetSecrets([FromRoute] string userName, [FromRoute] string repoName)
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _githubService.GetSecretsAsync(userName, repoName)));
-            }
-            catch(HttpRequestException ex)
-            {
-                return (ex.StatusCode) switch
-                {
-                    HttpStatusCode.NoContent => NoContent(),
-                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper<GithubSecretResponse>.BuildFailedResponse(ex))),
-                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper<GithubSecretResponse>.BuildFailedResponse(ex))),
-                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper<GithubSecretResponse>.BuildFailedResponse(ex))),
-                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<GithubSecretResponse>.BuildFailedResponse(ex)))
-                };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<GithubSecretResponse>.BuildFailedResponse(ex)));
-            }
+            GithubSecretResponse result = await _githubService.GetSecretsAsync(userName, repoName);
+
+            return Ok(result);
         }
 
         [HttpPut("/github/secrets/{owner}/{repoName}")]
         public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] IEnumerable<GithubSecret> secret)
         {
-            try
-            {
-                return Created($"github/secrets/{owner}/{repoName}", JsonConvert.SerializeObject(await _githubService.CreateSecretAsync(secret, owner, repoName)));
-            }
-            catch (HttpRequestException ex)
-            {
-                return (ex.StatusCode) switch
-                {
-                    HttpStatusCode.NoContent => NoContent(),
-                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
-                };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+            var result = await _githubService.CreateSecretAsync(secret, owner, repoName);
+
+            return Created($"github/secrets/{owner}/{repoName}", result);
         }
 
         #endregion
@@ -255,26 +140,9 @@ namespace WebBuilder2.Server.Controllers
         [HttpPut("/github/commit/{owner}/{repoId:long}")]
         public async Task<IActionResult> CreateCommitV2([FromRoute] string owner, [FromRoute] long repoId, [FromBody] GithubCreateCommitRequest commit)
         {
-            try
-            {
-                return Created($"github/commit/{owner}/{repoId}", JsonConvert.SerializeObject(await _githubService.CreateCommitAsync(owner, repoId, commit)));
-            }
-            catch (HttpRequestException ex)
-            {
-                return (ex.StatusCode) switch
-                {
-                    HttpStatusCode.NoContent => NoContent(),
-                    HttpStatusCode.UnprocessableEntity => UnprocessableEntity(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Unauthorized => Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.Forbidden => Forbid(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    HttpStatusCode.NotFound => NotFound(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex))),
-                    _ => BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)))
-                };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+            await _githubService.CreateCommitAsync(owner, repoId, commit);
+
+            return Created();
         }
 
         #endregion

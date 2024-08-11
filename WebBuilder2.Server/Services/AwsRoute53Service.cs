@@ -8,21 +8,16 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
-public class AwsRoute53Service : IAwsRoute53Service
+public class AwsRoute53Service(AmazonRoute53Client client) : IAwsRoute53Service
 {
-    private AmazonRoute53Client _client;
+    private readonly AmazonRoute53Client _client = client;
 
-    public AwsRoute53Service(AmazonRoute53Client client)
-    {
-        _client = client;
-    }
-
-    public async Task<ValidationResponse<Shared.Models.HostedZone>> GetHostedZonesAsync()
+    public async Task<IEnumerable<Shared.Models.HostedZone>> GetHostedZonesAsync()
     {
         var response = await _client.ListHostedZonesAsync();
         if (response.HttpStatusCode != HttpStatusCode.OK)
         {
-            return ValidationResponse<Shared.Models.HostedZone>.Failure(message: "", code: response.HttpStatusCode);
+            throw new Exception("Failed to retrieve list of hosted zones");
         }
 
         var hostedZones = response.HostedZones.Select(zone => new Shared.Models.HostedZone
@@ -31,6 +26,6 @@ public class AwsRoute53Service : IAwsRoute53Service
             Name = zone.Name
         });
 
-        return ValidationResponse<Shared.Models.HostedZone>.Success(hostedZones);
+        return hostedZones;
     }
 }

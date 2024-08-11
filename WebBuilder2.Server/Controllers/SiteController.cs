@@ -12,76 +12,49 @@ namespace WebBuilder2.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SiteController : ControllerBase
+public class SiteController(ISiteRepository siteRepository) : CustomControllerBase
 {
-    private ISiteRepository _siteRepository;
-
-    public SiteController(ISiteRepository siteRepository)
-    {
-        _siteRepository = siteRepository;
-    }
+    private readonly ISiteRepository _siteRepository = siteRepository;
 
     [HttpGet("/site/{id?}")]
     public IActionResult Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
-        try
-        {
             var result = _siteRepository.Get(exclude);
-            if (id != null) result = result?.Where(x => x.Id == id);
+        if (id != null) result = result?.Where(x => x.Id == id);
 
-            if (result == null) throw new Exception(id == null ? 
-                "Failed to get site data from database." :
-                $"Failed to retrieve site data with ID value of: {id}");
+        if (result == null) throw new Exception(id == null ? 
+            "Failed to get site data from database." :
+            $"Failed to retrieve site data with ID value of: {id}");
 
-            var listResult = result.ToList();
+        var listResult = result.ToList();
 
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(listResult)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(ex)));
-        }
+        return Ok(listResult);
     }
 
     [HttpPut("/site")]
     public IActionResult Put([FromBody] IEnumerable<SiteModel> sites)
     {
-        try
-        {
-            var result = _siteRepository.UpsertRange(sites);
-            return Ok(ValidationResponse<SiteModel>.Success(result));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
-        }
+        ValidateRequest(sites);
+
+        var result = _siteRepository.UpsertRange(sites);
+        return Ok(result);
     }
 
     [HttpPost("/site/delete")]
     public IActionResult SoftDelete([FromBody] IEnumerable<SiteModel> sites)
     {
-        try
-        {
-            var result = _siteRepository.SoftDeleteRange(sites);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
-        }
+        ValidateRequest(sites);
+
+        var result = _siteRepository.SoftDeleteRange(sites);
+        return Ok(result);
     }
 
     [HttpPost("/site/update")]
     public IActionResult Update([FromBody] IEnumerable<SiteModel> sites)
     {
-        try
-        {
-            var result = _siteRepository.UpdateRange(sites);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<SiteModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<SiteModel>.BuildFailedResponse(sites, ex)));
-        }
+        ValidateRequest(sites);
+
+        var result = _siteRepository.UpdateRange(sites);
+        return Ok(result);
     }
 }

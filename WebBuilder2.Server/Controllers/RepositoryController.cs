@@ -10,76 +10,49 @@ namespace WebBuilder2.Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class RepositoryController : ControllerBase
+public class RepositoryController(IRepositoryRepository repositoryRepository) : CustomControllerBase
 {
-    private IRepositoryRepository _repositoryRepository;
-
-    public RepositoryController(IRepositoryRepository repositoryRepository)
-    {
-        _repositoryRepository = repositoryRepository;
-    }
+    private readonly IRepositoryRepository _repositoryRepository = repositoryRepository;
 
     [HttpGet("/repository/{id?}")]
     public IActionResult Get([FromRoute] long? id, [FromQuery] IEnumerable<long>? exclude = null)
     {
-        try
-        {
-            var result = _repositoryRepository.Get(exclude);
-            if (id != null) result = result?.Where(x => x.Id == id);
+        var result = _repositoryRepository.Get(exclude);
+        if (id != null) result = result?.Where(x => x.Id == id);
 
-            if (result == null) throw new Exception(id == null ?
-                "Failed to get repository data from database." :
-                $"Failed to retrieve repository data with ID value of: {id}");
+        if (result == null) throw new Exception(id == null ?
+            "Failed to get repository data from database." :
+            $"Failed to retrieve repository data with ID value of: {id}");
 
-            List<RepositoryModel> resultList = result.ToList();
+        List<RepositoryModel> resultList = result.ToList();
 
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<RepositoryModel>.Success(resultList)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(ex)));
-        }
+        return Ok(resultList);
     }
 
     [HttpPut("/repository")]
     public IActionResult Put([FromBody] IEnumerable<RepositoryModel> repos)
     {
-        try
-        {
-            var result = _repositoryRepository.UpsertRange(repos);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<RepositoryModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repos, ex)));
-        }
+        ValidateRequest(repos);
+
+        var result = _repositoryRepository.UpsertRange(repos);
+        return Ok(result);
     }
 
     [HttpPost("/repository/delete")]
     public IActionResult SoftDelete([FromBody] IEnumerable<RepositoryModel> repos)
     {
-        try
-        {
-            var result = _repositoryRepository.SoftDeleteRange(repos);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<RepositoryModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repos, ex)));
-        }
+        ValidateRequest(repos);
+
+        var result = _repositoryRepository.SoftDeleteRange(repos);
+        return Ok(result);
     }
 
     [HttpPost("/repository/update")]
     public IActionResult Update([FromBody] IEnumerable<RepositoryModel> repos)
     {
-        try
-        {
-            var result = _repositoryRepository.UpdateRange(repos);
-            return Ok(JsonConvert.SerializeObject(ValidationResponse<RepositoryModel>.Success(result)));
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper<RepositoryModel>.BuildFailedResponse(repos, ex)));
-        }
+        ValidateRequest(repos);
+
+        var result = _repositoryRepository.UpdateRange(repos);
+        return Ok(result);
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Microsoft.JSInterop;
 using System.Security.Claims;
-using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Models;
-using WebBuilder2.Client.Utils;
+using WebBuilder2.Client.Utils.Providers.Contracts;
 using WebBuilder2.Shared.Models;
 
-namespace WebBuilder2.Client;
+namespace WebBuilder2.Client.Utils.Providers;
 
 public class AuthenticationStateProvider() : IAuthenticationStateProvider
 {

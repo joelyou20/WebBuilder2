@@ -8,34 +8,26 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
-public class AwsAmplifyService : IAwsAmplifyService
+public class AwsAmplifyService(AmazonAmplifyClient client, IAwsSecretsManagerService awsSecretsManagerService) : IAwsAmplifyService
 {
-    private AmazonAmplifyClient _client;
-    private IAwsSecretsManagerService _awsSecretsManagerService;
+    private readonly AmazonAmplifyClient _client = client;
+    private readonly IAwsSecretsManagerService _awsSecretsManagerService = awsSecretsManagerService;
 
-    public AwsAmplifyService(AmazonAmplifyClient client, IAwsSecretsManagerService awsSecretsManagerService)
+    public async Task<CreateAppResponse> CreateAppFromRepoAsync(RepositoryModel repo)
     {
-        _client = client;
-        _awsSecretsManagerService = awsSecretsManagerService;
-    }
-
-    public async Task<ValidationResponse> CreateAppFromRepoAsync(RepositoryModel repo)
-    {
-        if (repo.SiteRepository == null) return ValidationResponse.Failure("Attempted to connect site to Amplify, but repo does not have a connected site.");
-
         var token = await _awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat);
 
-        if (token == null) return ValidationResponse.Failure("Failed to retrieve Github PAT");
+        if (string.IsNullOrEmpty(token)) throw new AmazonAmplifyException("Failed to retrieve Github PAT");
 
         var request = new CreateAppRequest
         {
-            Name = repo.SiteRepository.Site.Name,
+            Name = repo.SiteRepository?.Site?.Name,
             AccessToken = "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",
             Repository = repo.HtmlUrl,
         };
 
         var response = await _client.CreateAppAsync(request);
 
-        return ValidationResponse.Default();
+        return response;
     }
 }

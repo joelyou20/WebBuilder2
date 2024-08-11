@@ -5,6 +5,6 @@ namespace WebBuilder2.Server.Services.Contracts
 {
     public interface IAwsCertificateManagerService
     {
-        Task<ValidationResponse<AwsNewSSLCertificateResponse>> ProvisionNewCertificateAsync(AwsNewSSLCertificateRequest request);
+        Task<AwsNewSSLCertificateResponse?> ProvisionNewCertificateAsync(AwsNewSSLCertificateRequest request);
     }
 }

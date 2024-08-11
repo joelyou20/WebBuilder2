@@ -16,7 +16,7 @@ public class AwsCostExplorerService : IAwsCostExplorerService
         _client = client;
     }
 
-    public async Task<ValidationResponse<string>> GetForecastedCostAsync()
+    public async Task<string> GetForecastedCostAsync()
     {
         var request = new GetCostForecastRequest
         {
@@ -34,9 +34,9 @@ public class AwsCostExplorerService : IAwsCostExplorerService
         if(response == null || response.HttpStatusCode != HttpStatusCode.OK)
         {
             // Handle error
-            return ValidationResponse<string>.Failure();
+            throw new AmazonCostExplorerException("Failed to get forecasted cost.");
         }
 
-        return ValidationResponse<string>.Success(response.Total.Amount);
+        return response.Total.Amount;
     }
 }

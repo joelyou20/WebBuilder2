@@ -1,0 +1,18 @@
+﻿@using WebBuilder2.Client.Observers.Contracts
+@inject IErrorObserver ErrorObserver
+@inherits ErrorBoundaryBase
+
+<ErrorBoundary>
+    <ChildContent>
+        @if (!ErrorObserver.HasError)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <div class="error-box">
+                <p>@ErrorObserver.ErrorMessage</p>
+            </div>
+        }
+    </ChildContent>
+</ErrorBoundary>

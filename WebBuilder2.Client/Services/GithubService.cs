@@ -10,33 +10,25 @@ using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Client.Services
 {
-    public class GithubService : ServiceBase, IGithubService
+    public class GithubService(IGithubClient client, NavigationManager navigationManager) : IGithubService
     {
-        private IGithubClient _client;
-        private NavigationManager _navigationManager;
-        private IErrorObserver _errorObserver;
-
-        public GithubService(IGithubClient client, NavigationManager navigationManager, IErrorObserver errorObserver, ILogService logService) : base(errorObserver, logService)
-        {
-            _client = client;
-            _navigationManager = navigationManager;
-            _errorObserver = errorObserver;
-        }
+        private readonly IGithubClient _client = client;
+        private readonly NavigationManager _navigationManager = navigationManager;
 
         public async Task<string?> GetGithubUser()
         {
             await PostAuthenticateAsync();
 
-            IEnumerable<string>? result = await ExecuteAsync<string>(_client.GetUserAsync);
+            string? result = await _client.GetUserAsync();
 
-            return result?.SingleOrDefault();
+            return result;
         }
 
         public async Task<List<RepositoryModel>?> GetRepositoriesAsync()
         {
             await PostAuthenticateAsync();
 
-            IEnumerable<RepositoryModel>? result = await ExecuteAsync(_client.GetRepositoriesAsync);
+            IEnumerable<RepositoryModel>? result = await _client.GetRepositoriesAsync();
 
             return result?.ToList();
         }
@@ -47,7 +39,7 @@ namespace WebBuilder2.Client.Services
 
             if (userName == null) throw new Exception("Failed to login to Github");
 
-            IEnumerable<RepoContent>? result = await ExecuteAsync(() => _client.PostRepositoryContentAsync(userName, repoName, reference));
+            IEnumerable<RepoContent>? result = await _client.PostRepositoryContentAsync(userName, repoName, reference);
 
             return result?.SingleOrDefault();
         }
@@ -56,13 +48,16 @@ namespace WebBuilder2.Client.Services
         {
             await PostAuthenticateAsync();
 
-            await ExecuteAsync(() => _client.PostCopyRepoAsync(request));
+            await _client.PostCopyRepoAsync(request);
         }
 
         public async Task<List<GitTreeItem>?> GetGitTreeAsync(string repoName)
         {
             var userName = await GetLoginAsync();
-            IEnumerable<GitTreeItem>? result = await ExecuteAsync(() => _client.GetGitTreeAsync(userName, repoName));
+
+            if (userName == null) throw new ArgumentNullException(nameof(userName));
+
+            IEnumerable<GitTreeItem>? result = await _client.GetGitTreeAsync(userName, repoName);
 
             return result?.ToList();
         }
@@ -71,7 +66,7 @@ namespace WebBuilder2.Client.Services
         {
             await PostAuthenticateAsync();
 
-            IEnumerable<GitIgnoreTemplateResponse>? result = await ExecuteAsync(_client.GetGitIgnoreTemplatesAsync);
+            IEnumerable<GitIgnoreTemplateResponse>? result = await _client.GetGitIgnoreTemplatesAsync();
 
             return result?.SingleOrDefault();
         }
@@ -80,7 +75,7 @@ namespace WebBuilder2.Client.Services
         {
             await PostAuthenticateAsync();
 
-            IEnumerable<GithubProjectLicense>? result = await ExecuteAsync(_client.GetGithubProjectLicensesAsync);
+            IEnumerable<GithubProjectLicense>? result = await _client.GetGithubProjectLicensesAsync();
 
             return result?.ToList();
         }
@@ -88,7 +83,10 @@ namespace WebBuilder2.Client.Services
         public async Task<GithubSecretResponse?> GetSecretsAsync(string repoName)
         {
             var userName = await GetLoginAsync();
-            IEnumerable<GithubSecretResponse>? result = await ExecuteAsync(() => _client.GetSecretsAsync(userName, repoName));
+
+            if (userName == null) throw new ArgumentNullException(nameof(userName));
+
+            IEnumerable<GithubSecretResponse>? result = await _client.GetSecretsAsync(userName, repoName);
 
             return result?.SingleOrDefault();
         }
@@ -99,46 +97,43 @@ namespace WebBuilder2.Client.Services
         public async Task<List<GithubSecret>?> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName)
         {
             var userName = await GetLoginAsync();
-            IEnumerable<GithubSecret>? result = await ExecuteAsync(() => _client.CreateSecretAsync(secrets, userName, repoName));
+
+            if (userName == null) throw new ArgumentNullException(nameof(userName));
+
+            IEnumerable<GithubSecret>? result = await _client.CreateSecretAsync(secrets, userName, repoName);
 
             return result?.ToList();
         }
-
-        //public async Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName)
-        //{
-        //    string? userName = await GetLoginAsync() ?? throw new Exception("Failed to login to Github");
-        //    await ExecuteAsync(() => _client.CreateCommitAsync(request, userName, repoName));
-        //}
 
         public async Task CreateCommitAsync(GithubCreateCommitRequest request, long repoId)
         {
             string? userName = await GetLoginAsync() ?? throw new Exception("Failed to login to Github");
             var repos = (await _client.GetRepositoriesAsync());
-            var repoName = repos?.Values?.FirstOrDefault(x => x.ExternalId == repoId)?.Name ?? 
+            var repoName = repos?.FirstOrDefault(x => x.ExternalId == repoId)?.Name ?? 
                 throw new Exception($"Cannot find Github Repository with ID = {repoId}");
-            await ExecuteAsync(() => _client.CreateCommitAsync(request, userName, repoId));
+            await _client.CreateCommitAsync(request, userName, repoId);
         }
 
         public async Task PostAuthenticateAsync()
         {
-            await ExecuteAsync(() => _client.PostAuthenticateAsync());
+            await _client.PostAuthenticateAsync();
         }
 
         public async Task<RepositoryModel?> PostCreateRepoAsync(RepositoryModel repository)
         {
             await PostAuthenticateAsync();
 
-            var result = await ExecuteAsync(() => _client.PostCreateRepoAsync(repository));
-            return result?.SingleOrDefault();
+            var result = await _client.PostCreateRepoAsync(repository);
+            return result;
         }
 
         private async Task<string?> GetLoginAsync()
         {
             await PostAuthenticateAsync();
 
-            IEnumerable<string>? result = await ExecuteAsync(_client.GetUserAsync);
+            string? result = await _client.GetUserAsync();
 
-            return result?.SingleOrDefault();
+            return result;
         }
     }
 }

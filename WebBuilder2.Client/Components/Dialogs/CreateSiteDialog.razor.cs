@@ -32,7 +32,7 @@ public partial class CreateSiteDialog
     private bool _useNewDomain = false;
     private bool _createDatabaseExpanded = false;
 
-    private List<ApiError> _errors = new();
+    private List<WebBuilder2.Shared.Models.Error> _errors = new();
 
     protected async override Task OnInitializedAsync()
     {

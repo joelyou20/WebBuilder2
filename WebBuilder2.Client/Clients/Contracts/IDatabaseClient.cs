@@ -4,5 +4,5 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface IDatabaseClient
 {
-    Task<ValidationResponse> PostCreateDatabaseAsync(string databaseName);
+    Task PostCreateDatabaseAsync(string databaseName);
 }

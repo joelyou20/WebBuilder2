@@ -5,7 +5,7 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface IGoogleClient
 {
-    Task<ValidationResponse<GoogleAdSenseAccount>> GetAccountsAsync();
-    Task<ValidationResponse<GooglePayment>> GetPaymentsAsync();
-    Task<ValidationResponse<GoogleAdClient>> GetAdClientsAsync();
+    Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync();
+    Task<IEnumerable<GooglePayment>> GetPaymentsAsync();
+    Task<IEnumerable<GoogleAdClient>> GetAdClientsAsync();
 }

@@ -21,7 +21,7 @@ public partial class CreateScriptDialog
 
     private ScriptModel _script = new();
     private readonly Func<Syntax, string> _syntaxSelectConverter = x => x.ToString();
-    private List<ApiError> _errors = new();
+    private List<WebBuilder2.Shared.Models.Error> _errors = new();
     private CodeEditor? _codeEditor;
 
     public void OnFileChanged(ScriptEditorFile file)

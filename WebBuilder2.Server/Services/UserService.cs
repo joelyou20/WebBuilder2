@@ -21,7 +21,7 @@ namespace WebBuilder2.Server.Services
             return result;
         }
 
-        public async Task<ValidationResponse> RegisterUserAsync(RegisterUserRequest request)
+        public async Task<IdentityResult> RegisterUserAsync(RegisterUserRequest request)
         {
             var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
             var result = await _userManager.CreateAsync(user, request.PasswordHash);
@@ -29,12 +29,12 @@ namespace WebBuilder2.Server.Services
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return ValidationResponse.Success();
+                return result;
             }
             else
             {
                 var message = BuildIdentityErrorMessage(result.Errors);
-                return ValidationResponse.Failure(message);
+                throw new Exception(message);
             }
         }
 
@@ -43,11 +43,9 @@ namespace WebBuilder2.Server.Services
             return await _userManager.FindByNameAsync(userName);
         }
 
-        public async Task<ValidationResponse> LogoutUserAsync()
+        public async Task LogoutUserAsync()
         {
             await _signInManager.SignOutAsync();
-
-            return ValidationResponse.Success();
         }
 
         private string BuildIdentityErrorMessage(IEnumerable<IdentityError> errors)

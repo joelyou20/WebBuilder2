@@ -7,17 +7,17 @@ namespace WebBuilder2.Client.Clients.Contracts;
 
 public interface IAwsClient
 {
-    Task<ValidationResponse<Bucket>> GetSingleBucketAsync(string name);
-    Task<ValidationResponse<Bucket>> GetBucketsAsync();
-    Task<ValidationResponse> CreateBucketsAsync(AwsCreateBucketRequest request);
-    Task<ValidationResponse> PostConfigureLoggingAsync(AwsConfigureLoggingRequest request);
-    Task<ValidationResponse> PostBucketPolicyAsync(AwsAddBucketPolicyRequest request);
-    Task<ValidationResponse> PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
-    Task<ValidationResponse<string>> GetForecastedCostAsync();
-    Task<ValidationResponse<HostedZone>> GetHostedZonesAsync();
-    Task<ValidationResponse> PostAppAsync(RepositoryModel repo);
-    Task<ValidationResponse<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain);
-    Task<ValidationResponse<Domain>> GetRegisteredDomainsAsync();
-    Task<ValidationResponse> PostRegisterDomainAsync(string domainName);
-    Task<ValidationResponse<AwsNewSSLCertificateResponse>> PostNewSSLCertificateAsync(AwsNewSSLCertificateRequest request);
+    Task<Bucket> GetSingleBucketAsync(string name);
+    Task<IEnumerable<Bucket>> GetBucketsAsync();
+    Task CreateBucketsAsync(AwsCreateBucketRequest request);
+    Task PostConfigureLoggingAsync(AwsConfigureLoggingRequest request);
+    Task PostBucketPolicyAsync(AwsAddBucketPolicyRequest request);
+    Task PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
+    Task<string> GetForecastedCostAsync();
+    Task<IEnumerable<HostedZone>> GetHostedZonesAsync();
+    Task PostAppAsync(RepositoryModel repo);
+    Task<IEnumerable<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain);
+    Task<IEnumerable<Domain>> GetRegisteredDomainsAsync();
+    Task PostRegisterDomainAsync(string domainName);
+    Task<AwsNewSSLCertificateResponse> PostNewSSLCertificateAsync(AwsNewSSLCertificateRequest request);
 }

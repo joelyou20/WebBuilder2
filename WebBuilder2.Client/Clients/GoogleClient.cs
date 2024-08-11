@@ -14,7 +14,7 @@ public class GoogleClient : ClientBase, IGoogleClient
 {
     public GoogleClient(HttpClient httpClient) : base(httpClient, "google") { }
 
-    public async Task<ValidationResponse<GoogleAdSenseAccount>> GetAccountsAsync() => await GetAsync<GoogleAdSenseAccount>("accounts");
-    public async Task<ValidationResponse<GooglePayment>> GetPaymentsAsync() => await GetAsync<GooglePayment>("payments");
-    public async Task<ValidationResponse<GoogleAdClient>> GetAdClientsAsync() => await GetAsync<GoogleAdClient>("adclients");
+    public async Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync() => await GetAsync<IEnumerable<GoogleAdSenseAccount>>("accounts");
+    public async Task<IEnumerable<GooglePayment>> GetPaymentsAsync() => await GetAsync<IEnumerable<GooglePayment>>("payments");
+    public async Task<IEnumerable<GoogleAdClient>> GetAdClientsAsync() => await GetAsync<IEnumerable<GoogleAdClient>>("adclients");
 }

@@ -1,12 +1,8 @@
-﻿using Amazon.S3.Model;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Octokit;
 using Sodium;
-using System.Collections.ObjectModel;
-using System.Management.Automation;
 using System.Net;
-using System.Reflection.Metadata;
 using System.Text;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
@@ -14,25 +10,17 @@ using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
 using WebBuilder2.Shared.Utils;
-using WebBuilder2.Shared.Validation;
-using static Azure.Core.HttpHeader;
 
 namespace WebBuilder2.Server.Services;
 
-public class GithubService : IGithubService
+public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSecretsManagerService) : IGithubService
 {
-    private IGitHubClient _client;
-    private IAwsSecretsManagerService _awsSecretsManagerService;
+    private readonly IGitHubClient _client = client;
+    private readonly IAwsSecretsManagerService _awsSecretsManagerService = awsSecretsManagerService;
 
-    public GithubService(IGitHubClient client, IAwsSecretsManagerService awsSecretsManagerService)
+    public async Task<IEnumerable<RepositoryModel>> GetRepositoriesAsync()
     {
-        _client = client;
-        _awsSecretsManagerService = awsSecretsManagerService;
-    }
-
-    public async Task<ValidationResponse<RepositoryModel>> GetRepositoriesAsync()
-    {
-        List<RepositoryModel> repos = new();
+        List<RepositoryModel> repos = [];
 
         var repositories = await _client.Repository.GetAllForCurrent();
 
@@ -41,100 +29,83 @@ public class GithubService : IGithubService
             repos.Add(ParseRepository(repo));
         }
 
-        return ValidationResponse<RepositoryModel>.Success(repos);
+        return repos;
     }
 
-    public async Task<ValidationResponse> AuthenticateUserAsync()
+    public async Task AuthenticateUserAsync()
     {
         // Check if client is already authenticated. _client.User.Current() will throw an AuthorizationException if the client is not authenticated
-        User user = await _client.User.Current();
-        return new ValidationResponse
-        {
-            IsSuccessful = true,
-            Message = "Success",
-        };
+        await _client.User.Current();
     }
 
-    public async Task<ValidationResponse<RepositoryModel>> CreateRepoAsync(RepositoryModel repository)
+    public async Task<RepositoryModel> CreateRepoAsync(RepositoryModel repository)
     {
-        try
+        NewRepository newRepo = new(repository.RepoName)
         {
-            NewRepository newRepo = new(repository.RepoName)
+            Description = repository.Description,
+            Private = repository.IsPrivate,
+            Visibility = repository.Visibility switch
             {
-                Description = repository.Description,
-                Private = repository.IsPrivate,
-                Visibility = repository.Visibility switch
-                {
-                    RepoVisibility.Public => RepositoryVisibility.Public,
-                    RepoVisibility.Private => RepositoryVisibility.Private,
-                    RepoVisibility.Internal => RepositoryVisibility.Internal,
-                    _ => throw new ArgumentOutOfRangeException(nameof(repository.Visibility),
-                                                               $"Not expected request visibility value {repository.Visibility}"),
-                },
-                IsTemplate = repository.IsTemplate,
-                AllowAutoMerge = repository.AllowAutoMerge,
-                AllowMergeCommit = repository.AllowMergeCommit,
-                AllowRebaseMerge = repository.AllowRebaseMerge,
-                AllowSquashMerge = repository.AllowSquashMerge,
-                AutoInit = repository.AutoInit,
-                DeleteBranchOnMerge = repository.DeleteBranchOnMerge,
-                GitignoreTemplate = repository.GitIgnoreTemplate,
-                HasDownloads = repository.HasDownloads,
-                HasIssues = repository.HasIssues,
-                HasProjects = repository.HasProjects,
-                HasWiki = repository.HasWiki,
-                Homepage = repository.Homepage,
-                LicenseTemplate = repository.LicenseTemplate,
-                TeamId = repository.TeamId,
-                UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault
-            };
+                RepoVisibility.Public => RepositoryVisibility.Public,
+                RepoVisibility.Private => RepositoryVisibility.Private,
+                RepoVisibility.Internal => RepositoryVisibility.Internal,
+                _ => throw new ArgumentOutOfRangeException(nameof(repository.Visibility),
+                                                            $"Not expected request visibility value {repository.Visibility}"),
+            },
+            IsTemplate = repository.IsTemplate,
+            AllowAutoMerge = repository.AllowAutoMerge,
+            AllowMergeCommit = repository.AllowMergeCommit,
+            AllowRebaseMerge = repository.AllowRebaseMerge,
+            AllowSquashMerge = repository.AllowSquashMerge,
+            AutoInit = repository.AutoInit,
+            DeleteBranchOnMerge = repository.DeleteBranchOnMerge,
+            GitignoreTemplate = repository.GitIgnoreTemplate,
+            HasDownloads = repository.HasDownloads,
+            HasIssues = repository.HasIssues,
+            HasProjects = repository.HasProjects,
+            HasWiki = repository.HasWiki,
+            Homepage = repository.Homepage,
+            LicenseTemplate = repository.LicenseTemplate,
+            TeamId = repository.TeamId,
+            UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault
+        };
 
-            var createResult = await _client.Repository.Create(newRepo);
+        var createResult = await _client.Repository.Create(newRepo);
 
-            var response = ParseRepository(createResult);
+        var response = ParseRepository(createResult);
 
-            response.AutoInit = repository.AutoInit;
-            response.GitIgnoreTemplate = repository.GitIgnoreTemplate;
-            response.HasProjects = repository.HasProjects;
-            response.LicenseTemplate = repository.LicenseTemplate;
-            response.TeamId = repository.TeamId;
-            response.UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault;
-            response.Visibility = repository.Visibility;
+        response.AutoInit = repository.AutoInit;
+        response.GitIgnoreTemplate = repository.GitIgnoreTemplate;
+        response.HasProjects = repository.HasProjects;
+        response.LicenseTemplate = repository.LicenseTemplate;
+        response.TeamId = repository.TeamId;
+        response.UseSquashPrTitleAsDefault = repository.UseSquashPrTitleAsDefault;
+        response.Visibility = repository.Visibility;
 
-            return ValidationResponse<RepositoryModel>.Success(response);
-        }
-        catch (ApiException ex)
-        {
-            var response = new ValidationResponse<RepositoryModel>
-            {
-                Errors = ex.ApiError.Errors.Select(error => new Shared.Models.ApiError(error.Message, ApiErrorSeverity.Error, error.Code, error.Resource, error.Field, ex)).ToList()
-            };
-
-            return response;
-        }
+        return response;
     }
 
-    public async Task<ValidationResponse<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync()
+    public async Task<GitIgnoreTemplateResponse> GetGitIgnoreTemplatesAsync()
     {
         IReadOnlyList<string> templates = await _client.GitIgnore.GetAllGitIgnoreTemplates();
         GitIgnoreTemplateResponse response = new(templates);
-        return ValidationResponse<GitIgnoreTemplateResponse>.Success(response);
+        return response;
     }
 
-    public async Task<ValidationResponse<GithubProjectLicense>> GetLicenseTemplatesAsync()
+    public async Task<IEnumerable<GithubProjectLicense>> GetLicenseTemplatesAsync()
     {
         IReadOnlyList<LicenseMetadata> licenses = await _client.Licenses.GetAllLicenses();
 
-        return ValidationResponse<GithubProjectLicense>.Success(licenses.Select(license => new GithubProjectLicense
+        return licenses.Select(license => new GithubProjectLicense
         {
             Featured = license.Featured,
             Key = license.Key,
             Name = license.Name,
             Url = license.Url
-        }));
+        });
     }
 
-    public async Task<ValidationResponse<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName)
+    public async Task<GithubSecretResponse> GetSecretsAsync(string userName, string repoName)
     {
         using var client = new HttpClient();
 
@@ -145,12 +116,12 @@ public class GithubService : IGithubService
         string message = await response.Content.ReadAsStringAsync();
         GithubSecretResponse? result = JsonConvert.DeserializeObject<GithubSecretResponse>(message);
 
-        if(result == null) return ValidationResponse<GithubSecretResponse>.Failure();
+        if (result == null) throw new Exception("Failed to deserialize github secrets.");
 
-        return ValidationResponse<GithubSecretResponse>.Success(result);
+        return result;
     }
 
-    public async Task<ValidationResponse<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName)
+    public async Task<IEnumerable<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName)
     {
         using var client = new HttpClient();
 
@@ -170,69 +141,53 @@ public class GithubService : IGithubService
             HttpResponseMessage response = await client.SendAsync(request);
         }
 
-        return ValidationResponse<GithubSecret>.Success(secrets);
+        return secrets;
     }
 
-    public async Task<ValidationResponse<string>> GetUserAsync()
+    public async Task<string> GetUserAsync()
     {
         var user = await _client.User.Current();
-        return ValidationResponse<string>.Success(user.Login);
+        return user.Login;
     }
 
-    public async Task<ValidationResponse<Reference>> CreateBranchAsync(string owner, long repoId, string branchName, Commit? commit = null)
+    public async Task<Reference> CreateBranchAsync(string owner, long repoId, string branchName, Commit? commit = null)
     {
-        try
-        {
-            commit ??= await GetMasterRefAsync(owner, repoId);
-            var reference = new NewReference($"refs/heads/{branchName}", commit.Sha);
-            var branches = await _client.Git.Reference.GetAll(repoId);
-            var existingBranch = branches.FirstOrDefault(x => x.Ref == reference.Ref);
+        commit ??= await GetMasterRefAsync(owner, repoId);
+        var reference = new NewReference($"refs/heads/{branchName}", commit.Sha);
+        var branches = await _client.Git.Reference.GetAll(repoId);
+        var existingBranch = branches.FirstOrDefault(x => x.Ref == reference.Ref);
 
-            if (existingBranch != null) return ValidationResponse<Reference>.Success(existingBranch);
+        if (existingBranch != null) return existingBranch;
 
-            var branch = await _client.Git.Reference.Create(repoId, reference);
+        var branch = await _client.Git.Reference.Create(repoId, reference);
 
-            return ValidationResponse<Reference>.Success(branch);
-        }
-        catch (Exception ex)
-        {
-            return ValidationResponse<Reference>.Failure(ex);
-        }
+        return branch;
     }
 
-    public async Task<ValidationResponse> CreateCommitAsync(string owner, long repoId, GithubCreateCommitRequest request)
+    public async Task CreateCommitAsync(string owner, long repoId, GithubCreateCommitRequest request)
     {
-        try
-        {
-            var user = await _client.User.Current();
+        var user = await _client.User.Current();
 
-            foreach (NewFile file in request.Files)
-            {
-                CreateFileRequest createFileRequest = new(request.Message, file.Content);
-                var createFileResult = await _client.Repository.Content.CreateFile(repoId, file.Path, createFileRequest);
-            }
-
-            return ValidationResponse.Success();
-        }
-        catch (Exception ex)
+        foreach (NewFile file in request.Files)
         {
-            return ValidationResponse.Failure(ex);
+            CreateFileRequest createFileRequest = new(request.Message, file.Content);
+            await _client.Repository.Content.CreateFile(repoId, file.Path, createFileRequest);
         }
     }
 
-    public async Task<ValidationResponse<RepoContent>> GetRepositoryContentAsync(string owner, string repoName, string? path = null)
+    public async Task<IEnumerable<RepoContent>> GetRepositoryContentAsync(string owner, string repoName, string? path = null)
     {
-        List<RepositoryContent>? repoContent = null;
+        List<RepositoryContent>? repoContentList = null;
 
         if (path == null)
         {
-            repoContent = (await _client.Repository.Content.GetAllContents(owner, repoName)).ToList();
+            repoContentList = [.. (await _client.Repository.Content.GetAllContents(owner, repoName))];
         }
         else
         {
             var contentBytes = await _client.Repository.Content.GetRawContent(owner, repoName, path);
             var bytesAsString = Convert.ToBase64String(contentBytes);
-            repoContent = new List<RepositoryContent> { new RepositoryContent(
+            repoContentList = new List<RepositoryContent> { new RepositoryContent(
                 name: path.Split('\\').Last(), 
                 path: path, 
                 sha: "", 
@@ -249,14 +204,14 @@ public class GithubService : IGithubService
             )};
         }
 
-        if (repoContent == null) return ValidationResponse<RepoContent>.Failure(message: "Failed to get repository content");
+        if (repoContentList == null) throw new Exception("Failed to get repository content");
 
-        FileType ConvertFileType(Octokit.ContentType contentType) => (contentType) switch
+        FileType ConvertFileType(ContentType contentType) => (contentType) switch
         {
-            Octokit.ContentType.File => FileType.File,
-            Octokit.ContentType.Dir => FileType.Directory,
-            Octokit.ContentType.Symlink => FileType.Symlink,
-            Octokit.ContentType.Submodule => FileType.Submodule,
+            ContentType.File => FileType.File,
+            ContentType.Dir => FileType.Directory,
+            ContentType.Symlink => FileType.Symlink,
+            ContentType.Submodule => FileType.Submodule,
             _ => throw new Exception($"Unknown file type discovered in Repository: {repoName}"),
         };
 
@@ -267,17 +222,17 @@ public class GithubService : IGithubService
             return decodedContent;
         }
 
-        return ValidationResponse<RepoContent>.Success(repoContent.Select(x => new RepoContent(x.Name, x.Path, DecodeContent(x.EncodedContent), ConvertFileType(x.Type.Value))));
+        return repoContentList.Select(x => new RepoContent(x.Name, x.Path, DecodeContent(x.EncodedContent), ConvertFileType(x.Type.Value)));
     }
 
-    public async Task<ValidationResponse<GitTreeItem>> GetGitTreeAsync(string owner, string repoName)
+    public async Task<IEnumerable<GitTreeItem>> GetGitTreeAsync(string owner, string repoName)
     {
         var reference = "refs/heads/master";
         TreeResponse treeResponse = await _client.Git.Tree.GetRecursive(owner, repoName, reference);
 
         IEnumerable<GitTreeItem> gitTree = BuildGitTreeRecursive(treeResponse.Tree.ToArray());
 
-        return ValidationResponse<GitTreeItem>.Success(gitTree);
+        return gitTree;
     }
 
 
@@ -327,14 +282,14 @@ public class GithubService : IGithubService
 
     // OctoKit has not implemented functionality for copying the contents of one repo into another, so I am handling
     //  that by using commands
-    public async Task<ValidationResponse> CopyRepoAsync(string clonedRepoName, string newRepoName, string? path)
+    public async Task<bool> CopyRepoAsync(string clonedRepoName, string newRepoName, string? path)
     {
         User user = await _client.User.Current();
         string currentDirectory = System.IO.Directory.GetCurrentDirectory();
         string scriptPath = @".\Scripts\CopyGitRepo.sh";
         bool isSuccessful = await ScriptRunner.RunAsync(scriptPath, [clonedRepoName, newRepoName, user.Login]);
 
-        return isSuccessful ? ValidationResponse.Failure() : ValidationResponse.Success();
+        return isSuccessful;
     }
 
 
@@ -398,7 +353,7 @@ public class GithubService : IGithubService
         return Convert.ToBase64String(sealedPublicKeyBox);
     }
 
-    private RepositoryModel ParseRepository(Octokit.Repository repo) => new()
+    private RepositoryModel ParseRepository(Repository repo) => new()
     {
         AllowAutoMerge = repo.AllowAutoMerge != null,
         AllowMergeCommit = repo.AllowMergeCommit != null,

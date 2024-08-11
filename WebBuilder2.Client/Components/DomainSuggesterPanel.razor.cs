@@ -22,7 +22,12 @@ public partial class DomainSuggesterPanel
     {
         _loading = true;
         StateHasChanged();
-        _domains = await AwsService.GetSuggestedDomainNamesAsync(_text);
+
+        var response = await AwsService.GetSuggestedDomainNamesAsync(_text);
+
+        if (response == null) throw new ArgumentNullException(nameof(response));
+
+        _domains = response.ToList();
 
         _loading = false;
         StateHasChanged();

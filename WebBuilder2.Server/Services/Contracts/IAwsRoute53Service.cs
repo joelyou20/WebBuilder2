@@ -5,5 +5,5 @@ namespace WebBuilder2.Server.Services.Contracts;
 
 public interface IAwsRoute53Service
 {
-    Task<ValidationResponse<HostedZone>> GetHostedZonesAsync();
+    Task<IEnumerable<HostedZone>> GetHostedZonesAsync();
 }

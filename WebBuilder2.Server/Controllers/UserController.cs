@@ -15,7 +15,7 @@ namespace WebBuilder2.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController(IUserService userService, ITokenService tokenService) : ControllerBase
+    public class UserController(IUserService userService, ITokenService tokenService) : CustomControllerBase
     {
         private readonly IUserService _userService = userService;
         private readonly ITokenService _tokenService = tokenService;
@@ -24,14 +24,9 @@ namespace WebBuilder2.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterUserRequest request)
         {
-            try
-            {
-                return Ok(JsonConvert.SerializeObject(await _userService.RegisterUserAsync(request)));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+            await _userService.RegisterUserAsync(request);
+
+            return Ok();
         }
 
         [HttpPost("/user/login")]
@@ -61,7 +56,7 @@ namespace WebBuilder2.Server.Controllers
                         UserName = user.UserName ?? "",
                         Token = token
                     };
-                    return Ok(JsonConvert.SerializeObject(ValidationResponse<LoginUserResponse>.Success(response)));
+                    return Ok(response);
                 }
                 if (result.IsLockedOut)
                 {
@@ -76,11 +71,11 @@ namespace WebBuilder2.Server.Controllers
             }
             catch(UnauthorizedAccessException ex)
             {
-                return Unauthorized(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+                return Unauthorized(ex);
             }
             catch (Exception ex)
             {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
+                return BadRequest(ex);
             }
         }
 
@@ -88,15 +83,9 @@ namespace WebBuilder2.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Logout()
         {
-            try
-            {
-                await _userService.LogoutUserAsync();
-                return Ok(JsonConvert.SerializeObject(ValidationResponse.Success()));
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(JsonConvert.SerializeObject(ValidationResponseHelper.BuildFailedResponse(ex)));
-            }
+            await _userService.LogoutUserAsync();
+
+            return Ok();
         }
     }
 }

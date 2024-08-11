@@ -7,7 +7,7 @@ namespace WebBuilder2.Server.Services.Contracts;
 public interface IAwsRoute53DomainsService
 {
     Task<string> CheckDomainAvailabilityAsync(string domain);
-    Task<ValidationResponse<DomainInquiry>> GetDomainSuggestionsAsync(string domain, bool onlyAvailable, int suggestionCount = 50);
-    Task<ValidationResponse<Domain>> GetRegisteredDomainsAsync();
-    Task<ValidationResponse> RegisterDomainAsync(string domainName);
+    Task<IEnumerable<DomainInquiry>> GetDomainSuggestionsAsync(string domain, bool onlyAvailable, int suggestionCount = 50);
+    Task<IEnumerable<Domain>> GetRegisteredDomainsAsync();
+    Task<RegisterDomainResponse> RegisterDomainAsync(string domainName);
 }
