@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using WebBuilder2.Client.Services.Contracts;
 using WebBuilder2.Shared.Models.Projections;
 
-namespace WebBuilder2.Client.Handlers;
+namespace WebBuilder2.Client.Utils.Handlers;
 
 public class TokenHandler : DelegatingHandler
 {

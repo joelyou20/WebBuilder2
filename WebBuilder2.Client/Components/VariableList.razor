@@ -1,11 +1,14 @@
 ﻿<MudCard>
-    <MudSelect T="RepositoryModel" Value="@_selectedRepo" Label="Repository" Clearable="false" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_repoSelectConverter" Required="true" ValueChanged="OnRepoSelected">
-        @foreach (RepositoryModel repo in _repositories)
-        {
-            <MudSelectItem Value="@repo" />
-        }
-    </MudSelect>
-    @if (_repositories.Any())
+    @if (_repositories != null)
+    {
+        <MudSelect T="RepositoryModel" Value="@_selectedRepo" Label="Repository" Clearable="false" AnchorOrigin="Origin.BottomCenter" ToStringFunc="@_repoSelectConverter" Required="true" ValueChanged="OnRepoSelected">
+            @foreach (RepositoryModel repo in _repositories)
+            {
+                <MudSelectItem Value="@repo" />
+            }
+        </MudSelect>
+    }
+    @if (_variables != null)
     {
         <MudText>Variables</MudText>
         <MudButton Variant="Variant.Filled" OnClick="OnCreateVariableButtonClick">Create Variable</MudButton>

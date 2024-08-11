@@ -24,7 +24,7 @@ public partial class ScriptList
     [Parameter] public int? MaxLines { get; set; }
     [Parameter] public bool ShowEditor { get; set; } = true;
 
-    private List<WebBuilder2.Shared.Models.Error> _errors = new();
+    private List<ApiError> _errors = new();
 
     public async Task OnExpandBtnClick(int index)
     {

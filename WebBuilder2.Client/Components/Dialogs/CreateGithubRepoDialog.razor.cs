@@ -26,7 +26,7 @@ public partial class CreateGithubRepoDialog
     private List<SiteModel>? _disconnectedSites = new();
     private readonly Func<RepositoryModel, string> _templateSelectConverter = r => r.Name;
     private readonly Func<SiteModel, string> _siteSelectConverter = r => r.Name;
-    private List<WebBuilder2.Shared.Models.Error> _errors = new();
+    private List<ApiError> _errors = new();
     private SiteModel? _selectedSite;
 
     protected override async Task OnInitializedAsync()

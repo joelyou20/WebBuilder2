@@ -6,10 +6,9 @@ namespace WebBuilder2.Client.Observers.Contracts;
 
 public interface IErrorObserver
 {
-    string? ErrorMessage { get; set; }
-    bool HasError { get; }
+    event EventHandler<List<ApiError>> ErrorsChanged;
+    void AddErrorRange(IEnumerable<ApiError> errors);
+    void AddError(ApiError error);
+    void AddError(Exception error);
 
-    event Action? OnErrorChanged;
-    void ReportError(string errorMessage);
-    void ClearError();
 }

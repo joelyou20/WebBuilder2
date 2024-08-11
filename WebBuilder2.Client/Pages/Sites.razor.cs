@@ -20,7 +20,7 @@ public partial class Sites
 
     private List<SiteModel> _siteList = new();
     private List<Domain>? _registeredDomains;
-    private List<Error> _errors = new();
+    private List<ApiError> _errors = new();
 
     protected override async Task OnInitializedAsync()
     {

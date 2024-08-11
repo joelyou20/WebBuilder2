@@ -8,5 +8,5 @@ namespace WebBuilder2.Shared.Models.Contracts;
 
 public interface IApiResponse
 {
-    public IEnumerable<Error> Errors { get; set; }
+    public IEnumerable<ApiError> Errors { get; set; }
 }

@@ -17,9 +17,7 @@ public partial class ImportGithubRepoDialog
     [Parameter] public IEnumerable<long> ExistingIds { get; set; } = default!;
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    private Dictionary<RepositoryModel, bool> _githubRepositories = new();
-
-    private bool _dataIsLoading = true;
+    private readonly Dictionary<RepositoryModel, bool> _githubRepositories = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,7 +31,6 @@ public partial class ImportGithubRepoDialog
         {
             if(!ExistingIds.Contains(x.Id)) _githubRepositories.Add(x, false);
         });
-        _dataIsLoading = false;
         StateHasChanged();
     }
 

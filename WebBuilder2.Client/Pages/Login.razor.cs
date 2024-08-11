@@ -26,6 +26,6 @@ public partial class Login
 
     private async Task OnResetPasswordBtnClicked()
     {
-
+        await Task.CompletedTask;
     }
 }

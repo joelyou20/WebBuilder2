@@ -1,20 +1,25 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
 using Serilog.Core;
+using System.Text;
+using System.Web;
 using WebBuilder2.Client;
 using WebBuilder2.Client.Clients;
 using WebBuilder2.Client.Clients.Contracts;
-using WebBuilder2.Client.Handlers;
 using WebBuilder2.Client.Managers;
 using WebBuilder2.Client.Managers.Contracts;
 using WebBuilder2.Client.Observers;
 using WebBuilder2.Client.Observers.Contracts;
 using WebBuilder2.Client.Services;
 using WebBuilder2.Client.Services.Contracts;
+using WebBuilder2.Client.Utils.Handlers;
 using WebBuilder2.Client.Utils.Providers;
 using WebBuilder2.Client.Utils.Providers.Contracts;
 using WebBuilder2.Client.Utils.Settings;
@@ -110,10 +115,43 @@ builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
 
 // <================== END OF SERVICES
 
-builder.Services.AddSingleton<IErrorObserver, ErrorObserver>();
+builder.Services.AddSingleton<IErrorObserver, ErrorObserver>(); 
 
+var unhandledExceptionProvider = new UnhandledExceptionProvider();
+builder.Logging.AddProvider(unhandledExceptionProvider);
 builder.Services.AddMudServices();
 
 var app = builder.Build();
+
+
+unhandledExceptionProvider.Log += (logLevel, exception) =>
+{
+    ApiErrorSeverity ConvertLogLevelToSeverity(LogLevel ll) => ll switch
+        {
+            LogLevel.Error => ApiErrorSeverity.Error,
+            LogLevel.Warning => ApiErrorSeverity.Warning,
+            LogLevel.Critical => ApiErrorSeverity.Error,
+            LogLevel.Information => ApiErrorSeverity.Info,
+            _ => ApiErrorSeverity.Normal,
+        };
+
+    if (logLevel == LogLevel.Critical && exception != null)
+    {
+        var errorObserver = app.Services.GetRequiredService<IErrorObserver>();
+
+        string stackTrace = exception.StackTrace != null ?
+            Encoding.UTF8.GetString(Encoding.UTF32.GetBytes(exception.StackTrace)) :
+            string.Empty;
+
+        string errorDetail = exception.Message + Environment.NewLine + stackTrace;
+
+        errorObserver.AddError(new ApiError
+        {
+            Severity = ConvertLogLevelToSeverity(logLevel),
+            Exception = exception,
+            Message = errorDetail
+        });
+    }
+};
 
 await app.RunAsync();

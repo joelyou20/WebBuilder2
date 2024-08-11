@@ -10,5 +10,7 @@ public enum ApiErrorSeverity
 {
     Information,
     Warning,
-    Error
+    Error,
+    Info,
+    Normal
 }

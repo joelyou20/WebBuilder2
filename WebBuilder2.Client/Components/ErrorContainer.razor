@@ -1,0 +1,13 @@
+﻿@if (Errors.Any())
+{
+    <div class="error-overlay">
+        @foreach (ApiError error in Errors)
+        {
+            <MudAlert id="error-detail" Severity="@ConvertSeverity(error.Severity)" ShowCloseIcon="true" CloseIconClicked="@(() => RemoveError(error))">
+                <ChildContent>
+                    @BuildErrorMessage(error)
+                </ChildContent>
+            </MudAlert>
+        }
+    </div>
+}

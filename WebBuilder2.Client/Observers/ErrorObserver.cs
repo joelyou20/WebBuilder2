@@ -7,20 +7,35 @@ namespace WebBuilder2.Client.Observers;
 
 public class ErrorObserver : IErrorObserver
 {
-    public string? ErrorMessage { get; set; }
-    public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    public event EventHandler<List<ApiError>> ErrorsChanged = default!;
 
-    public event Action? OnErrorChanged;
+    protected List<ApiError> Errors { get; private set; } = [];
 
-    public void ReportError(string errorMessage)
+    public void AddErrorRange(IEnumerable<ApiError> errors)
     {
-        ErrorMessage = errorMessage;
-        OnErrorChanged?.Invoke();
+        foreach (var error in errors)
+        {
+            AddError(error);
+        }
     }
 
-    public void ClearError()
+    public void AddError(ApiError error)
     {
-        ErrorMessage = null;
-        OnErrorChanged?.Invoke();
+        Errors.Add(error);
+        ErrorsChanged?.Invoke(this, Errors);
+    }
+
+    public void AddError(Exception ex)
+    {
+        Errors.Add(new ApiError(
+            exception: ex,
+            code: "",
+            field: ex.Source ?? "",
+            message: ex.Message,
+            resource: "",
+            severity: ApiErrorSeverity.Error,
+            stackTrace: ex.StackTrace
+        ));
+        ErrorsChanged?.Invoke(this, Errors);
     }
 }

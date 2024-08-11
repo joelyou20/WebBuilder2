@@ -32,11 +32,13 @@ public partial class CreateSiteDialog
     private bool _useNewDomain = false;
     private bool _createDatabaseExpanded = false;
 
-    private List<WebBuilder2.Shared.Models.Error> _errors = new();
+    private List<ApiError> _errors = new();
 
     protected async override Task OnInitializedAsync()
     {
-        _templateRepositories = (await RepositoryService.GetRepositoriesAsync()).Where(x => x.IsTemplate).ToList();
+        var repos = await RepositoryService.GetRepositoriesAsync();
+
+        _templateRepositories = repos.Where(x => x.IsTemplate).ToList();
     }
 
     public void OnTemplateSelected(RepositoryModel? templateRepository = null)
@@ -76,7 +78,7 @@ public partial class CreateSiteDialog
 
     public void OnInvalidSubmit() => InvokeAsync(async () =>
     {
-        return;
+        await Task.CompletedTask;
     });
 
     public Color GetStatusColor(JobStatus status) => status switch

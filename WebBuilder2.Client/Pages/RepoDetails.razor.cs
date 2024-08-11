@@ -24,7 +24,6 @@ public partial class RepoDetails
     [Parameter] public long Id { get; set; }
 
     private RepositoryModel? _repo;
-    private List<WebBuilder2.Shared.Models.Error> _errors = new();
     private HashSet<GitTreeItem> _repoTree = new();
     private string _fileContent = string.Empty;
     private CodeEditor? _codeEditor;
@@ -42,7 +41,7 @@ public partial class RepoDetails
 
         List<GitTreeItem>? gitTreeResponse = await GithubService.GetGitTreeAsync(_repo.Name);
 
-        _repoTree = gitTreeResponse!.ToHashSet();
+        _repoTree = [.. gitTreeResponse!];
 
         StateHasChanged();
     }

@@ -9,7 +9,7 @@ public partial class ScriptsWidget
 {
     [Inject] public IScriptService ScriptService { get; set; } = default!;
 
-    private List<ScriptModel> _scripts = new();
+    private List<ScriptModel> _scripts = [];
 
     protected override async Task OnInitializedAsync()
     {
