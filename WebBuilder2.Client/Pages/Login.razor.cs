@@ -15,7 +15,7 @@ public partial class Login
     [Inject] public IErrorObserver ErrorObserver { get; set; } = default!;
     [Inject] public ILocalStorageService LocalStorageService { get; set; } = default!;
 
-    private LoginUserRequest _request = new();
+    private readonly LoginUserRequest _request = new();
 
     private async Task HandleLogin()
     {

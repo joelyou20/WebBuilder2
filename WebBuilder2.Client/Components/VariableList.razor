@@ -8,17 +8,21 @@
             }
         </MudSelect>
     }
-    @if (_variables != null)
+    @if (_variables == null)
     {
-        <MudText>Variables</MudText>
-        <MudButton Variant="Variant.Filled" OnClick="OnCreateVariableButtonClick">Create Variable</MudButton>
-        foreach(GithubSecret variable in _variables)
-        {
-            <MudText>@($"Name: {variable.Name}; CreatedAt: {variable.CreatedAt}; UpdatedAt: {variable.UpdatedAt}")</MudText>
-        }
+        <MudText>Loading...</MudText>
+    }
+    else if (_variables.Count == 0)
+    {
+        <MudText>No variables found</MudText>
     }
     else
     {
-        <MudText>Loading...</MudText>
+        <MudText>Variables</MudText>
+        <MudButton Variant="Variant.Filled" OnClick="OnCreateVariableButtonClick">Create Variable</MudButton>
+        foreach (GithubSecret variable in _variables)
+        {
+            <MudText>@($"Name: {variable.Name}; CreatedAt: {variable.CreatedAt}; UpdatedAt: {variable.UpdatedAt}")</MudText>
+        }
     }
 </MudCard>

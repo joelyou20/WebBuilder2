@@ -1,17 +1,11 @@
-using Google;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Octokit;
 using Serilog;
-using System.Configuration;
-using System.Web.Services.Description;
 using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Settings;
-using WebBuilder2.Server.Utils;
 using WebBuilder2.Server.Utils.Extensions;
 using ConfigurationManager = Microsoft.Extensions.Configuration.ConfigurationManager;
 

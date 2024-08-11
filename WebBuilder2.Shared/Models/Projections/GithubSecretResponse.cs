@@ -13,6 +13,6 @@ public class GithubSecretResponse
     public int TotalCount { get; set; }
 
     [JsonProperty("secrets")]
-    public List<GithubSecret> GithubSecrets { get; set; } = new();
+    public IEnumerable<GithubSecret> GithubSecrets { get; set; } = default!;
 }
 

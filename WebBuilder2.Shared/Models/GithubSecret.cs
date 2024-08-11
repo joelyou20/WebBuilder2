@@ -1,13 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebBuilder2.Shared.Models;
-
+ 
 public class GithubSecret
 {
     [JsonProperty("name")]
@@ -15,7 +10,7 @@ public class GithubSecret
     [JsonProperty("value")]
     public string? Value { get; set; }
     [JsonProperty("created_at")]
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
     [JsonProperty("updated_at")]
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

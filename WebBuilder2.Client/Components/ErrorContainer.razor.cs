@@ -31,19 +31,6 @@ public partial class ErrorContainer
         _ => Severity.Error,
     };
 
-    public string BuildErrorMessage(ApiError error)
-    {
-        StringBuilder sb = new();
-        if (!string.IsNullOrEmpty(error.Code)) sb.AppendLine($"Code: {error.Code}");
-        if (!string.IsNullOrEmpty(error.Message)) sb.AppendLine($"Message: {error.Message}");
-        if (!string.IsNullOrEmpty(error.Resource)) sb.AppendLine($"Resource: {error.Resource}");
-        if (!string.IsNullOrEmpty(error.Field)) sb.AppendLine($"Field: {error.Field}");
-        if (!string.IsNullOrEmpty(error.StackTrace)) sb.AppendLine($"StackTrace: {error.StackTrace}");
-
-        var result = sb.ToString();
-        return result;
-    }
-
     public void RemoveError(ApiError error)
     {
         Errors.Remove(error);

@@ -17,8 +17,8 @@ public partial class VariableList
 
     private string? _repoName;
     private readonly Func<RepositoryModel, string> _repoSelectConverter = r => r.Name;
-    private List<GithubSecret>? _variables = new();
-    private List<RepositoryModel>? _repositories = new();
+    private List<GithubSecret>? _variables;
+    private List<RepositoryModel>? _repositories;
     private RepositoryModel? _selectedRepo;
 
     protected override async Task OnInitializedAsync()
@@ -38,10 +38,10 @@ public partial class VariableList
 
     private async Task UpdateDataAsync()
     {
-        if (_repositories == null || !_repositories.Any() || _repoName == null) return;
+        if (_repositories == null || _repositories.Count == 0 || _repoName == null) return;
         var result = await GithubService.GetSecretsAsync(_repoName);
 
-        _variables = result?.GithubSecrets.ToList();
+        _variables = result.ToList();
 
         StateHasChanged();
     }

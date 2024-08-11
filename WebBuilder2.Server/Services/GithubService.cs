@@ -105,7 +105,7 @@ public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSe
         });
     }
 
-    public async Task<GithubSecretResponse> GetSecretsAsync(string userName, string repoName)
+    public async Task<IEnumerable<GithubSecret>> GetSecretsAsync(string userName, string repoName)
     {
         using var client = new HttpClient();
 
@@ -118,7 +118,7 @@ public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSe
 
         if (result == null) throw new Exception("Failed to deserialize github secrets.");
 
-        return result;
+        return result.GithubSecrets;
     }
 
     public async Task<IEnumerable<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName)

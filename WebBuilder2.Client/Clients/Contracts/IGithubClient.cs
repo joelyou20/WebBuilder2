@@ -16,7 +16,7 @@ public interface IGithubClient
     Task PostAuthenticateAsync();
     Task<IEnumerable<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync();
     Task<IEnumerable<GithubProjectLicense>> GetGithubProjectLicensesAsync();
-    Task<IEnumerable<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName);
+    Task<IEnumerable<GithubSecret>> GetSecretsAsync(string userName, string repoName);
     Task<IEnumerable<GithubSecret>> CreateSecretAsync(GithubSecret secret, string userName, string repoName);
     Task<IEnumerable<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName);
     Task CreateCommitAsync(GithubCreateCommitRequest request, string userName, long repoId);

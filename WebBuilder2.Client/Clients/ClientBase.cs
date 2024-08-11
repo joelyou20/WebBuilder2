@@ -76,6 +76,8 @@ public class ClientBase(HttpClient httpClient, string endpoint)
 
         HttpResponseMessage response = await _httpClient.GetAsync(url);
 
+        response.EnsureSuccessStatusCode();
+
         return await ParseResponseAsync<T>(response);
     }
 
@@ -85,14 +87,18 @@ public class ClientBase(HttpClient httpClient, string endpoint)
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
 
+        response.EnsureSuccessStatusCode();
+
         return await ParseResponseAsync<T>(response);
     }
 
     public async Task PostAsync(string? path = null, JsonContent? content = null)
     {
-        await _httpClient.PostAsync(path == null ?
+        var response = await _httpClient.PostAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task<T> PutAsync<T>(string? path = null, JsonContent? content = null) where T : class
@@ -101,14 +107,18 @@ public class ClientBase(HttpClient httpClient, string endpoint)
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
 
+        response.EnsureSuccessStatusCode();
+
         return await ParseResponseAsync<T>(response);
     }
 
     public async Task PutAsync(string? path = null, JsonContent? content = null)
     {
-        await _httpClient.PutAsync(path == null ?
+        var response = await _httpClient.PutAsync(path == null ?
             $"{_httpClient.BaseAddress}{_endpoint}" :
             $"{_httpClient.BaseAddress}{_endpoint}/{path}", content);
+
+        response.EnsureSuccessStatusCode();
     }
 
     public static async Task<T> ParseResponseAsync<T>(HttpResponseMessage response) where T : class

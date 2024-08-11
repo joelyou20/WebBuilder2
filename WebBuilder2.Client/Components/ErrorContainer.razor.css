@@ -1,2 +1,20 @@
-﻿﻿.error-overlay {
+﻿.error-message, ::deep span {
+    width: 95%;
+    white-space: pre;
+    overflow: scroll;
+    text-overflow: clip;
+    display: block;
+}
+
+::deep #error-detail {
+    width: 100%
+}
+
+::deep .mud-alert-position {
+    width: 95%;
+}
+
+.error-overlay {
+    width: 0;
+    min-width: 100%;
 }

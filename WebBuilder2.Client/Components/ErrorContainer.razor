@@ -4,9 +4,15 @@
         @foreach (ApiError error in Errors)
         {
             <MudAlert id="error-detail" Severity="@ConvertSeverity(error.Severity)" ShowCloseIcon="true" CloseIconClicked="@(() => RemoveError(error))">
-                <ChildContent>
-                    @BuildErrorMessage(error)
-                </ChildContent>
+                <span class="error-message">@($"{nameof(error.Message)}: {error.Message}")"</span>
+                <MudExpansionPanel Text="Details">
+                    <span>@($"{nameof(error.Message)}: {error.Message}")"</span>
+                    <br /><span>@($"{nameof(error.Code)}: {error.Code}")"</span>
+                    <br /><span>@($"{nameof(error.Resource)}: {error.Resource}")"</span>
+                    <br /><span>@($"{nameof(error.Exception)}: {error.Exception}")"</span>
+                    <br /><span>@($"{nameof(error.Field)}: {error.Field}")"</span>
+                    <br /><span>@($"{nameof(error.StackTrace)}: {error.StackTrace}")"</span>
+                </MudExpansionPanel>
             </MudAlert>
         }
     </div>

@@ -7,18 +7,18 @@ namespace WebBuilder2.Client.Services.Contracts;
 
 public interface IGithubService
 {
-    Task<string?> GetGithubUser();
-    Task<List<RepositoryModel>?> GetRepositoriesAsync();
-    Task<RepoContent?> GetRepositoryContentAsync(string repoName, string? path = null);
+    Task<string> GetGithubUser();
+    Task<List<RepositoryModel>> GetRepositoriesAsync();
+    Task<RepoContent> GetRepositoryContentAsync(string repoName, string? path = null);
     Task PostCopyRepoAsync(GithubCopyRepoRequest request);
-    Task<List<GitTreeItem>?> GetGitTreeAsync(string repoName);
-    Task<GitIgnoreTemplateResponse?> GetGitIgnoreTemplatesAsync();
-    Task<List<GithubProjectLicense>?> GetGithubProjectLicensesAsync();
+    Task<List<GitTreeItem>> GetGitTreeAsync(string repoName);
+    Task<GitIgnoreTemplateResponse> GetGitIgnoreTemplatesAsync();
+    Task<List<GithubProjectLicense>> GetGithubProjectLicensesAsync();
     Task PostAuthenticateAsync();
-    Task<RepositoryModel?> PostCreateRepoAsync(RepositoryModel repository);
-    Task<GithubSecretResponse?> GetSecretsAsync(string repoName);
-    Task<List<GithubSecret>?> CreateSecretAsync(GithubSecret secret, string repoName);
-    Task<List<GithubSecret>?> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName);
+    Task<RepositoryModel> PostCreateRepoAsync(RepositoryModel repository);
+    Task<IEnumerable<GithubSecret>> GetSecretsAsync(string repoName);
+    Task<List<GithubSecret>> CreateSecretAsync(GithubSecret secret, string repoName);
+    Task<List<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string repoName);
     //Task CreateCommitAsync(GithubCreateCommitRequest request, string repoName);
     Task CreateCommitAsync(GithubCreateCommitRequest request, long repoId);
 }

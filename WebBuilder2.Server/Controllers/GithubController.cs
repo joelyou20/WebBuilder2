@@ -120,7 +120,7 @@ namespace WebBuilder2.Server.Controllers
         [HttpGet("/github/secrets/{userName}/{repoName}")]
         public async Task<IActionResult> GetSecrets([FromRoute] string userName, [FromRoute] string repoName)
         {
-            GithubSecretResponse result = await _githubService.GetSecretsAsync(userName, repoName);
+            IEnumerable<GithubSecret> result = await _githubService.GetSecretsAsync(userName, repoName);
 
             return Ok(result);
         }

@@ -25,7 +25,7 @@ namespace WebBuilder2.Client.Clients
         public async Task PostAuthenticateAsync() => await PostAsync("auth");
         public async Task<IEnumerable<GitIgnoreTemplateResponse>> GetGitIgnoreTemplatesAsync() => await GetAsync<IEnumerable<GitIgnoreTemplateResponse>>("gitignore");
         public async Task<IEnumerable<GithubProjectLicense>> GetGithubProjectLicensesAsync() => await GetAsync<IEnumerable<GithubProjectLicense>>("license");
-        public async Task<IEnumerable<GithubSecretResponse>> GetSecretsAsync(string userName, string repoName) => await GetAsync<IEnumerable<GithubSecretResponse>>($"secrets/{userName}/{repoName}");
+        public async Task<IEnumerable<GithubSecret>> GetSecretsAsync(string userName, string repoName) => await GetAsync<IEnumerable<GithubSecret>>($"secrets/{userName}/{repoName}");
         public async Task<IEnumerable<GithubSecret>> CreateSecretAsync(GithubSecret secret, string userName, string repoName) => await CreateSecretAsync(new GithubSecret[] { secret }, userName, repoName);
         public async Task<IEnumerable<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName) => 
             await PutAsync<IEnumerable<GithubSecret>>($"secrets/{userName}/{repoName}", JsonContent.Create(secrets));

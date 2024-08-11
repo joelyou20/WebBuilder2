@@ -11,7 +11,7 @@ namespace WebBuilder2.Server.Services.Contracts
         Task<RepositoryModel> CreateRepoAsync(RepositoryModel repository);
         Task<GitIgnoreTemplateResponse> GetGitIgnoreTemplatesAsync();
         Task<IEnumerable<GithubProjectLicense>> GetLicenseTemplatesAsync();
-        Task<GithubSecretResponse> GetSecretsAsync(string userName, string repoName);
+        Task<IEnumerable<GithubSecret>> GetSecretsAsync(string userName, string repoName);
         Task<IEnumerable<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName);
         Task<string> GetUserAsync();
         Task CreateCommitAsync(string owner, long repoId, GithubCreateCommitRequest request);

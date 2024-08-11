@@ -82,8 +82,7 @@ builder.Services.AddHttpClient<ISiteRepositoryClient, SiteRepositoryClient>(clie
     .AddHttpMessageHandler<TokenHandler>();
 builder.Services.AddHttpClient<IDatabaseClient, DatabaseClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
     .AddHttpMessageHandler<TokenHandler>();
-builder.Services.AddHttpClient<IUserClient, UserClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); })
-    .AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient<IUserClient, UserClient>(client => { client.BaseAddress = new Uri(configuration.GetValue<string>("ServerUrl")!); });
 
 // <================== END OF CLIENTS
 
@@ -123,35 +122,6 @@ builder.Services.AddMudServices();
 
 var app = builder.Build();
 
-
-unhandledExceptionProvider.Log += (logLevel, exception) =>
-{
-    ApiErrorSeverity ConvertLogLevelToSeverity(LogLevel ll) => ll switch
-        {
-            LogLevel.Error => ApiErrorSeverity.Error,
-            LogLevel.Warning => ApiErrorSeverity.Warning,
-            LogLevel.Critical => ApiErrorSeverity.Error,
-            LogLevel.Information => ApiErrorSeverity.Info,
-            _ => ApiErrorSeverity.Normal,
-        };
-
-    if (logLevel == LogLevel.Critical && exception != null)
-    {
-        var errorObserver = app.Services.GetRequiredService<IErrorObserver>();
-
-        string stackTrace = exception.StackTrace != null ?
-            Encoding.UTF8.GetString(Encoding.UTF32.GetBytes(exception.StackTrace)) :
-            string.Empty;
-
-        string errorDetail = exception.Message + Environment.NewLine + stackTrace;
-
-        errorObserver.AddError(new ApiError
-        {
-            Severity = ConvertLogLevelToSeverity(logLevel),
-            Exception = exception,
-            Message = errorDetail
-        });
-    }
-};
+unhandledExceptionProvider.Setup(app.Services.GetRequiredService<IErrorObserver>());
 
 await app.RunAsync();
