@@ -80,3 +80,9 @@
 ::deep .login-input-field ::after {
     content: unset !important;
 }
+
+@media (min-width: 0) and (max-width: 100rem) {
+    .login-container {
+        margin: 0 1rem;
+    }
+}

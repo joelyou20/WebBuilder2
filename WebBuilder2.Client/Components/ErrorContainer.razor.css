@@ -1,9 +1,9 @@
 ﻿.error-message, ::deep span {
-    width: 95%;
+    width: auto;
     white-space: pre;
-    overflow: scroll;
-    text-overflow: clip;
+    overflow: auto;
     display: block;
+    text-wrap: pretty;
 }
 
 ::deep #error-detail {

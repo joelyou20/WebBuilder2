@@ -3,8 +3,11 @@
     white-space: break-spaces;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-wrap: nowrap;
+    overflow: scroll;
+    /* text-wrap: nowrap; */
+    width: 0;
+    display: flex;
+    min-width: 100%;
 }
 
 ::deep .mud-table-cell {
