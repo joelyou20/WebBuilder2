@@ -4,6 +4,7 @@ using Octokit;
 using Sodium;
 using System.Net;
 using System.Text;
+using WebBuilder2.Server.Clients.Contracts;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
@@ -13,9 +14,10 @@ using WebBuilder2.Shared.Utils;
 
 namespace WebBuilder2.Server.Services;
 
-public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSecretsManagerService) : IGithubService
+public class GithubService(IGitHubClient client, IGitHubCustomClient customClient, IAwsSecretsManagerService awsSecretsManagerService) : IGithubService
 {
     private readonly IGitHubClient _client = client;
+    private readonly IGitHubCustomClient _customClient = customClient;
     private readonly IAwsSecretsManagerService _awsSecretsManagerService = awsSecretsManagerService;
 
     public async Task<IEnumerable<RepositoryModel>> GetRepositoriesAsync()
@@ -88,6 +90,9 @@ public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSe
     public async Task<GitIgnoreTemplateResponse> GetGitIgnoreTemplatesAsync()
     {
         IReadOnlyList<string> templates = await _client.GitIgnore.GetAllGitIgnoreTemplates();
+        
+        if (templates == null) throw new ArgumentNullException(nameof(templates));
+        
         GitIgnoreTemplateResponse response = new(templates);
         return response;
     }
@@ -107,41 +112,31 @@ public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSe
 
     public async Task<IEnumerable<GithubSecret>> GetSecretsAsync(string userName, string repoName)
     {
-        using var client = new HttpClient();
+        ArgumentNullException.ThrowIfNull(userName);
+        ArgumentNullException.ThrowIfNull(repoName);
 
-        HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Get, "actions/secrets", userName, repoName);
+        string pat = await _awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat);
+        var result = await _customClient.GetGithubSecrets(userName, repoName, pat);
 
-        HttpResponseMessage response = await client.SendAsync(request);
-
-        string message = await response.Content.ReadAsStringAsync();
-        GithubSecretResponse? result = JsonConvert.DeserializeObject<GithubSecretResponse>(message);
-
-        if (result == null) throw new Exception("Failed to deserialize github secrets.");
-
-        return result.GithubSecrets;
+        return result;
     }
 
-    public async Task<IEnumerable<GithubSecret>> CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName)
+    public async Task CreateSecretAsync(IEnumerable<GithubSecret> secrets, string userName, string repoName)
     {
-        using var client = new HttpClient();
+        ArgumentNullException.ThrowIfNull(secrets);
+        ArgumentNullException.ThrowIfNull(userName);
+        ArgumentNullException.ThrowIfNull(repoName);
 
-        GithubPublicKey? publicKey = await GetPublicKeyAsync(userName, repoName) ?? throw new NotFoundException("Github public key not found", HttpStatusCode.NotFound);
+        if (!secrets.Any()) throw new Exception("Empty list provided");
 
-        foreach(GithubSecret secret in secrets)
+        string pat = await _awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat);
+        
+        foreach (GithubSecret secret in secrets)
         {
             if (secret.Value == null) throw new ArgumentNullException($"Github Secret: {secret.Name} has no value.");
 
-            string encodedSecret = EncodeSecret(secret.Value, publicKey.Key);
-
-            GithubCreateSecretRequest githubCreateSecretRequest = new(encodedSecret, publicKey.Id);
-            JsonContent content = JsonContent.Create(githubCreateSecretRequest);
-
-            HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Put, $"actions/secrets/{secret.Name}", userName, repoName, content);
-
-            HttpResponseMessage response = await client.SendAsync(request);
+            await _customClient.CreateSecretAsync(userName, repoName, pat, secret);
         }
-
-        return secrets;
     }
 
     public async Task<string> GetUserAsync()
@@ -152,22 +147,24 @@ public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSe
 
     public async Task<Reference> CreateBranchAsync(string owner, long repoId, string branchName, Commit? commit = null)
     {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentNullException.ThrowIfNull(repoId);
+        ArgumentNullException.ThrowIfNull(branchName);
+
         commit ??= await GetMasterRefAsync(owner, repoId);
-        var reference = new NewReference($"refs/heads/{branchName}", commit.Sha);
-        var branches = await _client.Git.Reference.GetAll(repoId);
-        var existingBranch = branches.FirstOrDefault(x => x.Ref == reference.Ref);
+        NewReference reference = new($"refs/heads/{branchName}", commit.Sha);
+        IReadOnlyList<Reference> branches = await _client.Git.Reference.GetAll(repoId);
+        Reference? existingBranch = branches.FirstOrDefault(x => x.Ref == reference.Ref);
 
         if (existingBranch != null) return existingBranch;
 
-        var branch = await _client.Git.Reference.Create(repoId, reference);
+        Reference branch = await _client.Git.Reference.Create(repoId, reference);
 
         return branch;
     }
 
     public async Task CreateCommitAsync(string owner, long repoId, GithubCreateCommitRequest request)
     {
-        var user = await _client.User.Current();
-
         foreach (NewFile file in request.Files)
         {
             CreateFileRequest createFileRequest = new(request.Message, file.Content);
@@ -316,51 +313,20 @@ public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSe
 
     private async Task<GithubPublicKey?> GetPublicKeyAsync(string userName, string repoName)
     {
-        using var client = new HttpClient();
-
-        HttpRequestMessage request = await BuildRequestAsync(HttpMethod.Get, "actions/secrets/public-key", userName, repoName);
-
-        HttpResponseMessage response = await client.SendAsync(request);
-
-        string message = await response.Content.ReadAsStringAsync();
-        GithubPublicKey? result = JsonConvert.DeserializeObject<GithubPublicKey>(message);
+        string pat = await _awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat);
+        var result = await _customClient.GetPublicKeyAsync(userName, repoName, pat);
 
         return result;
     }
 
-    private async Task<HttpRequestMessage> BuildRequestAsync(HttpMethod method, string endpoint, string userName, string repoName, JsonContent? content = null)
-    {
-        string pat = await _awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat);
-
-        HttpRequestMessage request = new(method, $"https://api.github.com/repos/{userName}/{repoName}/{endpoint}");
-        request.Headers.Add("Accept", "application/vnd.github+json");
-        request.Headers.Add("Authorization", $"Bearer {pat}");
-        request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
-        request.Headers.Add("User-Agent", "request");
-        request.Headers.Add("Cookie", "_octo=GH1.1.1578474083.1689685007; logged_in=no");
-        if(content != null) request.Content = content;
-
-        return request;
-    }
-
-    private string EncodeSecret(string secret, string publicKey)
-    {
-        var encodedSecret = Encoding.UTF8.GetBytes(secret);
-        var encodedPublicKey = Convert.FromBase64String(publicKey);
-
-        var sealedPublicKeyBox = SealedPublicKeyBox.Create(encodedSecret, encodedPublicKey);
-
-        return Convert.ToBase64String(sealedPublicKeyBox);
-    }
-
     private RepositoryModel ParseRepository(Repository repo) => new()
     {
-        AllowAutoMerge = repo.AllowAutoMerge != null,
-        AllowMergeCommit = repo.AllowMergeCommit != null,
-        AllowRebaseMerge = repo.AllowRebaseMerge != null,
-        AllowSquashMerge = repo.AllowSquashMerge != null,
+        AllowAutoMerge = repo.AllowAutoMerge ?? false,
+        AllowMergeCommit = repo.AllowMergeCommit ?? false,
+        AllowRebaseMerge = repo.AllowRebaseMerge ?? false,
+        AllowSquashMerge = repo.AllowSquashMerge ?? false,
         CreatedDateTime = repo.CreatedAt.DateTime,
-        DeleteBranchOnMerge = repo.DeleteBranchOnMerge != null,
+        DeleteBranchOnMerge = repo.DeleteBranchOnMerge ?? false,
         DeletedDateTime = null,
         Description = repo.Description ?? "No description", // This is added to solve issues when importing repos that don't have existing values
         HasDownloads = repo.HasDownloads,
@@ -382,7 +348,7 @@ public class GithubService(IGitHubClient client, IAwsSecretsManagerService awsSe
         var headMasterRef = "heads/master";
 
         // Get reference of master branch
-        var masterReference = await _client.Git.Reference.Get(repoId, headMasterRef);
+        Reference masterReference = await _client.Git.Reference.Get(repoId, headMasterRef);
 
         // Get the laster commit of this branch
         return await _client.Git.Commit.Get(repoId, masterReference.Object.Sha);

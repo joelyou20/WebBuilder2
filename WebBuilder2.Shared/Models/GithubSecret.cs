@@ -10,7 +10,7 @@ public class GithubSecret
     [JsonProperty("value")]
     public string? Value { get; set; }
     [JsonProperty("created_at")]
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
     [JsonProperty("updated_at")]
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

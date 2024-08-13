@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.IO;
+using WebBuilder2.Server.Clients;
+using WebBuilder2.Server.Clients.Contracts;
 using WebBuilder2.Server.Data;
 using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
@@ -62,6 +65,7 @@ builder.Services.AddAwsCostExplorerClient();
 builder.Services.AddAwsAmplifyClient();
 builder.Services.AddAwsCertificateManagerClient();
 builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
+builder.Services.AddHttpClient<IGitHubCustomClient, GitHubCustomClient>();
 
 builder.Services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
 

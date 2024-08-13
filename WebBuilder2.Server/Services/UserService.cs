@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.Text;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
-using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services
 {
-    public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService) : IUserService
+    public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) : IUserService
     {
         private UserManager<ApplicationUser> _userManager = userManager;
         private SignInManager<ApplicationUser> _signInManager = signInManager;
-        private ITokenService _tokenService = tokenService;
 
         public async Task<SignInResult> LoginUserAsync(ApplicationUser user, LoginUserRequest request)
         {

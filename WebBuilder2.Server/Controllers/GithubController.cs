@@ -128,9 +128,9 @@ namespace WebBuilder2.Server.Controllers
         [HttpPut("/github/secrets/{owner}/{repoName}")]
         public async Task<IActionResult> CreateSecret([FromRoute] string owner, [FromRoute] string repoName, [FromBody] IEnumerable<GithubSecret> secret)
         {
-            var result = await _githubService.CreateSecretAsync(secret, owner, repoName);
+            await _githubService.CreateSecretAsync(secret, owner, repoName);
 
-            return Created($"github/secrets/{owner}/{repoName}", result);
+            return Created();
         }
 
         #endregion
