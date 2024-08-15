@@ -69,6 +69,7 @@ builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerS
 builder.Services.AddHttpClient<IGitHubCustomClient, GitHubCustomClient>();
 
 builder.Services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
+builder.Services.Configure<AwsAmplifySettings>(configuration.GetSection(nameof(AwsAmplifySettings)));
 
 builder.Services.AddAdSenseService(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 
