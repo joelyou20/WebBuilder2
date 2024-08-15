@@ -1,7 +1,8 @@
-﻿using FizzWare.NBuilder;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Amazon.S3.Model;
+using FizzWare.NBuilder;
 using Moq;
 using Octokit;
+using System.Text;
 using Webbuilder2.Server.Tests.Utils;
 using WebBuilder2.Server.Clients.Contracts;
 using WebBuilder2.Server.Services;
@@ -9,7 +10,6 @@ using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Dtos;
 using WebBuilder2.Shared.Models.Projections;
-using static Azure.Core.HttpHeader;
 
 namespace Webbuilder2.Server.Tests.Services;
 
@@ -19,6 +19,13 @@ public class GithubServiceTest
     private Mock<IAwsSecretsManagerService> _awsSecretsManagerServiceMock = default!;
     private Mock<IGitHubCustomClient> _githubCustomClientMock = default!;
     private GithubService _githubService = default!;
+
+    private string _owner = "test_owner";
+    private string _repoName = "test_repoName";
+    private string _userName = "test_userName";
+    private string _githubPAT = "test_pat";
+    private string _branchName = "test_branchName";
+    private long _repoId = 12345;
 
     [SetUp]
     public void Setup()
@@ -66,7 +73,7 @@ public class GithubServiceTest
         // Arrange
         var repository = Builder<Repository>.CreateNew().Build();
         var repositoryModel = Builder<RepositoryModel>.CreateNew()
-            .With(x => x.RepoName = "test_repoName")
+            .With(x => x.RepoName = _repoName)
             .With(x => x.AllowAutoMerge = repository.AllowAutoMerge ?? false)
             .With(x => x.AllowMergeCommit = repository.AllowMergeCommit ?? false)
             .With(x => x.AllowRebaseMerge = repository.AllowRebaseMerge ?? false)
@@ -89,7 +96,7 @@ public class GithubServiceTest
         // Arrange
         Repository nullRepository = null!;
         var repositoryModel = Builder<RepositoryModel>.CreateNew()
-            .With(x => x.RepoName = "test_repoName")
+            .With(x => x.RepoName = _repoName)
             .Build();
 
         _githubClientMock.Setup(x => x.Repository.Create(It.IsAny<NewRepository>())).ReturnsAsync(nullRepository);
@@ -182,10 +189,6 @@ public class GithubServiceTest
     public void CreateSecretAsync_Fails_WhenSecretValueIsNull()
     {
         // Arrange
-        string userName = "test_userName";
-        string repoName = "test_repoName";
-        string pat = "12345";
-
         List<GithubSecret> secrets =
         [
             new GithubSecret
@@ -195,45 +198,37 @@ public class GithubServiceTest
             }
         ];
 
-        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(pat);
+        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(_githubPAT);
         _githubCustomClientMock.Setup(x => x.CreateSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<GithubSecret>()));
 
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await _githubService.CreateSecretAsync(secrets, userName, repoName));
+        Assert.ThrowsAsync<ArgumentNullException>(async () => await _githubService.CreateSecretAsync(secrets, _userName, _repoName));
     }
 
     [Test]
     public void CreateSecretAsync_Fails_WhenSecretsListIsNull()
     {
         // Arrange
-        string userName = "test_userName";
-        string repoName = "test_repoName";
-        string pat = "12345";
-
         List<GithubSecret> secrets = null!;
 
-        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(pat);
+        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(_githubPAT);
         _githubCustomClientMock.Setup(x => x.CreateSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<GithubSecret>()));
 
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await _githubService.CreateSecretAsync(secrets, userName, repoName));
+        Assert.ThrowsAsync<ArgumentNullException>(async () => await _githubService.CreateSecretAsync(secrets, _userName, _repoName));
     }
 
     [Test]
     public void CreateSecretAsync_Fails_WhenSecretsListIsEmpty()
     {
         // Arrange
-        string userName = "test_userName";
-        string repoName = "test_repoName";
-        string pat = "12345";
-
         List<GithubSecret> secrets = [];
 
-        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(pat);
+        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(_githubPAT);
         _githubCustomClientMock.Setup(x => x.CreateSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<GithubSecret>()));
 
         // Act & Assert
-        Assert.ThrowsAsync<Exception>(async () => await _githubService.CreateSecretAsync(secrets, userName, repoName));
+        Assert.ThrowsAsync<Exception>(async () => await _githubService.CreateSecretAsync(secrets, _userName, _repoName));
     }
 
     [TestCase("test_userName", null!)]
@@ -241,8 +236,6 @@ public class GithubServiceTest
     public void CreateSecretAsync_Fails_WhenInputIsNull(string userName, string repoName)
     {
         // Arrange
-        string pat = "12345";
-
         List<GithubSecret> secrets =
         [
             new GithubSecret
@@ -252,7 +245,7 @@ public class GithubServiceTest
             }
         ];
 
-        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(pat);
+        _awsSecretsManagerServiceMock.Setup(x => x.GetSecretAsync(It.IsAny<string>())).ReturnsAsync(_githubPAT);
         _githubCustomClientMock.Setup(x => x.CreateSecretAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<GithubSecret>()));
 
         // Act & Assert
@@ -263,10 +256,6 @@ public class GithubServiceTest
     public async Task CreateBranchAsync_Succeeds()
     {
         // Arrange
-        string owner = "test_owner";
-        long repoId = 12345;
-        string branchName = "test_branchName";
-
         Reference masterReference = Builder<Reference>.CreateNew().Build();
         Commit commit = Builder<Commit>.CreateNew().Build();
         IReadOnlyList<Reference> branches = new List<Reference>()
@@ -280,7 +269,7 @@ public class GithubServiceTest
         _githubClientMock.Setup(x => x.Git.Reference.GetAll(It.IsAny<long>())).ReturnsAsync(branches);
         _githubClientMock.Setup(x => x.Git.Reference.Create(It.IsAny<long>(), It.IsAny<NewReference>())).ReturnsAsync(branch);
         // Act
-        Reference reference = await _githubService.CreateBranchAsync(owner, repoId, branchName, commit);
+        Reference reference = await _githubService.CreateBranchAsync(_owner, _repoId, _branchName, commit);
 
         // Assert
         Assert.That(reference, Is.Not.Null);
@@ -291,10 +280,6 @@ public class GithubServiceTest
     public async Task CreateBranchAsync_Succeeds_IfBranchAlreadyExists()
     {
         // Arrange
-        string owner = "test_owner";
-        long repoId = 12345;
-        string branchName = "test_branchName";
-
         Reference masterReference = Builder<Reference>.CreateNew().Build();
         Commit commit = Builder<Commit>.CreateNew().Build();
         Reference existingBranch = Builder<Reference>.CreateNew().Build();
@@ -302,7 +287,7 @@ public class GithubServiceTest
 
         // Manually set the read-only field using reflection
         var nameField = typeof(Reference).GetProperty(nameof(Reference.Ref), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-        nameField?.SetValue(existingBranch, $"refs/heads/{branchName}");
+        nameField?.SetValue(existingBranch, $"refs/heads/{_branchName}");
 
         IReadOnlyList<Reference> branches = new List<Reference>()
         {
@@ -314,7 +299,7 @@ public class GithubServiceTest
         _githubClientMock.Setup(x => x.Git.Reference.GetAll(It.IsAny<long>())).ReturnsAsync(branches);
         
         // Act
-        Reference reference = await _githubService.CreateBranchAsync(owner, repoId, branchName, commit);
+        Reference reference = await _githubService.CreateBranchAsync(_owner, _repoId, _branchName, commit);
 
         // Assert
         Assert.That(reference, Is.EqualTo(branches[0]));
@@ -325,10 +310,183 @@ public class GithubServiceTest
     [TestCase(null!, "test_branchName")]
     public void CreateBranchAsync_Fails_WhenInputValuesAreNull(string owner, string branchName)
     {
+        // Act & Assert
+        Assert.ThrowsAsync<ArgumentNullException>(async () => await _githubService.CreateBranchAsync(owner, _repoId, branchName, null));
+    }
+
+    [Test]
+    public async Task CreateCommitAsync_Succeeds()
+    {
         // Arrange
-        long repoId = 12345;
+        GithubCreateCommitRequest request = new GithubCreateCommitRequest
+        {
+            Branch = _branchName,
+            Message = "test_message",
+            Files =
+            [
+                Builder<NewFile>.CreateNew().Build(),
+                Builder<NewFile>.CreateNew().Build(),
+                Builder<NewFile>.CreateNew().Build()
+            ]
+        };
+        _githubClientMock.Setup(x => x.Repository.Content.CreateFile(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CreateFileRequest>()));
+
+        // Act
+        await _githubService.CreateCommitAsync(_owner, _repoId, request);
+
+        // Assert
+        _githubClientMock.Verify(x => x.Repository.Content.CreateFile(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CreateFileRequest>()), Times.Exactly(request.Files.Count));
+    }
+
+    [Test]
+    public async Task GetRepositoryContentAsync_Succeeds()
+    {
+        // Arrange
+        string path = "test_path";
+        
+        string content = "text_content";
+        byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+        string contentBase64 = Convert.ToBase64String(contentBytes);
+
+        _githubClientMock.Setup(x => x.Repository.Content.GetRawContent(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(contentBytes);
+
+        // Act
+        IEnumerable<RepoContent> response = await _githubService.GetRepositoryContentAsync(_owner, _repoName, path);
+
+        var responseArray = response.ToArray();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(responseArray[0].Content, Is.EqualTo(content));
+            Assert.That(responseArray[0].Name, Is.EqualTo(path)); // Name is being set to path.
+            Assert.That(responseArray[0].FileType.ToString().ToLower(), Is.EqualTo(ContentType.File.ToString().ToLower()));
+            Assert.That(responseArray[0].Path, Is.EqualTo(path));
+        });
+    }
+
+    [Test]
+    public async Task GetRepositoryContentAsync_Succeeds_IfPathIsNull()
+    {
+        // Arrange
+        string path = null!;
+
+        string content = "text_content";
+        byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+        string contentBase64 = Convert.ToBase64String(contentBytes);
+        IReadOnlyList<RepositoryContent> repoContentList = new List<RepositoryContent>
+        {
+            new(name: "test_name",
+                path: path,
+                sha: "test_sha",
+                size: 10,
+                type: ContentType.File,
+                downloadUrl: "test_downloadUrl",
+                url: "test_url",
+                gitUrl: "test_gitUrl",
+                htmlUrl: "test_htmlUrl",
+                encoding: "test_encoding",
+                encodedContent: contentBase64,
+                target: "test_target",
+                submoduleGitUrl: "test_submoduleGitUrl")
+        };
+
+        _githubClientMock.Setup(x => x.Repository.Content.GetAllContents(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(repoContentList);
+
+        // Act
+        IEnumerable<RepoContent> response = await _githubService.GetRepositoryContentAsync(_owner, _repoName, path);
+
+        var responseArray = response.ToArray();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(responseArray[0].Content, Is.EqualTo(content));
+            Assert.That(responseArray[0].Name, Is.EqualTo(repoContentList[0].Name));
+            Assert.That(responseArray[0].FileType.ToString().ToLower(), Is.EqualTo(repoContentList[0].Type.ToString().ToLower()));
+            Assert.That(responseArray[0].Path, Is.EqualTo(repoContentList[0].Path));
+        });
+    }
+
+    [Test]
+    public void GetRepositoryContentAsync_Fails_WhenPathIsNull_And_RepoContentListIsNull()
+    {
+        // Arrange
+        string path = null!;
+        IReadOnlyList<RepositoryContent> repoContentList = null!;
+
+        _githubClientMock.Setup(x => x.Repository.Content.GetAllContents(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(repoContentList);
 
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await _githubService.CreateBranchAsync(owner, repoId, branchName, null));
+        Assert.ThrowsAsync<NullReferenceException>(async () => await _githubService.GetRepositoryContentAsync(_owner, _repoName, path));
+    }
+
+    [Test]
+    public void GetRepositoryContentAsync_Fails_WhenContentBytesIsNull()
+    {
+        // Arrange
+        string path = "test_path";
+        byte[] contentBytes = null!;
+
+        _githubClientMock.Setup(x => x.Repository.Content.GetRawContent(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(contentBytes);
+
+        // Act
+        Assert.ThrowsAsync<ArgumentNullException>(async () => await _githubService.GetRepositoryContentAsync(_owner, _repoName, path));
+    }
+
+    [Test]
+    public async Task GetGitTreeAsync_Succeeds()
+    {
+        // Arrange
+        TreeResponse treeResponse = new(
+            sha: "test_sha",
+            url: "test_url",
+            tree: new List<TreeItem>
+            {
+                Builder<TreeItem>.CreateNew()
+                    .With(x => x.Type, TreeType.Tree)
+                    .Build(),
+                Builder<TreeItem>.CreateNew()
+                    .With(x => x.Type, TreeType.Blob)
+                    .Build(),
+                Builder<TreeItem>.CreateNew()
+                    .With(x => x.Type, TreeType.Blob)
+                    .Build(),
+            },
+            truncated: true);
+        _githubClientMock.Setup(x => x.Git.Tree.GetRecursive(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(treeResponse);
+
+        // Act
+        var gitTree = await _githubService.GetGitTreeAsync(_owner, _repoName);
+        var gitTreeArray = gitTree.ToArray();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(gitTreeArray.Count(), Is.EqualTo(1));
+
+            Assert.That(gitTreeArray[0].Sha, Is.EqualTo(treeResponse.Tree[0].Sha));
+            Assert.That(gitTreeArray[0].Mode, Is.EqualTo(treeResponse.Tree[0].Mode));
+            Assert.That(gitTreeArray[0].Path, Is.EqualTo(treeResponse.Tree[0].Path));
+            Assert.That(gitTreeArray[0].Items, Is.Not.Null);
+        });
+    }
+
+    [Test]
+    [Ignore("Gotta figure out how to mock the ScriptRunner.")]
+    public async Task CopyRepoAsync_Succeeds()
+    {
+        // Arrange
+        string clonedRepoName = "test_clonedRepoName";
+        string newRepoName = "test_newRepoName";
+        string path = "test_path";
+        User user = Builder<User>.CreateNew().Build();
+
+        _githubClientMock.Setup(x => x.User.Current()).ReturnsAsync(user);
+
+        // Act
+        var isSuccessful = await _githubService.CopyRepoAsync(clonedRepoName, newRepoName, path);
+
+        // Assert
     }
 }

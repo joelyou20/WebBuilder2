@@ -182,14 +182,14 @@ public class GithubService(IGitHubClient client, IGitHubCustomClient customClien
         }
         else
         {
-            var contentBytes = await _client.Repository.Content.GetRawContent(owner, repoName, path);
+            byte[] contentBytes = await _client.Repository.Content.GetRawContent(owner, repoName, path);
             var bytesAsString = Convert.ToBase64String(contentBytes);
-            repoContentList = new List<RepositoryContent> { new RepositoryContent(
+            repoContentList = [ new RepositoryContent(
                 name: path.Split('\\').Last(), 
                 path: path, 
                 sha: "", 
                 size: 0, 
-                type: Octokit.ContentType.File, 
+                type: ContentType.File, 
                 downloadUrl: "", 
                 url: "", 
                 gitUrl: "", 
@@ -198,18 +198,15 @@ public class GithubService(IGitHubClient client, IGitHubCustomClient customClien
                 encodedContent: bytesAsString, 
                 target: "", 
                 submoduleGitUrl: ""
-            )};
+            )];
         }
-
-        if (repoContentList == null) throw new Exception("Failed to get repository content");
 
         FileType ConvertFileType(ContentType contentType) => (contentType) switch
         {
-            ContentType.File => FileType.File,
             ContentType.Dir => FileType.Directory,
             ContentType.Symlink => FileType.Symlink,
             ContentType.Submodule => FileType.Submodule,
-            _ => throw new Exception($"Unknown file type discovered in Repository: {repoName}"),
+            _ => FileType.File
         };
 
         string DecodeContent(string content)
@@ -282,8 +279,12 @@ public class GithubService(IGitHubClient client, IGitHubCustomClient customClien
     public async Task<bool> CopyRepoAsync(string clonedRepoName, string newRepoName, string? path)
     {
         User user = await _client.User.Current();
-        string currentDirectory = System.IO.Directory.GetCurrentDirectory();
+        string currentDirectory = Directory.GetCurrentDirectory();
+#if TEST
+        string scriptPath = @".\test.sh";
+#else
         string scriptPath = @".\Scripts\CopyGitRepo.sh";
+#endif
         bool isSuccessful = await ScriptRunner.RunAsync(scriptPath, [clonedRepoName, newRepoName, user.Login]);
 
         return isSuccessful;

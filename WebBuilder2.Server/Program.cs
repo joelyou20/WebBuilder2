@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.IO;
+using System.Security.Authentication;
 using WebBuilder2.Server.Clients;
 using WebBuilder2.Server.Clients.Contracts;
 using WebBuilder2.Server.Data;
@@ -70,6 +71,14 @@ builder.Services.AddHttpClient<IGitHubCustomClient, GitHubCustomClient>();
 builder.Services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
 
 builder.Services.AddAdSenseService(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ConfigureHttpsDefaults(httpsOptions =>
+    {
+        httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13;
+    });
+});
 
 var app = builder.Build();
 
