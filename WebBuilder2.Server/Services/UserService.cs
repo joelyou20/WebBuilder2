@@ -8,11 +8,21 @@ namespace WebBuilder2.Server.Services
 {
     public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) : IUserService
     {
-        private UserManager<ApplicationUser> _userManager = userManager;
-        private SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
-        public async Task<SignInResult> LoginUserAsync(ApplicationUser user, LoginUserRequest request)
+        public async Task<SignInResult> LoginUserAsync(LoginUserRequest request)
         {
+            if(string.IsNullOrEmpty(request.Username))
+            {
+                throw new ArgumentNullException(nameof(request.Username));
+            }
+
+            if(string.IsNullOrEmpty(request.Password))
+            {
+                throw new ArgumentNullException(nameof(request.Password));
+            }
+
             var result = await _signInManager.PasswordSignInAsync(request.Username, request.Password, request.RememberMe, lockoutOnFailure: true);
 
             return result;
@@ -20,8 +30,8 @@ namespace WebBuilder2.Server.Services
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterUserRequest request)
         {
-            var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
-            var result = await _userManager.CreateAsync(user, request.PasswordHash);
+            ApplicationUser user = new() { UserName = request.Email, Email = request.Email };
+            IdentityResult result = await _userManager.CreateAsync(user, request.PasswordHash);
 
             if (result.Succeeded)
             {
@@ -35,15 +45,9 @@ namespace WebBuilder2.Server.Services
             }
         }
 
-        public async Task<ApplicationUser?> GetUserAsync(string userName)
-        {
-            return await _userManager.FindByNameAsync(userName);
-        }
+        public async Task<ApplicationUser?> GetUserAsync(string userName) => await _userManager.FindByNameAsync(userName);
 
-        public async Task LogoutUserAsync()
-        {
-            await _signInManager.SignOutAsync();
-        }
+        public async Task LogoutUserAsync() => await _signInManager.SignOutAsync();
 
         private string BuildIdentityErrorMessage(IEnumerable<IdentityError> errors)
         {

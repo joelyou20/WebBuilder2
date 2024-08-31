@@ -1,7 +1,8 @@
 ﻿html {
     --primary-color: #F21137;
     --secondary-color: #68020F;
-    --background-color: #FAFAFF;
+    --background-color-dark: #FAFAFF;
+    --background-color-light: #778AA0;
     --text-color: #0D160B;
     --accent-color: #3e4c5c;
 }

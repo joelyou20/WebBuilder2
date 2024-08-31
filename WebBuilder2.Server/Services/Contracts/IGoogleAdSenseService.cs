@@ -7,7 +7,8 @@ namespace WebBuilder2.Server.Services.Contracts;
 
 public interface IGoogleAdSenseService
 {
-    Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync(string? name = null);
+    Task<GoogleAdSenseAccount> GetSingleAccountByNameAsync(string name);
+    Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync();
     Task<IEnumerable<GooglePayment>> GetPaymentsAsync();
     Task<IEnumerable<GoogleAdClient>> GetClientsAsync();
 }

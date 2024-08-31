@@ -13,6 +13,7 @@ using WebBuilder2.Shared.Models.Projections;
 
 namespace Webbuilder2.Server.Tests.Services;
 
+[TestFixture]
 public class GithubServiceTest
 {
     private Mock<IGitHubClient> _githubClientMock = default!;

@@ -5,18 +5,19 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Settings;
+using WebBuilder2.Server.Options;
 using WebBuilder2.Shared.Models.Dtos;
 
 namespace Webbuilder2.Server.Tests.Services;
 
+[TestFixture]
 public class AwsAmplifyServiceTest
 {
     private AwsAmplifyService _awsAmplifyService;
     private Mock<AmazonAmplifyClient> _awsAmplifyClientMock;
     private Mock<IAwsSecretsManagerService> _awsSecretsManagerServiceMock;
 
-    private string _testAccessToken = "test_accessToken";
+    private readonly string _testAccessToken = "test_accessToken";
 
     [SetUp]
     public void Setup()
@@ -24,7 +25,7 @@ public class AwsAmplifyServiceTest
         IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                { AwsAmplifySettingsStore.AccessToken, _testAccessToken }
+                { AwsAmplifyOptionsStore.AccessToken, _testAccessToken }
             })
             .Build();
         _awsAmplifyClientMock = new Mock<AmazonAmplifyClient>();
@@ -47,7 +48,9 @@ public class AwsAmplifyServiceTest
             .With(x => x.HtmlUrl, "test_htmlUrl")
             .Build();
 
-        CreateAppResponse createAppResponse = Builder<CreateAppResponse>.CreateNew().Build();
+        CreateAppResponse createAppResponse = Builder<CreateAppResponse>.CreateNew()
+            .With(x => x.HttpStatusCode, System.Net.HttpStatusCode.OK)
+            .Build();
         
         CreateAppRequest createAppRequest = new()
         {

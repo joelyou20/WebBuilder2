@@ -10,23 +10,28 @@ public class GoogleService(IGoogleClient client) : IGoogleService
 {
     private readonly IGoogleClient _client = client;
 
-    public async Task<List<GoogleAdSenseAccount>?> GetAccountsAsync()
+    public async Task<GoogleAdSenseAccount> GetSingleAccountByNameAsync(string name)
     {
-        IEnumerable<GoogleAdSenseAccount>? result = await _client.GetAccountsAsync();
-        return result?.ToList();
+        GoogleAdSenseAccount result = await _client.GetSingleAccountByNameAsync(name);
+        return result;
+    }
+    public async Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync()
+    {
+        IEnumerable<GoogleAdSenseAccount> result = await _client.GetAccountsAsync();
+        return result;
     }
 
-    public async Task<List<GooglePayment>?> GetPaymentsAsync()
+    public async Task<IEnumerable<GooglePayment>> GetPaymentsAsync()
     {
-        IEnumerable<GooglePayment>? result = await _client.GetPaymentsAsync();
+        IEnumerable<GooglePayment> result = await _client.GetPaymentsAsync();
 
-        return result?.ToList();
+        return result;
     }
 
-    public async Task<List<GoogleAdClient>?> GetAdClientsAsync()
+    public async Task<IEnumerable<GoogleAdClient>> GetAdClientsAsync()
     {
-        IEnumerable<GoogleAdClient>? result = await _client.GetAdClientsAsync();
+        IEnumerable<GoogleAdClient> result = await _client.GetAdClientsAsync();
 
-        return result?.ToList();
+        return result;
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace WebBuilder2.Server.Settings;
+﻿namespace WebBuilder2.Server.Options;
 
-public class GoogleSettings
+public class GoogleOptions
 {
     public string ClientId { get; set; } = string.Empty;
     public string AdsenseAccountId { get; set; } = string.Empty;

@@ -1,20 +1,15 @@
 ﻿using Amazon.CostExplorer;
 using Amazon.CostExplorer.Model;
-using Amazon.S3.Model;
 using System.Net;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Shared.Validation;
+using WebBuilder2.Server.Utils;
+using WebBuilder2.Server.Utils.Extensions;
 
 namespace WebBuilder2.Server.Services;
 
-public class AwsCostExplorerService : IAwsCostExplorerService
+public class AwsCostExplorerService(AmazonCostExplorerClient client) : IAwsCostExplorerService
 {
-    private AmazonCostExplorerClient _client;
-
-    public AwsCostExplorerService(AmazonCostExplorerClient client)
-    {
-        _client = client;
-    }
+    private readonly AmazonCostExplorerClient _client = client;
 
     public async Task<string> GetForecastedCostAsync()
     {
@@ -29,13 +24,9 @@ public class AwsCostExplorerService : IAwsCostExplorerService
             }
         };
 
-        var response = await _client.GetCostForecastAsync(request);
-        
-        if(response == null || response.HttpStatusCode != HttpStatusCode.OK)
-        {
-            // Handle error
-            throw new AmazonCostExplorerException("Failed to get forecasted cost.");
-        }
+        GetCostForecastResponse response = await _client.GetCostForecastAsync(request);
+
+        AmazonServiceResponseValidator<AmazonCostExplorerException>.Validate(response, "Failed to get forecasted cost.");
 
         return response.Total.Amount;
     }

@@ -7,14 +7,11 @@ using Amazon.SecretsManager;
 using Amazon.CertificateManager;
 using Google.Apis.Adsense.v2;
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Http;
 using Google.Apis.Services;
 using Octokit;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Settings;
+using WebBuilder2.Server.Options;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Google;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Server.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,7 +26,7 @@ namespace WebBuilder2.Server.Utils.Extensions
             
             var pat = awsSecretsManagerService.GetSecretAsync(AwsSecret.GithubPat).Result;
 
-            var githubSettings = configuration.GetSection(nameof(GithubSettings)).Get<GithubSettings>()!;
+            var githubSettings = configuration.GetSection(nameof(GithubOptions)).Get<GithubOptions>()!;
             services.AddSingleton<IGitHubClient, GitHubClient>(sp =>
             {
                 var client = new GitHubClient(new ProductHeaderValue(githubSettings.OrganizationName))
@@ -126,7 +123,7 @@ namespace WebBuilder2.Server.Utils.Extensions
 
             var clientSecret = awsSecretsManagerService.GetSecretAsync(AwsSecret.GoogleClientSecret).Result;
 
-            var googleSettings = configuration.GetSection(nameof(GoogleSettings)).Get<GoogleSettings>()!;
+            var googleSettings = configuration.GetSection(nameof(GoogleOptions)).Get<GoogleOptions>()!;
 
             var credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     new ClientSecrets

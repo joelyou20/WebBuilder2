@@ -1,15 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System.IO;
 using System.Security.Authentication;
 using WebBuilder2.Server.Clients;
 using WebBuilder2.Server.Clients.Contracts;
 using WebBuilder2.Server.Data;
+using WebBuilder2.Server.Options;
 using WebBuilder2.Server.Repositories;
 using WebBuilder2.Server.Repositories.Contracts;
 using WebBuilder2.Server.Services;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Settings;
+using WebBuilder2.Server.Services.Wrappers;
+using WebBuilder2.Server.Services.Wrappers.Contracts;
+using WebBuilder2.Server.Utils;
 using WebBuilder2.Server.Utils.Extensions;
 using ConfigurationManager = Microsoft.Extensions.Configuration.ConfigurationManager;
 
@@ -41,6 +43,7 @@ builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>(
 builder.Services.AddScoped<IAwsAmplifyService, AwsAmplifyService>();
 builder.Services.AddScoped<IAwsCertificateManagerService, AwsCertificateManagerService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
+builder.Services.AddScoped<IAdsenseServiceWrapper, AdsenseServiceWrapper>();
 builder.Services.AddScoped<IGoogleAdSenseService, GoogleAdSenseService>();
 builder.Services.AddScoped<ISqlService, SqlService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -68,8 +71,8 @@ builder.Services.AddAwsCertificateManagerClient();
 builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 builder.Services.AddHttpClient<IGitHubCustomClient, GitHubCustomClient>();
 
-builder.Services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
-builder.Services.Configure<AwsAmplifySettings>(configuration.GetSection(nameof(AwsAmplifySettings)));
+builder.Services.Configure<GoogleOptions>(configuration.GetSection(nameof(GoogleOptions)));
+builder.Services.Configure<AwsAmplifyOptions>(configuration.GetSection(nameof(AwsAmplifyOptions)));
 
 builder.Services.AddAdSenseService(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 

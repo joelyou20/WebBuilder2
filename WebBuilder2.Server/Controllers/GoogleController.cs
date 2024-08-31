@@ -12,10 +12,18 @@ public class GoogleController(IGoogleAdSenseService googleAdSenseService) : Cont
 {
     private readonly IGoogleAdSenseService _googleAdSenseService = googleAdSenseService;
 
-    [HttpGet("/google/accounts/{name?}")]
-    public async Task<IActionResult> GetAccountsAsync([FromRoute] string? name)
+    [HttpGet("/google/accounts/{name}")]
+    public async Task<IActionResult> GetSingleAccountByNameAsync([FromRoute] string name)
     {
-        var result = await _googleAdSenseService.GetAccountsAsync(name);
+        var result = await _googleAdSenseService.GetSingleAccountByNameAsync(name);
+
+        return Ok(result);
+    }
+
+    [HttpGet("/google/accounts")]
+    public async Task<IActionResult> GetAccountsAsync()
+    {
+        var result = await _googleAdSenseService.GetAccountsAsync();
 
         return Ok(result);
     }

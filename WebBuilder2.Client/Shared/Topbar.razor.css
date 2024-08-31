@@ -12,5 +12,5 @@
 }
 
 div, ::deep button {
-    color: var(--background-color);
+    color: var(--background-color-dark);
 }

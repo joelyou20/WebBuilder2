@@ -1,35 +1,33 @@
-﻿using Amazon.CostExplorer;
-using Amazon.Route53Domains;
+﻿using Amazon.Route53Domains;
 using Amazon.Route53Domains.Model;
+using Amazon.S3;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Utils;
 using WebBuilder2.Shared.Models;
-using WebBuilder2.Shared.Validation;
 
 namespace WebBuilder2.Server.Services;
 
-public class AwsRoute53DomainsService : IAwsRoute53DomainsService
+public class AwsRoute53DomainsService(AmazonRoute53DomainsClient client) : IAwsRoute53DomainsService
 {
-    private AmazonRoute53DomainsClient _client;
-
-    public AwsRoute53DomainsService(AmazonRoute53DomainsClient client)
-    {
-        _client = client;
-    }
+    private readonly AmazonRoute53DomainsClient _client = client;
 
     public async Task<string> CheckDomainAvailabilityAsync(string domain)
     {
-        var result = await _client.CheckDomainAvailabilityAsync(
+        CheckDomainAvailabilityResponse response = await _client.CheckDomainAvailabilityAsync(
             new CheckDomainAvailabilityRequest
             {
                 DomainName = domain
             }
         );
-        return result.Availability.Value;
+
+        AmazonServiceResponseValidator<AmazonRoute53DomainsException>.Validate(response, $"Failed to get domain availability for domain {domain}");
+
+        return response.Availability.Value;
     }
 
     public async Task<IEnumerable<DomainInquiry>> GetDomainSuggestionsAsync(string domain, bool onlyAvailable, int suggestionCount = 10)
     {
-        var suggestionResult = await _client.GetDomainSuggestionsAsync(
+        GetDomainSuggestionsResponse response = await _client.GetDomainSuggestionsAsync(
             new GetDomainSuggestionsRequest
             {
                 DomainName = domain,
@@ -38,7 +36,9 @@ public class AwsRoute53DomainsService : IAwsRoute53DomainsService
             }
         );
 
-        var domainSuggestions = suggestionResult.SuggestionsList;
+        AmazonServiceResponseValidator<AmazonRoute53DomainsException>.Validate(response);
+
+        var domainSuggestions = response.SuggestionsList;
         var domainTypes = domainSuggestions.Select(x => x.DomainName.Split('.').Last()).Distinct().ToList();
         IEnumerable<DomainPrice>? priceResult = await ListPrices(domainTypes);
 
@@ -80,7 +80,7 @@ public class AwsRoute53DomainsService : IAwsRoute53DomainsService
     public async Task<IEnumerable<DomainPrice>> ListPrices(List<string> domainTypes)
     {
         var results = new List<DomainPrice>();
-        var paginatePrices = _client.Paginators.ListPrices(new ListPricesRequest());
+        IListPricesPaginator paginatePrices = _client.Paginators.ListPrices(new ListPricesRequest());
         // Get the entire list using the paginator.
         await foreach (var prices in paginatePrices.Prices)
         {
@@ -92,11 +92,11 @@ public class AwsRoute53DomainsService : IAwsRoute53DomainsService
 
     public async Task<IEnumerable<Domain>> GetRegisteredDomainsAsync()
     {
-        ListDomainsResponse result = await _client.ListDomainsAsync();
+        ListDomainsResponse response = await _client.ListDomainsAsync();
 
-        if (result == null) throw new AmazonRoute53DomainsException("Failed to get list of registered domains.");
-        
-        IEnumerable<Domain> domainNames = result.Domains.Select(x => new Domain {
+        AmazonServiceResponseValidator<AmazonRoute53DomainsException>.Validate(response);
+
+        IEnumerable<Domain> domainNames = response.Domains.Select(x => new Domain {
             Name = x.DomainName 
         });
 
@@ -113,7 +113,7 @@ public class AwsRoute53DomainsService : IAwsRoute53DomainsService
 
         RegisterDomainResponse response = await _client.RegisterDomainAsync(request);
 
-        if (response == null) throw new AmazonRoute53DomainsException($"Failed to register domain {domainName}.");
+        AmazonServiceResponseValidator<AmazonRoute53DomainsException>.Validate(response);
 
         return response;
     }

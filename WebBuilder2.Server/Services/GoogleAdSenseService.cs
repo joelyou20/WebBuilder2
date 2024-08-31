@@ -1,62 +1,56 @@
-﻿using Google;
-using Google.Apis.Adsense.v2;
-using Google.Apis.Adsense.v2.Data;
-using Google.Apis.Http;
-using Google.Apis.Services;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using WebBuilder2.Server.Services.Contracts;
-using WebBuilder2.Server.Settings;
+using WebBuilder2.Server.Options;
 using WebBuilder2.Shared.Models;
-using WebBuilder2.Shared.Validation;
+using Google;
+using WebBuilder2.Server.Services.Wrappers.Contracts;
+using Google.Apis.Adsense.v2.Data;
+using Google.Apis.Adsense.v2;
 
 namespace WebBuilder2.Server.Services;
 
-public class GoogleAdSenseService : IGoogleAdSenseService
+public class GoogleAdSenseService(IAdsenseServiceWrapper adsenseService) : IGoogleAdSenseService
 {
-    private AdsenseService _adSenseService;
-    private GoogleSettings _googleSettings;
+    private readonly IAdsenseServiceWrapper _adsenseService = adsenseService;
 
-    public GoogleAdSenseService(AdsenseService adsenseService, IOptions<GoogleSettings> googleSettings)
+    public async Task<GoogleAdSenseAccount> GetSingleAccountByNameAsync(string name)
     {
-        _adSenseService = adsenseService;
-        _googleSettings = googleSettings.Value;
+        Account account = await _adsenseService.GetSingleAccountAsync(name);
+
+        if (account == null) throw new GoogleApiException("GoogleAdSenseService", $"Failed to get account with name: {name}.");
+
+        var result = new GoogleAdSenseAccount
+        {
+            Name = account.Name,
+            DisplayName = account.DisplayName,
+            State = account.State,
+        };
+
+        return result;
     }
 
-    public async Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync(string? name = null)
+    public async Task<IEnumerable<GoogleAdSenseAccount>> GetAccountsAsync()
     {
-        List<GoogleAdSenseAccount> googleAdsenseAccounts = new();
-        if (string.IsNullOrEmpty(name))
+        ListAccountsResponse response = await _adsenseService.GetAccountsAsync();
+
+        if (response == null) throw new GoogleApiException("GoogleAdSenseService", "Failed to get accounts.");
+
+        IEnumerable<GoogleAdSenseAccount> googleAdsenseAccounts = response.Accounts.Select(account => new GoogleAdSenseAccount
         {
-            var accountsListRequest = _adSenseService.Accounts.List();
-            var accounts = await accountsListRequest.ExecuteAsync();
-            googleAdsenseAccounts.AddRange(accounts.Accounts.Select(account => new GoogleAdSenseAccount
-            {
-                Name = account.Name,
-                DisplayName = account.DisplayName,
-                State = account.State,
-            }));
-        }
-        else
-        {
-            var accountGetRequest = _adSenseService.Accounts.Get(name);
-            var account = await accountGetRequest.ExecuteAsync();
-            googleAdsenseAccounts.Add(new GoogleAdSenseAccount
-            {
-                Name = account.Name,
-                DisplayName = account.DisplayName,
-                State = account.State,
-            });
-        }
+            Name = account.Name,
+            DisplayName = account.DisplayName,
+            State = account.State,
+        });
 
         return googleAdsenseAccounts;
     }
 
     public async Task<IEnumerable<GooglePayment>> GetPaymentsAsync()
     {
-        var features = _adSenseService.Features;
-        var payments = _adSenseService.Accounts.Payments.List(_googleSettings.AdsenseAccountId);
-        var response = await payments.ExecuteAsync();
+        ListPaymentsResponse response = await _adsenseService.GetPaymentsAsync();
 
+        if (response == null) throw new GoogleApiException("GoogleAdSenseService", "Failed to get payments.");
+        
         var result = response.Payments.Select(payment => new GooglePayment
         {
             Name = payment.Name,
@@ -72,8 +66,9 @@ public class GoogleAdSenseService : IGoogleAdSenseService
 
     public async Task<IEnumerable<GoogleAdClient>> GetClientsAsync()
     {
-        var clients = _adSenseService.Accounts.Adclients.List(_googleSettings.AdsenseAccountId);
-        var response = await clients.ExecuteAsync();
+        ListAdClientsResponse response = await _adsenseService.GetClientsAsync();
+
+        if (response == null) throw new GoogleApiException("GoogleAdSenseService", "Failed to get clients.");
 
         var result = response.AdClients.Select(client => new GoogleAdClient
         {

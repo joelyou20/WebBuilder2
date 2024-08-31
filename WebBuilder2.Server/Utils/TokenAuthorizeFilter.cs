@@ -1,33 +1,28 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System.Diagnostics.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
 
-public class TokenAuthorizationFilter : IAsyncAuthorizationFilter
+namespace WebBuilder2.Server.Utils;
+
+public class TokenAuthorizationFilter(IConfiguration configuration) : IAsyncAuthorizationFilter
 {
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _configuration = configuration;
 
-    public TokenAuthorizationFilter(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
-    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+    public Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var token = context.HttpContext.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
-        if (context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any()) return;
+        if (context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any()) return Task.CompletedTask;
 
         if (string.IsNullOrEmpty(token) || !ValidateToken(token))
         {
             // Return 401 Unauthorized if token is missing or invalid
             context.Result = new UnauthorizedResult();
-            return;
+            return Task.CompletedTask;
         }
+
+        return Task.CompletedTask;
     }
 
     private bool ValidateToken(string token)

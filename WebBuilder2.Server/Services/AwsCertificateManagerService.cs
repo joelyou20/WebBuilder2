@@ -1,6 +1,9 @@
 ﻿using Amazon.CertificateManager;
 using Amazon.CertificateManager.Model;
+using Amazon.CostExplorer;
 using WebBuilder2.Server.Services.Contracts;
+using WebBuilder2.Server.Utils;
+using WebBuilder2.Server.Utils.Extensions;
 using WebBuilder2.Shared.Models;
 using WebBuilder2.Shared.Models.Projections;
 
@@ -30,19 +33,14 @@ namespace WebBuilder2.Server.Services
                 SubjectAlternativeNames = request.AlternativeNames
             };
 
-            var awsResponse =  await _client.RequestCertificateAsync(awsRequest);
+            RequestCertificateResponse response = await _client.RequestCertificateAsync(awsRequest);
 
-            if (awsResponse.HttpStatusCode != System.Net.HttpStatusCode.OK)
+            AmazonServiceResponseValidator<AmazonCertificateManagerException>.Validate(response);
+
+            return new()
             {
-                throw new Exception(message: $"{awsResponse.HttpStatusCode}: Failed to request SSL certificate for {request.DomainName}");
-            }
-
-            AwsNewSSLCertificateResponse response = new()
-            {
-                Arn = awsResponse.CertificateArn,
-            };
-
-            return response;
+                Arn = response.CertificateArn,
+            }; ;
         }
 
         private async Task<bool> ValidateDomainAsync(string domainName)

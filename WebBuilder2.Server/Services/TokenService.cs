@@ -8,18 +8,25 @@ using WebBuilder2.Shared.Models;
 
 namespace WebBuilder2.Server.Services;
 
-public class TokenService : ITokenService
+public class TokenService(IConfiguration configuration) : ITokenService
 {
-    private readonly IConfiguration _configuration;
-
-    public TokenService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+    private readonly IConfiguration _configuration = configuration;
 
     public string GenerateToken(ApplicationUser user)
     {
-        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]));
+        if (string.IsNullOrEmpty(user.UserName))
+        {
+            throw new ArgumentNullException("Username is null");
+        }
+
+        string? jwtKey = _configuration["Jwt:Key"];
+
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            throw new KeyNotFoundException("JwtKey not found");
+        }
+
+        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
