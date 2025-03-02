@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Octokit;
 using Sodium;
@@ -333,7 +334,7 @@ public class GithubService(IGitHubClient client, IGitHubCustomClient customClien
         HasDownloads = repo.HasDownloads,
         HasIssues = repo.HasIssues,
         HasWiki = repo.HasWiki,
-        Homepage = repo.Homepage.IsNullOrEmpty() ? "No homepage" : repo.Homepage, // This is added to solve issues when importing repos that don't have existing values
+        Homepage = repo.Homepage == null || repo.Homepage.Trim() == "" ? "No homepage" : repo.Homepage, // This is added to solve issues when importing repos that don't have existing values
         ExternalId = repo.Id,
         IsPrivate = repo.Private,
         IsTemplate = repo.IsTemplate,

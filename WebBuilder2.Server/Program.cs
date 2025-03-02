@@ -43,6 +43,7 @@ builder.Services.AddScoped<IAwsRoute53DomainsService, AwsRoute53DomainsService>(
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>();
 builder.Services.AddScoped<IAwsCertificateManagerService, AwsCertificateManagerService>();
+builder.Services.AddScoped<IAwsEC2Service, AwsEC2Service>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<IAdsenseServiceWrapper, AdsenseServiceWrapper>();
 builder.Services.AddScoped<IGoogleAdSenseService, GoogleAdSenseService>();
@@ -110,7 +111,7 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.MapStaticAssets();
 
 app.UseRouting();
 

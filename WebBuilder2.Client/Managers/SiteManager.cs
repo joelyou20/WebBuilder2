@@ -52,6 +52,12 @@ public class SiteManager(
         //await AllowPublicAccessJobAsync();
         //await AddBucketPolicyJobAsync(createSiteRequest);
         await CreateDatabaseAsync(createSiteRequest);
+        await PushSiteToEC2(createSiteRequest);
+    }
+
+    private async Task PushSiteToEC2(CreateSiteRequest createSiteRequest)
+    {
+
     }
 
     private async Task CreateDatabaseAsync(CreateSiteRequest createSiteRequest)
