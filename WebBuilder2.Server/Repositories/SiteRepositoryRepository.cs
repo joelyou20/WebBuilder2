@@ -5,16 +5,10 @@ using WebBuilder2.Shared.Models.Dtos;
 
 namespace WebBuilder2.Server.Repositories
 {
-    public class SiteRepositoryRepository : ISiteRepositoryRepository
+    public class SiteRepositoryRepository(AppDbContext db, ILogger<SiteRepositoryRepository> logger) : ISiteRepositoryRepository
     {
-        private readonly AppDbContext _db;
-        private readonly ILogger<SiteRepositoryRepository> _logger;
-
-        public SiteRepositoryRepository(AppDbContext db, ILogger<SiteRepositoryRepository> logger)
-        {
-            _db = db;
-            _logger = logger;
-        }
+        private readonly AppDbContext _db = db;
+        private readonly ILogger<SiteRepositoryRepository> _logger = logger;
 
         public IQueryable<SiteRepositoryModel>? Get(IEnumerable<long>? exclude = null)
         {
@@ -59,9 +53,16 @@ namespace WebBuilder2.Server.Repositories
 
         public IEnumerable<SiteRepositoryModel> UpsertRange(IEnumerable<SiteRepositoryModel> values)
         {
-            IEnumerable<long> valuesList = values.Select(x => x.Id).ToArray();
-            List<SiteRepositoryModel> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<SiteRepositoryModel>();
-            List<SiteRepositoryModel> newValues = values.Where(x => !existingValues.Select(y => y.Id == x.Id).Any()).ToList();
+            IEnumerable<long> valuesList = values
+                .Where(x => x.Id != 0)
+                .Select(x => x.Id)
+                .ToArray();
+            List<SiteRepositoryModel> existingValues = valuesList.Any() ? Get()?
+                .Where(x => valuesList.Contains(x.Id))
+                .ToList() ?? [] : [];
+            List<SiteRepositoryModel> newValues = values
+                .Where(x => !existingValues.Select(y => y.Id == x.Id).Any())
+                .ToList();
 
             var result = new List<SiteRepositoryModel>();
 

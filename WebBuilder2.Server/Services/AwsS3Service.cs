@@ -1,5 +1,4 @@
-﻿using Amazon.Amplify;
-using Amazon.CostExplorer;
+﻿using Amazon.CostExplorer;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;

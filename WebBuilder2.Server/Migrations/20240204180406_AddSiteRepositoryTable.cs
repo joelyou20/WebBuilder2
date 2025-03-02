@@ -36,13 +36,13 @@ namespace WebBuilder2.Server.Migrations
                         column: x => x.RepositoryId,
                         principalTable: "Repository",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_SiteRepository_Site_SiteId",
                         column: x => x.SiteId,
                         principalTable: "Site",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(
@@ -81,7 +81,7 @@ namespace WebBuilder2.Server.Migrations
                 column: "SiteId",
                 principalTable: "Site",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
         }
     }
 }

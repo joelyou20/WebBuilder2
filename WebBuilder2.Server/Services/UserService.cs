@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Sodium;
 using System.Text;
 using WebBuilder2.Server.Services.Contracts;
 using WebBuilder2.Shared.Models;
@@ -11,27 +12,37 @@ namespace WebBuilder2.Server.Services
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
-        public async Task<SignInResult> LoginUserAsync(LoginUserRequest request)
+        public async Task<SignInResult> LoginUserAsync(LoginUserRequest request, ApplicationUser user)
         {
-            if(string.IsNullOrEmpty(request.Username))
+            SignInResult result = null!;
+            try
             {
-                throw new ArgumentNullException(nameof(request.Username));
-            }
+                if (string.IsNullOrEmpty(request.Username))
+                {
+                    throw new ArgumentNullException(nameof(request.Username));
+                }
 
-            if(string.IsNullOrEmpty(request.Password))
+                if (string.IsNullOrEmpty(request.Password))
+                {
+                    throw new ArgumentNullException(nameof(request.Password));
+                }
+                var test = await _userManager.CheckPasswordAsync(user, request.Password);
+
+                result = await _signInManager.PasswordSignInAsync(request.Username, request.Password, request.RememberMe, lockoutOnFailure: true);
+
+                return result;
+            }
+            catch (Exception ex)
             {
-                throw new ArgumentNullException(nameof(request.Password));
+                result = SignInResult.Failed;
+                throw;
             }
-
-            var result = await _signInManager.PasswordSignInAsync(request.Username, request.Password, request.RememberMe, lockoutOnFailure: true);
-
-            return result;
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterUserRequest request)
         {
             ApplicationUser user = new() { UserName = request.Email, Email = request.Email };
-            IdentityResult result = await _userManager.CreateAsync(user, request.PasswordHash);
+            IdentityResult result = await _userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
             {

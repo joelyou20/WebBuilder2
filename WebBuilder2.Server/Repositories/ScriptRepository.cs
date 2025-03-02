@@ -59,9 +59,16 @@ public class ScriptRepository : IScriptRepository
 
     public IEnumerable<ScriptModel> UpsertRange(IEnumerable<ScriptModel> values)
     {
-        IEnumerable<long> valuesList = values.Select(x => x.Id);
-        List<ScriptModel> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<ScriptModel>();
-        List<ScriptModel> newValues = values.Where(x => !existingValues.Any(y => y.Id.Equals(x.Id))).ToList();
+        IEnumerable<long> valuesList = values
+            .Where(x => x.Id != 0)
+            .Select(x => x.Id)
+            .ToArray();
+        List<ScriptModel> existingValues = valuesList.Any() ? Get()?
+            .Where(x => valuesList.Contains(x.Id))
+            .ToList() ?? [] : [];
+        List<ScriptModel> newValues = values
+            .Where(x => !existingValues.Select(y => y.Id == x.Id).Any())
+            .ToList();
 
         var result = new List<ScriptModel>();
 

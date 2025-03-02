@@ -38,7 +38,7 @@ namespace WebBuilder2.Server.Controllers
                     return Forbid("Email not confirmed.");
                 }
 
-                var result = await _userService.LoginUserAsync(request);
+                var result = await _userService.LoginUserAsync(request, user);
 
                 if (result.Succeeded)
                 {

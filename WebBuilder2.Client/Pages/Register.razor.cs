@@ -17,8 +17,6 @@ public partial class Register
 
     private async Task HandleRegistration()
     {
-        var user = new ApplicationUser { UserName = _request.Email, Email = _request.Email };
-        _request.PasswordHash = PasswordHasher.HashPassword(user, _password);
         await UserService.RegisterUserAsync(_request);
         NavigationManager.NavigateTo("/");
     }

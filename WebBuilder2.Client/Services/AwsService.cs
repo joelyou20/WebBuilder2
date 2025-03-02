@@ -27,7 +27,6 @@ public class AwsService(IAwsClient client) : IAwsService
         return result;
     }
 
-    public async Task CreateAmplifyAppAsync(RepositoryModel repo) => await _client.PostAppAsync(repo);
     public async Task<IEnumerable<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain) => await _client.GetSuggestedDomainNamesAsync(domain);
     public async Task<IEnumerable<Domain>> GetRegisteredDomainsAsync() => await _client.GetRegisteredDomainsAsync();
     public async Task PostRegisterDomainAsync(string domainName) => await _client.PostRegisterDomainAsync(domainName);

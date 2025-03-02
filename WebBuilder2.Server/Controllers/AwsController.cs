@@ -12,14 +12,13 @@ namespace WebBuilder2.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class AwsController(IAwsS3Service awsS3Service, IAwsRoute53Service awsRoute53Service,
-        IAwsCostExplorerService awsCostExplorerService, IAwsAmplifyService awsAmplifyService,
-        IAwsRoute53DomainsService awsRoute53DomainsService, IAwsCertificateManagerService awsCertificateManagerService) : CustomControllerBase
+        IAwsCostExplorerService awsCostExplorerService, IAwsRoute53DomainsService awsRoute53DomainsService, 
+        IAwsCertificateManagerService awsCertificateManagerService) : CustomControllerBase
     {
         private readonly IAwsS3Service _awsS3Service = awsS3Service;
         private readonly IAwsRoute53Service _awsRoute53Service = awsRoute53Service;
         private readonly IAwsRoute53DomainsService _awsRoute53DomainsService = awsRoute53DomainsService;
         private readonly IAwsCostExplorerService _awsCostExplorerService = awsCostExplorerService;
-        private readonly IAwsAmplifyService _awsAmplifyService = awsAmplifyService;
         private readonly IAwsCertificateManagerService _awsCertificateManagerService = awsCertificateManagerService;
 
         [HttpGet("/aws/bucket/{name}")]
@@ -83,14 +82,6 @@ namespace WebBuilder2.Server.Controllers
             string result = await _awsCostExplorerService.GetForecastedCostAsync();
 
             return Ok(result);
-        }
-
-        [HttpPost("/aws/app")]
-        public async Task<IActionResult> PostAppAsync([FromBody] RepositoryModel repo)
-        {
-            await _awsAmplifyService.CreateAppFromRepoAsync(repo);
-
-            return Ok();
         }
 
         [HttpGet("/aws/route53/domain/suggest/{domain}")]

@@ -12,7 +12,7 @@ namespace WebBuilder2.Server.Data.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-        public long SiteRepositoryId { get; set; }
+        public long? SiteRepositoryId { get; set; }
         public SiteRepository? SiteRepository { get; set; }
         public long ExternalId { get; set; }
         public string Name { get; set; } = string.Empty;

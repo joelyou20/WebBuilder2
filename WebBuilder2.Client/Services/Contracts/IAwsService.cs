@@ -15,7 +15,6 @@ public interface IAwsService
     Task PostConfigurePublicAccessBlockAsync(AwsPublicAccessBlockRequest request);
     Task<IEnumerable<HostedZone>> GetHostedZonesAsync();
     Task<decimal> GetForecastedCostAsync();
-    Task CreateAmplifyAppAsync(RepositoryModel repo);
     Task<IEnumerable<DomainInquiry>> GetSuggestedDomainNamesAsync(string domain);
     Task<IEnumerable<Domain>> GetRegisteredDomainsAsync();
     Task PostRegisterDomainAsync(string domainName);

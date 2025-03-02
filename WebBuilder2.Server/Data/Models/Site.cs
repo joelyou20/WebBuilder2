@@ -15,7 +15,7 @@ namespace WebBuilder2.Server.Data.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         [ForeignKey(nameof(SiteRepositoryId))]
-        public long SiteRepositoryId { get; set; }
+        public long? SiteRepositoryId { get; set; }
         public SiteRepository? SiteRepository { get; set; }
         public DateTime? SSLCertificateIssueDate { get; set; }
         public string? SSLARN { get; set; }

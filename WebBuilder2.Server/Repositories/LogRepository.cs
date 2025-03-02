@@ -60,9 +60,16 @@ public class LogRepository : ILogRepository
 
     public IEnumerable<LogModel> UpsertRange(IEnumerable<LogModel> values)
     {
-        IEnumerable<long> valuesList = values.Select(x => x.Id);
-        List<LogModel> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<LogModel>();
-        List<LogModel> newValues = values.Where(x => !existingValues.Any(y => y.Id.Equals(x.Id))).ToList();
+        IEnumerable<long> valuesList = values
+            .Where(x => x.Id != 0)
+            .Select(x => x.Id)
+            .ToArray();
+        List<LogModel> existingValues = valuesList.Any() ? Get()?
+            .Where(x => valuesList.Contains(x.Id))
+            .ToList() ?? [] : [];
+        List<LogModel> newValues = values
+            .Where(x => !existingValues.Select(y => y.Id == x.Id).Any())
+            .ToList();
 
         var result = new List<LogModel>();
 

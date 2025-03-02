@@ -7,7 +7,7 @@ namespace WebBuilder2.Server.Services.Contracts
 {
     public interface IUserService
     {
-        Task<SignInResult> LoginUserAsync(LoginUserRequest request);
+        Task<SignInResult> LoginUserAsync(LoginUserRequest request, ApplicationUser user);
         Task LogoutUserAsync();
         Task<IdentityResult> RegisterUserAsync(RegisterUserRequest request);
         Task<ApplicationUser?> GetUserAsync(string userName);

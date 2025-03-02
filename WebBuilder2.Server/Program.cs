@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Security.Authentication;
@@ -13,6 +14,7 @@ using WebBuilder2.Server.Services.Wrappers;
 using WebBuilder2.Server.Services.Wrappers.Contracts;
 using WebBuilder2.Server.Utils;
 using WebBuilder2.Server.Utils.Extensions;
+using WebBuilder2.Shared.Models;
 using ConfigurationManager = Microsoft.Extensions.Configuration.ConfigurationManager;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,7 +42,6 @@ builder.Services.AddScoped<IAwsRoute53Service, AwsRoute53Service>();
 builder.Services.AddScoped<IAwsRoute53DomainsService, AwsRoute53DomainsService>();
 builder.Services.AddScoped<IAwsCostExplorerService, AwsCostExplorerService>();
 builder.Services.AddScoped<IAwsSecretsManagerService, AwsSecretsManagerService>();
-builder.Services.AddScoped<IAwsAmplifyService, AwsAmplifyService>();
 builder.Services.AddScoped<IAwsCertificateManagerService, AwsCertificateManagerService>();
 builder.Services.AddScoped<IGithubService, GithubService>();
 builder.Services.AddScoped<IAdsenseServiceWrapper, AdsenseServiceWrapper>();
@@ -66,13 +67,11 @@ builder.Services.AddAwsS3Client();
 builder.Services.AddAwsRoute53Client();
 builder.Services.AddAwsRoute53DomainsClient();
 builder.Services.AddAwsCostExplorerClient();
-builder.Services.AddAwsAmplifyClient();
 builder.Services.AddAwsCertificateManagerClient();
 builder.Services.AddGitHubClient(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 builder.Services.AddHttpClient<IGitHubCustomClient, GitHubCustomClient>();
 
 builder.Services.Configure<GoogleOptions>(configuration.GetSection(nameof(GoogleOptions)));
-builder.Services.Configure<AwsAmplifyOptions>(configuration.GetSection(nameof(AwsAmplifyOptions)));
 
 builder.Services.AddAdSenseService(sp => sp.GetRequiredService<IAwsSecretsManagerService>(), configuration);
 

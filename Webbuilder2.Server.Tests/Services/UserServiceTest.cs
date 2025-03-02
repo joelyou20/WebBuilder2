@@ -40,8 +40,10 @@ public class UserServiceTest
             Username = "test_userName"
         };
 
+        ApplicationUser user = new ApplicationUser();
+
         // Act
-        var result = await _userService.LoginUserAsync(request);
+        var result = await _userService.LoginUserAsync(request, user);
 
         // Assert
         _signInManagerMock.Verify(x => x.PasswordSignInAsync(request.Username, request.Password, request.RememberMe, It.IsAny<bool>()));
@@ -61,8 +63,10 @@ public class UserServiceTest
             Username = username
         };
 
+        ApplicationUser user = new ApplicationUser();
+
         // Act & Assert
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await _userService.LoginUserAsync(request));
+        Assert.ThrowsAsync<ArgumentNullException>(async () => await _userService.LoginUserAsync(request, user));
     }
 
     [Test]
@@ -72,7 +76,7 @@ public class UserServiceTest
         RegisterUserRequest request = new()
         {
             Email = "test_email",
-            PasswordHash = "test_passwordHash"
+            Password = "test_passwordHash"
         };
 
         IdentityResult identityResult = Builder<IdentityResult>.CreateNew()
@@ -97,7 +101,7 @@ public class UserServiceTest
         RegisterUserRequest request = new()
         {
             Email = "test_email",
-            PasswordHash = "test_passwordHash"
+            Password = "test_passwordHash"
         };
 
         IdentityResult identityResult = Builder<IdentityResult>.CreateNew()

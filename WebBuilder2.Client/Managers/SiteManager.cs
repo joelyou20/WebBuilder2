@@ -41,14 +41,14 @@ public class SiteManager(
     {
         _logger.LogInformation("Running site creation");
 
-        //await CreateSiteJobAsync(createSiteRequest);
+        await CreateSiteJobAsync(createSiteRequest);
         //await RegisterDomainJobAsync(createSiteRequest);
         //await CreateAwsBucketsJobAsync(createSiteRequest);
         //await ConfigureAwsLoggingJobAsync();
-        //await CreateRepositoryJobAsync(createSiteRequest);
+        await CreateRepositoryJobAsync(createSiteRequest);
         //await AddRepositorySecretsJobAsync();
-        //await ScaffoldRepositoryJobAsync(createSiteRequest);
-        //await AddScriptsToRepositoryJobAsync();
+        await ScaffoldRepositoryJobAsync(createSiteRequest);
+        await AddScriptsToRepositoryJobAsync();
         //await AllowPublicAccessJobAsync();
         //await AddBucketPolicyJobAsync(createSiteRequest);
         await CreateDatabaseAsync(createSiteRequest);

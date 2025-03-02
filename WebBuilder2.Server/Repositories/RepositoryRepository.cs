@@ -86,9 +86,16 @@ public class RepositoryRepository : IRepositoryRepository
 
     public IEnumerable<RepositoryModel> UpsertRange(IEnumerable<RepositoryModel> values)
     {
-        IEnumerable<long> valuesList = values.Select(x => x.Id);
-        List<RepositoryModel> existingValues = Get()?.Where(x => valuesList.Contains(x.Id)).ToList() ?? new List<RepositoryModel>();
-        List<RepositoryModel> newValues = values.Where(x => !existingValues.Any(y => y.Id.Equals(x.Id))).ToList();
+        IEnumerable<long> valuesList = values
+            .Where(x => x.Id != 0)
+            .Select(x => x.Id)
+            .ToArray();
+        List<RepositoryModel> existingValues = valuesList.Any() ? Get()?
+            .Where(x => valuesList.Contains(x.Id))
+            .ToList() ?? [] : [];
+        List<RepositoryModel> newValues = values
+            .Where(x => !existingValues.Select(y => y.Id == x.Id).Any())
+            .ToList();
 
         var result = new List<RepositoryModel>();
 

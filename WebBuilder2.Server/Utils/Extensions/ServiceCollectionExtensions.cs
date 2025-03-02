@@ -1,5 +1,4 @@
-﻿using Amazon.Amplify;
-using Amazon.CostExplorer;
+﻿using Amazon.CostExplorer;
 using Amazon.Route53;
 using Amazon.Route53Domains;
 using Amazon.S3;
@@ -102,19 +101,6 @@ namespace WebBuilder2.Server.Utils.Extensions
             var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
 
             return services.AddScoped(sp => new AmazonSecretsManagerClient(credentials, awsConfig));
-        }
-
-        public static IServiceCollection AddAwsAmplifyClient(this IServiceCollection services)
-        {
-            AmazonAmplifyConfig awsConfig = new()
-            {
-                UseAlternateUserAgentHeader = AwsConfig.UseAlternateUserAgentHeader,
-                RegionEndpoint = AwsConfig.RegionEndpoint
-            };
-
-            var credentials = AwsAuthenticationHelper.LoadDefaultProfile();
-
-            return services.AddScoped(sp => new AmazonAmplifyClient(credentials, awsConfig));
         }
 
         public static IServiceCollection AddAdSenseService(this IServiceCollection services, Func<IServiceProvider, IAwsSecretsManagerService> serviceProvider, ConfigurationManager configuration)
