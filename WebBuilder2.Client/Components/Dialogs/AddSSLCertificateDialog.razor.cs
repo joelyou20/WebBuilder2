@@ -13,7 +13,7 @@ public partial class AddSSLCertificateDialog
 
     [Parameter] public SiteModel? Site { get; set; }
     [Parameter] public bool IsReadOnly { get; set; } = true;
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
     private AwsNewSSLCertificateRequest _request { get; set; } = new();
 

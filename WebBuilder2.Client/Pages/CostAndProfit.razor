@@ -4,7 +4,7 @@
 @if (_accounts != null)
 {
     <MudCard>
-        <MudList>
+        <MudList T="string">
             @foreach (var account in _accounts)
             {
                 <MudListItem>@($"{account.DisplayName}: {account.State}")</MudListItem>
@@ -14,7 +14,7 @@
 }
 @if(_adClients != null)
 {
-    <MudList>
+    <MudList T="string">
         @foreach (var client in _adClients)
         {
             <MudListItem>@($"{client.Name}: {client.State}")</MudListItem>

@@ -18,7 +18,7 @@ public partial class CreateGithubRepoDialog
     [Inject] public ISiteService SiteService { get; set; } = default!;
 
     [Parameter] public List<RepositoryModel> TemplateRepositories { get; set; } = new();
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
     private RepositoryModel _model = new();
     private List<string>? _gitIgnoreTemplates = new();

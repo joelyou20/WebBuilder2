@@ -6,10 +6,10 @@
         }
         else
         {
-            <MudList>
+            <MudList T="string">
                 @foreach (KeyValuePair<RepositoryModel, bool> repo in _githubRepositories)
                 {
-                    <MudListItem>
+                    <MudListItem T="object">
                         <MudCard>
                             <MudText>@($"Name: {repo.Key.Name}")</MudText>
                                 <MudText>@($"Description: {repo.Key.Description}")</MudText>

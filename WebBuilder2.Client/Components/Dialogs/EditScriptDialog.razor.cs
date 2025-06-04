@@ -11,7 +11,7 @@ public partial class EditScriptDialog
     [Inject] public IScriptService ScriptService { get; set; } = default!;
 
     [Parameter] public ScriptModel Script { get; set; } = new();
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
     public void OnFileChanged(ScriptEditorFile file)
     {

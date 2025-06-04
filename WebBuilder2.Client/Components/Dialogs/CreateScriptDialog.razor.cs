@@ -17,7 +17,7 @@ public partial class CreateScriptDialog
 {
     [Inject] public IScriptService ScriptService { get; set; } = default!;
 
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
     private ScriptModel _script = new();
     private readonly Func<Syntax, string> _syntaxSelectConverter = x => x.ToString();

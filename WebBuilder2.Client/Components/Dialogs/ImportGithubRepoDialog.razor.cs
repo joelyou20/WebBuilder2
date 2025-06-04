@@ -15,7 +15,7 @@ public partial class ImportGithubRepoDialog
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter] public IEnumerable<long> ExistingIds { get; set; } = default!;
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
     private readonly Dictionary<RepositoryModel, bool> _githubRepositories = [];
 

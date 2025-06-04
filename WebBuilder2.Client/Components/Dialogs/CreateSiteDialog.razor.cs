@@ -20,7 +20,7 @@ public partial class CreateSiteDialog
     [Inject] public IRepositoryService RepositoryService { get; set; } = default!;
 
     [Parameter] public List<Domain> RegisteredDomains { get; set; } = new();
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
     private CreateSiteRequest _createSiteRequest = new();
 

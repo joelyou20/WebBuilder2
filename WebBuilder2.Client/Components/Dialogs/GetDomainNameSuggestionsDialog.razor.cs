@@ -8,5 +8,5 @@ namespace WebBuilder2.Client.Components.Dialogs;
 
 public partial class GetDomainNameSuggestionsDialog
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 }

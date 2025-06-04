@@ -9,7 +9,7 @@ else
         <MudRadioGroup T="DomainInquiry" SelectedOptionChanged="@OnSelectedOptionChanged">
             @foreach (DomainInquiry domain in _domains)
             {
-                <MudRadio Option="@domain">@($"{domain.Name}, {domain.Price.Currency}{domain.Price.Price}")</MudRadio>
+                <MudRadio T="DomainInquiry" Value="@domain">@($"{domain.Name}, {domain.Price.Currency}{domain.Price.Price}")</MudRadio>
             }
         </MudRadioGroup>
     </div>

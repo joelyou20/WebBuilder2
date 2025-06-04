@@ -54,14 +54,20 @@ public partial class RepoDetails
         StateHasChanged();
     }
 
+    private IReadOnlyCollection<TreeItemData<GitTreeItem>> BuildTree(IEnumerable<GitTreeItem> items) => 
+        [.. items.Select(item => new TreeItemData<GitTreeItem>
+        {
+            Value = item,
+            Children = (item.Items != null ? BuildTree(item.Items) : null)?.ToList() ?? [],
+        })];
+
+
     public async Task OnSelectedFileChanged(GitTreeItem item)
     {
         if(_repo == null || item == null || item.Type == GitTreeType.Tree) return;
 
-        RepoContent? repoContent = await GithubService.GetRepositoryContentAsync(_repo.Name, item.Path);
-
-        if(repoContent == null) throw new Exception("Failed to get repository content");
-
+        RepoContent? repoContent = await GithubService.GetRepositoryContentAsync(_repo.Name, item.Path) ?? 
+            throw new Exception("Failed to get repository content");
         _fileContent = repoContent.Content;
 
         if(_codeEditor != null) await _codeEditor.Refresh(_fileContent, GetSyntax(item.Path));

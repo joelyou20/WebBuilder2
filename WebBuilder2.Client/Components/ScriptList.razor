@@ -5,12 +5,12 @@
 @using WebBuilder2.Shared.Models.Dtos;
 
 <div>
-    <MudList>
+    <MudList T="string">
         @foreach (ScriptModel script in Scripts)
         {
             int index = Scripts.IndexOf(script);
 
-            <MudListItem>
+            <MudListItem T="object">
                 <MudCard class="expanded" id="@($"script-{index}")">
                     <div class="sl-card-content">
                         <div class="sl-top-row">

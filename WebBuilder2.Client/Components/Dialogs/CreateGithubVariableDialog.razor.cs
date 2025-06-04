@@ -13,7 +13,7 @@ public partial class CreateGithubVariableDialog
     [Inject] public IGithubService GithubService { get; set; } = default!;
 
     [Parameter] public IEnumerable<string> RepositoryNames { get; set; } = Enumerable.Empty<string>();
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
 
     private GithubSecret _secret = new GithubSecret();
     private string _selectedRepo = string.Empty;
